@@ -1,0 +1,75 @@
+import type { ReactNode } from 'react'
+import { Sidebar } from '@/components/layout/sidebar'
+import { MobileNav } from '@/components/layout/mobile-nav'
+import { TopBar } from '@/components/layout/top-bar'
+import { RedactedContent } from '@/components/layout/redacted-content'
+import { PageTransition } from '@/components/layout/page-transition'
+import { createClient } from '@/lib/supabase/server'
+import { getRolePrivilege } from '@/lib/constants'
+import type { Notification, Profile } from '@/types'
+
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  let profile: Profile | null = null
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, role, display_name, username, avatar_url')
+      .eq('id', user.id)
+      .single()
+    profile = data as unknown as Profile | null
+  }
+
+  // Notifications non lues + liste des 15 dernières
+  let unreadCount = 0
+  let notifications: Notification[] = []
+  if (user) {
+    const [{ count }, { data: notifData }] = await Promise.all([
+      supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_id', user.id)
+        .eq('is_read', false),
+      supabase
+        .from('notifications')
+        .select('*')
+        .eq('profile_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(15),
+    ])
+    unreadCount = count ?? 0
+    notifications = (notifData ?? []) as Notification[]
+  }
+
+  // Badge chat non-lu — une seule requête SQL via RPC (voir migration 022)
+  let chatUnreadCount = 0
+  if (user) {
+    const { data } = await supabase.rpc('get_chat_unread_count')
+    chatUnreadCount = Number(data ?? 0)
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sidebar desktop */}
+      <Sidebar profile={profile} badges={{ '/messages': chatUnreadCount }} />
+
+      {/* Contenu principal */}
+      <div className="lg:pl-64 flex flex-col min-h-screen">
+        <TopBar unreadCount={unreadCount} notifications={notifications} />
+        <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6">
+          {getRolePrivilege(profile?.role ?? '') <= 50
+            ? <RedactedContent />
+            : <PageTransition>{children}</PageTransition>}
+        </main>
+      </div>
+
+      {/* Navigation mobile en bas */}
+      <MobileNav />
+    </div>
+  )
+}
