@@ -334,8 +334,11 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 | ID | Item | Domaine | Priorité | Statut |
 |---|---|---|---|---|
 | ~~FEAT-08~~ | ~~Fiche événement cliquable → dialog lecture seule~~ | UX | P1 | ✅ 2026-06-05 |
-| UX-06 | Champ "mot de passe actuel" requis pour modifier le mdp | UX | P1 | 🔄 en cours |
+| ~~UX-06~~ | ~~Champ "mot de passe actuel" requis pour modifier le mdp~~ | UX | P1 | ✅ 2026-06-05 |
 | UX-07 | Background visuel thème SC (hangar / planète sombre) | UX | P2 | 📋 à faire |
 
 ### ~~FEAT-08 · Fiche événement cliquable → dialog lecture seule~~ ✅ TERMINÉ 2026-06-05
 `EventViewDialog` créé — dialog lecture seule accessible à tous les membres. Cards cliquables avec `stopPropagation` sur les boutons d'action.
+
+### ~~UX-06 · Champ "mot de passe actuel" requis~~ ✅ TERMINÉ 2026-06-05
+Vérification `signInWithPassword` avant `updateUser`. Champ `autoComplete="current-password"`, erreur inline, zones tactiles ≥ 44px.
