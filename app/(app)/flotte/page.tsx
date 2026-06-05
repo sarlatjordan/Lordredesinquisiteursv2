@@ -1,11 +1,9 @@
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { ShipCard } from '@/components/flotte/ship-card'
 import { AddShipButton } from '@/components/flotte/add-ship-button'
 import { HangarSyncDialog } from '@/components/flotte/hangar-sync-dialog'
 import { SyncMatrixButton } from '@/components/flotte/sync-matrix-button'
-import { RsiBookmarkletImport } from '@/components/flotte/rsi-bookmarklet-import'
 import { Rocket } from 'lucide-react'
 import type { ShipWithOwner } from '@/types'
 import { SHIP_TYPES, type ShipType, getRolePrivilege, PRIVILEGE } from '@/lib/constants'
@@ -77,11 +75,6 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
           <AddShipButton />
         </div>
       </div>
-
-      {/* Import bookmarklet RSI */}
-      <Suspense fallback={null}>
-        <RsiBookmarkletImport />
-      </Suspense>
 
       {/* Bouton admin : sync matrice RSI */}
       {isAdmin && (

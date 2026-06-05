@@ -20,7 +20,7 @@ export default async function EditOperationPage({ params }: { params: Promise<{ 
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(profile?.role ?? '') < 300) redirect(`/operations/${id}`)
+  if (getRolePrivilege(profile?.role ?? '') < 600) redirect(`/operations/${id}`)
 
   const { data: op } = await supabase.from('operations').select('*').eq('id', id).single()
   if (!op) notFound()

@@ -329,6 +329,34 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 
 ---
 
+## 🆕 Nouvelles features — sprint 2026-06-05
+
+### ~~FEAT-07 · Page profil accessible aux Visiteurs~~ ✅ TERMINÉ 2026-06-05
+`proxy.ts` — header `x-pathname` injecté sur chaque requête.
+`app/(app)/layout.tsx` — guard Visiteur bypassé pour `/membres/[username]` via `isMembreProfile`.
+
+### ~~FEAT-09 · Seuil commandement opérations : Gardien → Maître Inquisiteur~~ ✅ TERMINÉ 2026-06-05
+Seuil `>= 300` → `>= 600` dans `operations/page.tsx`, `[id]/page.tsx`, `new/page.tsx`, `[id]/edit/page.tsx`.
+Boutons Lancer / Terminer / Annuler / Modifier / Supprimer et création d'opération réservés Maître Inquisiteur+.
+
+### ~~TECH-06 · Supprimer le bookmarklet RSI~~ ✅ TERMINÉ 2026-06-05
+`components/flotte/rsi-bookmarklet-import.tsx` supprimé.
+`app/api/hangar-bookmarklet/route.ts` supprimé.
+`flotte/page.tsx` nettoyé (import + bloc `<Suspense>`).
+
+### ~~FEAT-17 · Audit des points attribués aux membres~~ ✅ TERMINÉ 2026-06-05
+`app/(app)/admin/points/page.tsx` créé — vue Sage+ listant les 200 dernières attributions (membre, rang, montant, raison, auteur, date).
+`components/layout/sidebar.tsx` — lien « Points » (icône Zap) ajouté dans la section Administration.
+
+| ID | Item | Domaine | Priorité | Statut |
+|---|---|---|---|---|
+| ~~FEAT-07~~ | ~~Profil accessible aux Visiteurs~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
+| ~~FEAT-09~~ | ~~Seuil commandement → Maître Inquisiteur~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
+| ~~TECH-06~~ | ~~Supprimer le bookmarklet RSI~~ | Tech | ~~P1~~ | ✅ 2026-06-05 |
+| ~~FEAT-17~~ | ~~Audit des points (Sage+)~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
+
+---
+
 ## 🎨 Nouvelles features UX — Sprint 2026-06-05
 
 | ID | Item | Domaine | Priorité | Statut |

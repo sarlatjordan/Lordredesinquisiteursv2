@@ -25,7 +25,7 @@ export default async function OperationsPage() {
       .eq('id', user.id)
       .single()
     userPrivilege = getRolePrivilege(profile?.role ?? '')
-    canManage = userPrivilege >= 300
+    canManage = userPrivilege >= 600
   }
 
   const cols = 'id, title, description, type, status, risk_level, system_name, departure_at, commander_id, estimated_duration_min, min_privilege'
