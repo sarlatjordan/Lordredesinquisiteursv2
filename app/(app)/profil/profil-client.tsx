@@ -374,6 +374,7 @@ function SectionDonnees() {
 // ─── Section sécurité (mot de passe) ─────────────────────────────────────────
 
 interface PasswordFormValues {
+  current_password: string
   new_password: string
   confirm_password: string
 }
@@ -381,6 +382,7 @@ interface PasswordFormValues {
 function SectionSecurite({ email }: { email: string }) {
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [error, setError] = useState('')
+  const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -392,18 +394,25 @@ function SectionSecurite({ email }: { email: string }) {
       setFormError('confirm_password', { message: 'Les mots de passe ne correspondent pas' })
       return
     }
-    if (data.new_password.length < 8) {
-      setFormError('new_password', { message: 'Minimum 8 caractères' })
-      return
-    }
 
     setStatus('saving')
     startTransition(async () => {
       const supabase = createClient()
-      const { error: err } = await supabase.auth.updateUser({ password: data.new_password })
-      if (err) {
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({
+        email,
+        password: data.current_password,
+      })
+      if (verifyErr) {
         setStatus('error')
-        setError(err.message)
+        setFormError('current_password', { message: 'Mot de passe actuel incorrect' })
+        setError('')
+        return
+      }
+
+      const { error: updateErr } = await supabase.auth.updateUser({ password: data.new_password })
+      if (updateErr) {
+        setStatus('error')
+        setError(updateErr.message)
       } else {
         setStatus('success')
         reset()
@@ -421,46 +430,76 @@ function SectionSecurite({ email }: { email: string }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="new_password">Nouveau mot de passe</Label>
+          <Label htmlFor="current_password">Mot de passe actuel</Label>
           <div className="relative">
             <Input
-              id="new_password"
-              type={showNew ? 'text' : 'password'}
+              id="current_password"
+              type={showCurrent ? 'text' : 'password'}
               placeholder="••••••••"
-              autoComplete="new-password"
+              autoComplete="current-password"
               className="pr-9"
-              {...register('new_password', { required: 'Requis', minLength: { value: 8, message: 'Minimum 8 caractères' } })}
+              {...register('current_password', { required: 'Requis' })}
             />
-            <button type="button" onClick={() => setShowNew(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            <button type="button" onClick={() => setShowCurrent(v => !v)}
+              aria-label={showCurrent ? 'Masquer le mot de passe actuel' : 'Afficher le mot de passe actuel'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center">
+              {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {errors.new_password && <p className="text-xs text-destructive">{errors.new_password.message}</p>}
+          {errors.current_password && <p className="text-xs text-destructive">{errors.current_password.message}</p>}
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="confirm_password">Confirmer le mot de passe</Label>
-          <div className="relative">
-            <Input
-              id="confirm_password"
-              type={showConfirm ? 'text' : 'password'}
-              placeholder="••••••••"
-              autoComplete="new-password"
-              className="pr-9"
-              {...register('confirm_password', { required: 'Requis' })}
-            />
-            <button type="button" onClick={() => setShowConfirm(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+        <div className="border-t border-border pt-4 space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="new_password">Nouveau mot de passe</Label>
+            <div className="relative">
+              <Input
+                id="new_password"
+                type={showNew ? 'text' : 'password'}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className="pr-9"
+                {...register('new_password', { required: 'Requis', minLength: { value: 8, message: 'Minimum 8 caractères' } })}
+              />
+              <button type="button" onClick={() => setShowNew(v => !v)}
+                aria-label={showNew ? 'Masquer le nouveau mot de passe' : 'Afficher le nouveau mot de passe'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center">
+                {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.new_password && <p className="text-xs text-destructive">{errors.new_password.message}</p>}
           </div>
-          {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password.message}</p>}
+
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm_password">Confirmer le mot de passe</Label>
+            <div className="relative">
+              <Input
+                id="confirm_password"
+                type={showConfirm ? 'text' : 'password'}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className="pr-9"
+                {...register('confirm_password', { required: 'Requis' })}
+              />
+              <button type="button" onClick={() => setShowConfirm(v => !v)}
+                aria-label={showConfirm ? 'Masquer la confirmation' : 'Afficher la confirmation'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center">
+                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password.message}</p>}
+          </div>
         </div>
+
+        {status === 'error' && error && (
+          <div className="rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2">
+            <p className="text-xs text-destructive">{error}</p>
+          </div>
+        )}
 
         <div className="flex items-center gap-3">
           <Button type="submit" size="sm" disabled={isPending}>Changer le mot de passe</Button>
-          <Feedback status={status} error={error} />
+          {status !== 'error' && <Feedback status={status} error={error} />}
         </div>
       </form>
     </Section>
