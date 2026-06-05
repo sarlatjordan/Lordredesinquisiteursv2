@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { LogOut, Shield, Settings, ClipboardList, ImageIcon, Globe, Activity, TrendingUp } from 'lucide-react'
+import { LogOut, Shield, Settings, ClipboardList, ImageIcon, Globe, Activity, TrendingUp, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getRolePrivilege } from '@/lib/constants'
 import { NAV_LINKS } from './nav-links'
@@ -135,6 +135,7 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
               { href: '/admin/candidatures', label: 'Candidatures', Icon: ClipboardList },
               { href: '/admin/galerie',      label: 'Galerie',       Icon: ImageIcon },
               { href: '/admin/activite',     label: 'Activité',      Icon: Activity },
+              { href: '/admin/points',       label: 'Points',         Icon: Zap },
             ].map(({ href, label, Icon }) => (
               <Link key={href} href={href}>
                 <motion.div
