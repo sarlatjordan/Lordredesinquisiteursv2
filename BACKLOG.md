@@ -326,3 +326,16 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 **Total P0 nouveaux :** 7 items (dont BUG-02) — **7 corrigés ✅**
 **Total P1 nouveaux :** 20 items · ~13h — **21 corrigés (+UX-D01, UX-D02, UX-D04, ARCH-05, ARCH-07) — TOUS FERMÉS ✅**
 **Total P2 nouveaux :** 9 items · ~3h30 — **9 corrigés — TOUS FERMÉS ✅**
+
+---
+
+## 🎨 Nouvelles features UX — Sprint 2026-06-05
+
+| ID | Item | Domaine | Priorité | Statut |
+|---|---|---|---|---|
+| ~~FEAT-08~~ | ~~Fiche événement cliquable → dialog lecture seule~~ | UX | P1 | ✅ 2026-06-05 |
+| UX-06 | Champ "mot de passe actuel" requis pour modifier le mdp | UX | P1 | 🔄 en cours |
+| UX-07 | Background visuel thème SC (hangar / planète sombre) | UX | P2 | 📋 à faire |
+
+### ~~FEAT-08 · Fiche événement cliquable → dialog lecture seule~~ ✅ TERMINÉ 2026-06-05
+`EventViewDialog` créé — dialog lecture seule accessible à tous les membres. Cards cliquables avec `stopPropagation` sur les boutons d'action.
