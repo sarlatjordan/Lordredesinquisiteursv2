@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { EventCard } from '@/components/evenements/event-card'
 import { EventForm } from '@/components/evenements/event-form'
 import { EventDetailDialog } from '@/components/evenements/event-detail-dialog'
+import { EventViewDialog } from '@/components/evenements/event-view-dialog'
 import { createEvent, registerForEvent, unregisterFromEvent } from '@/actions/events'
 import type { EventWithDetails } from '@/types'
 import { useRouter } from 'next/navigation'
@@ -23,6 +24,7 @@ interface EventsClientProps {
 export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrganizer = false }: EventsClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [managedEvent, setManagedEvent] = useState<EventWithDetails | null>(null)
+  const [viewedEvent, setViewedEvent] = useState<EventWithDetails | null>(null)
   const [createError, setCreateError] = useState<string | null>(null)
   const [registerError, setRegisterError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -123,6 +125,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
                   onRegister={handleRegister}
                   onUnregister={handleUnregister}
                   onManage={isOrganizer ? setManagedEvent : undefined}
+                  onView={setViewedEvent}
                   index={i}
                 />
               ))}
@@ -142,6 +145,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
                   currentUserId={currentUserId}
                   isOrganizer={isOrganizer}
                   onManage={isOrganizer ? setManagedEvent : undefined}
+                  onView={setViewedEvent}
                   index={i}
                 />
               ))}
@@ -154,6 +158,11 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
         event={managedEvent}
         open={managedEvent !== null}
         onClose={() => setManagedEvent(null)}
+      />
+      <EventViewDialog
+        event={viewedEvent}
+        open={viewedEvent !== null}
+        onClose={() => setViewedEvent(null)}
       />
     </div>
   )

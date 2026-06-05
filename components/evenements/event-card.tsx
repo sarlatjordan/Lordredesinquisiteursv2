@@ -16,6 +16,7 @@ interface EventCardProps {
   onRegister?: (eventId: string, status: 'confirme' | 'peut_etre') => void
   onUnregister?: (eventId: string) => void
   onManage?: (event: EventWithDetails) => void
+  onView?: (event: EventWithDetails) => void
   index?: number
 }
 
@@ -26,6 +27,7 @@ export function EventCard({
   onRegister,
   onUnregister,
   onManage,
+  onView,
   index = 0,
 }: EventCardProps) {
   const isAttending = event.attendees?.some(
@@ -49,8 +51,9 @@ export function EventCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="rounded-lg border border-border bg-card overflow-hidden hover:border-primary/20 transition-colors group"
+      className={`rounded-lg border border-border bg-card overflow-hidden transition-colors group ${onView ? 'cursor-pointer hover:border-primary/40' : 'hover:border-primary/20'}`}
       aria-label={`Événement : ${event.title}`}
+      onClick={() => onView?.(event)}
     >
       <div className={`h-0.5 w-full ${EVENT_TYPE_COLORS[event.type as EventType]?.split(' ')[2] ?? ''}`} />
 
@@ -134,7 +137,7 @@ export function EventCard({
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs text-green-400 border-green-400/30 hover:bg-green-400/10"
-                onClick={() => onUnregister(event.id)}
+                onClick={(e) => { e.stopPropagation(); onUnregister(event.id) }}
               >
                 <CheckCircle2 className="h-3 w-3 mr-1" />
                 Inscrit — Se désinscrire
@@ -144,17 +147,17 @@ export function EventCard({
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs text-amber-400 border-amber-400/30 hover:bg-amber-400/10"
-                onClick={() => onUnregister(event.id)}
+                onClick={(e) => { e.stopPropagation(); onUnregister(event.id) }}
               >
                 <HelpCircle className="h-3 w-3 mr-1" />
                 Peut-être — Se désinscrire
               </Button>
             ) : (
               <>
-                <Button size="sm" className="h-7 text-xs" onClick={() => onRegister(event.id, 'confirme')}>
+                <Button size="sm" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); onRegister(event.id, 'confirme') }}>
                   Participer
                 </Button>
-                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onRegister(event.id, 'peut_etre')}>
+                <Button variant="outline" size="sm" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); onRegister(event.id, 'peut_etre') }}>
                   Peut-être
                 </Button>
               </>
