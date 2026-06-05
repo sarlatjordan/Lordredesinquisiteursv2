@@ -92,30 +92,30 @@
 
 <!-- Stats -->
 <div class="global">
-  <div class="stat"><div class="stat-value c-p0">2</div><div class="stat-label">P0 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-p1">0</div><div class="stat-label">P1 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-p2">0</div><div class="stat-label">P2 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-done">76</div><div class="stat-label">Terminés (total)</div></div>
-  <div class="stat"><div class="stat-value c-cyan">97%</div><div class="stat-label">Complétion globale</div></div>
+  <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P0 ouverts</div></div>
+  <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P1 ouverts</div></div>
+  <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P2 ouverts</div></div>
+  <div class="stat"><div class="stat-value c-done">78</div><div class="stat-label">Terminés (total)</div></div>
+  <div class="stat"><div class="stat-value c-done">100%</div><div class="stat-label">Complétion globale</div></div>
 </div>
 
 <!-- Barre progression -->
 <div class="progress-wrap">
-  <div class="progress-label"><span>Progression globale (76 / 78 items)</span><span style="color:#4ade80">97%</span></div>
-  <div class="bar-bg"><div class="bar-fill" style="width:97%"></div></div>
+  <div class="progress-label"><span>Progression globale (78 / 78 items)</span><span style="color:#4ade80">100% 🎉</span></div>
+  <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
   <div style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
     <div class="bar-row">
-      <span class="bar-label" style="color:#f87171">P0</span>
-      <div class="bar-bg-sm"><div class="bar-fill-p0" style="width:12%"></div></div>
-      <span class="bar-count">2 ouverts</span>
+      <span class="bar-label" style="color:#4ade80">P0</span>
+      <div class="bar-bg-sm"><div class="bar-fill-p0" style="width:0%"></div></div>
+      <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
     <div class="bar-row">
-      <span class="bar-label" style="color:#818cf8">P1</span>
+      <span class="bar-label" style="color:#4ade80">P1</span>
       <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:0%"></div></div>
       <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
     <div class="bar-row">
-      <span class="bar-label" style="color:#94a3b8">P2</span>
+      <span class="bar-label" style="color:#4ade80">P2</span>
       <div class="bar-bg-sm"><div class="bar-fill-p2" style="width:0%"></div></div>
       <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
@@ -129,24 +129,22 @@
   <div class="section-header">
     <span class="section-icon">🐛</span>
     <span class="section-title t-bug">Bugs actifs & P0 critique</span>
-    <span class="section-count">2 items</span>
+    <span class="section-count" style="color:#4ade80">0 ouvert · tout ✓</span>
   </div>
   <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:5px">
-    <div class="item item-ops">
-      <div class="badge b-ops">!</div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label">SEC-02 · Comptes de test potentiels en prod</div>
-        <div class="item-sub">Supabase Dashboard → supprimer test.*@inqfr.test</div>
+        <div class="item-label crossed">SEC-02 · Comptes de test — vérifiés et supprimés</div>
+        <div class="item-sub">Guard anti-prod ajouté dans scripts/seed-test-users.ts</div>
       </div>
-      <div class="item-meta"><span class="tag tag-ops">Ops</span><span class="effort">15 min</span></div>
     </div>
-    <div class="item item-ops">
-      <div class="badge b-ops">!</div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label">OPS-01 · 2FA TOTP Supabase (Sage+)</div>
-        <div class="item-sub">Dashboard → Auth → MFA → activer TOTP</div>
+        <div class="item-label crossed">OPS-01 · 2FA TOTP activé (Sage+)</div>
+        <div class="item-sub">MFA TOTP activé sur Supabase Dashboard — communiqué aux Sages+</div>
       </div>
-      <div class="item-meta"><span class="tag tag-ops">Ops</span><span class="effort">0 code</span></div>
     </div>
   </div>
 </div>

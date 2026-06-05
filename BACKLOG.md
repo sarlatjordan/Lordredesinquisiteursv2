@@ -51,12 +51,11 @@ Sur-réservation possible sous concurrence. Fix : RPC `SECURITY DEFINER` avec `S
 ### ~~SEC-C02 · CSP `unsafe-inline` sur `style-src`~~ ✅ RISQUE DOCUMENTÉ 2026-06-04
 Compromis pragmatique avec Tailwind v4 — acceptable si nonce scripts reste strict.
 
-### SEC-02 · Vérifier/supprimer comptes de test en prod ⚠️
-**Action manuelle :** Supabase Dashboard → Authentication → Users → chercher `test.*@inqfr.test`.
-**Fix code :** Guard anti-prod dans `scripts/seed-test-users.ts`.
+### ~~SEC-02 · Vérifier/supprimer comptes de test en prod~~ ✅ CORRIGÉ 2026-06-04
+Comptes `test.*@inqfr.test` vérifiés et supprimés. Guard anti-prod ajouté dans `scripts/seed-test-users.ts`.
 
-### OPS-01 · Activer 2FA TOTP sur les comptes privilégiés ⚠️
-**Action manuelle :** Supabase Dashboard → Authentication → MFA → activer TOTP. Obligatoire Sage+.
+### ~~OPS-01 · Activer 2FA TOTP sur les comptes privilégiés~~ ✅ CORRIGÉ 2026-06-04
+MFA TOTP activé sur Supabase Dashboard. Communicé aux Sages+.
 
 ---
 
@@ -254,12 +253,12 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 | # | Item | Priorité | Statut |
 |---|---|---|---|
 | SEC-01 | RLS auto-promotion profiles | P0 | ✅ Migration 020 |
-| SEC-02 | Comptes de test prod | P0 | ⚠️ Action ops manuelle |
+| SEC-02 | Comptes de test prod | P0 | ✅ |
 | SEC-03 | Turnstile formulaire candidature | P0 | ✅ |
 | SEC-04 | console.log hangar-sync | P0 | ✅ |
 | UX-01 | Redirect post-login | P0 | ✅ |
 | UX-02 | Visiteur bloqué sans explication | P0 | ✅ |
-| OPS-01 | 2FA TOTP Supabase | P0 | ⚠️ Action ops manuelle |
+| OPS-01 | 2FA TOTP Supabase | P0 | ✅ |
 | FEAT-01 | Messagerie instantanée | P1 | ✅ Migration 021-022 |
 | FEAT-02 | Centre de notifications | P1 | ✅ |
 | FEAT-03 | Onboarding checklist aspirant | P1 | ✅ Migration 023 |
