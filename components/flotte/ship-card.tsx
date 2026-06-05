@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Users, Shield, Trash2, Loader2, ShoppingBag } from 'lucide-react'
+import { Rocket, Users, Shield, Trash2, Loader2, ShoppingBag, Pencil, Check, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { SHIP_TYPES, SHIP_STATUS, SHIP_STATUS_COLORS, type ShipType, type ShipStatus } from '@/lib/constants'
 import { getInitials } from '@/lib/utils'
-import { deleteShip } from '@/actions/ships'
+import { deleteShip, updateShipName } from '@/actions/ships'
 import { useRouter } from 'next/navigation'
 import type { ShipWithOwner } from '@/types'
 
@@ -23,9 +23,17 @@ export function ShipCard({ ship, index = 0, currentUserId, isAdmin, imageUrl }: 
   const [confirm, setConfirm] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [deleted, setDeleted] = useState(false)
+
+  const [editing, setEditing] = useState(false)
+  const [nameInput, setNameInput] = useState(ship.name)
+  const [nameError, setNameError] = useState('')
+  const [isSavingName, startNameTransition] = useTransition()
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const router = useRouter()
 
   const canDelete = isAdmin || ship.owner_id === currentUserId
+  const canEdit   = isAdmin || ship.owner_id === currentUserId
 
   function handleDelete() {
     startTransition(async () => {
@@ -33,6 +41,34 @@ export function ShipCard({ ship, index = 0, currentUserId, isAdmin, imageUrl }: 
       if (res.success) {
         setDeleted(true)
         router.refresh()
+      }
+    })
+  }
+
+  function startEdit() {
+    setNameInput(ship.name)
+    setNameError('')
+    setEditing(true)
+    setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  function cancelEdit() {
+    setEditing(false)
+    setNameInput(ship.name)
+    setNameError('')
+  }
+
+  function saveName() {
+    const trimmed = nameInput.trim()
+    if (trimmed.length < 2) { setNameError('Minimum 2 caractères'); return }
+    if (trimmed.length > 100) { setNameError('Maximum 100 caractères'); return }
+    startNameTransition(async () => {
+      const res = await updateShipName(ship.id, trimmed)
+      if (res.success) {
+        setEditing(false)
+        router.refresh()
+      } else {
+        setNameError(res.error)
       }
     })
   }
@@ -80,25 +116,74 @@ export function ShipCard({ ship, index = 0, currentUserId, isAdmin, imageUrl }: 
 
           <div className="flex-1 min-w-0">
             <div className="flex items-start gap-2 flex-wrap">
-              <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate flex-1">
-                {ship.name}
-              </p>
+              {editing ? (
+                <div className="flex items-center gap-1 flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={nameInput}
+                    onChange={e => { setNameInput(e.target.value); setNameError('') }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') saveName()
+                      if (e.key === 'Escape') cancelEdit()
+                    }}
+                    maxLength={100}
+                    className="flex-1 min-w-0 text-sm font-semibold bg-muted/50 border border-primary/30 rounded px-2 py-0.5 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                  />
+                  <button
+                    onClick={saveName}
+                    disabled={isSavingName}
+                    aria-label="Confirmer le nom"
+                    className="text-primary hover:text-primary/80 p-0.5 rounded"
+                  >
+                    {isSavingName ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    disabled={isSavingName}
+                    aria-label="Annuler"
+                    className="text-muted-foreground hover:text-foreground p-0.5 rounded"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate flex-1">
+                    {ship.name}
+                  </p>
+                  {canEdit && !confirm && (
+                    <button
+                      onClick={startEdit}
+                      aria-label="Modifier le nom du vaisseau"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-muted-foreground hover:text-foreground p-0.5 rounded"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </>
+              )}
+
               {ship.is_org_ship && !imageUrl && (
                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-primary border-primary/30 bg-primary/10 shrink-0">
                   <Shield className="h-2.5 w-2.5 mr-0.5" />
                   Org
                 </Badge>
               )}
-              {canDelete && !confirm && (
+              {canDelete && !confirm && !editing && (
                 <button
                   onClick={() => setConfirm(true)}
+                  aria-label="Supprimer ce vaisseau"
                   className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto shrink-0 text-muted-foreground hover:text-destructive p-0.5 rounded"
-                  title="Supprimer ce vaisseau"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
+
+            {nameError && (
+              <p className="text-[11px] text-destructive mt-0.5">{nameError}</p>
+            )}
 
             <p className="text-xs text-muted-foreground mt-0.5">
               {ship.model}

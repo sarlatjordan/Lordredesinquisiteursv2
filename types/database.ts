@@ -926,17 +926,17 @@ export interface Database {
       onboarding_progress: {
         Row: {
           profile_id: string
-          step: 'profile' | 'ship' | 'operation' | 'bonus'
+          step: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
           completed_at: string
         }
         Insert: {
           profile_id: string
-          step: 'profile' | 'ship' | 'operation' | 'bonus'
+          step: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
           completed_at?: string
         }
         Update: {
           profile_id?: string
-          step?: 'profile' | 'ship' | 'operation' | 'bonus'
+          step?: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
           completed_at?: string
         }
         Relationships: TableRelationship[]

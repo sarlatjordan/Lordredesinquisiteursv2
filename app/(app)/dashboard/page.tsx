@@ -8,7 +8,8 @@ import { GuildBankCard } from '@/components/dashboard/guild-bank-card'
 import { RecentEvents } from '@/components/dashboard/recent-events'
 import { FleetSummary } from '@/components/dashboard/fleet-summary'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
-import type { EventWithDetails, ShipWithOwner, OnboardingStep, InventoryStockRow } from '@/types'
+import type { EventWithDetails, ShipWithOwner, InventoryStockRow } from '@/types'
+import { ONBOARDING_CONFIGS, type RankOnboardingConfig } from '@/lib/constants'
 import { getCachedOrgSettings } from '@/lib/cached-org-settings'
 
 export const metadata: Metadata = { title: 'Tableau de bord' }
@@ -76,28 +77,41 @@ export default async function DashboardPage() {
     return sum + stocks.reduce((s, st) => s + (st.quantity - st.reserved_quantity), 0)
   }, 0)
 
-  // Onboarding — uniquement pour les Aspirants (privilege 100)
-  let onboardingProps: {
-    completedSteps: OnboardingStep[]
-    profileDone: boolean
-    shipDone: boolean
-    opDone: boolean
-  } | null = null
+  // Onboarding par rang — Aspirant (100) et Consacré (150)
+  let onboardingConfig: RankOnboardingConfig | null = null
+  let onboardingCompletedSteps: string[] = []
+  let onboardingStepsDone: Record<string, boolean> = {}
 
-  if (privilege === 100 && user) {
-    const [progressResult, shipResult, opResult] = await Promise.all([
-      supabase.from('onboarding_progress').select('step').eq('profile_id', user.id),
-      supabase.from('ships').select('*', { count: 'exact', head: true }).eq('owner_id', user.id),
-      supabase.from('op_registrations').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
-    ])
+  const roleKey = me?.role ?? ''
+  const rankConfig = ONBOARDING_CONFIGS[roleKey as keyof typeof ONBOARDING_CONFIGS] ?? null
 
-    onboardingProps = {
-      completedSteps: (progressResult.data ?? [])
-        .map(r => r.step)
-        .filter((s): s is OnboardingStep => s !== 'bonus'),
-      profileDone: !!(me?.bio && me?.star_citizen_handle),
-      shipDone:    (shipResult.count ?? 0) > 0,
-      opDone:      (opResult.count ?? 0) > 0,
+  if (rankConfig && user) {
+    onboardingConfig = rankConfig
+    const stepKeys = rankConfig.steps.map(s => s.key)
+
+    if (roleKey === 'aspirant') {
+      const [progressResult, shipResult, opResult] = await Promise.all([
+        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
+        supabase.from('ships').select('*', { count: 'exact', head: true }).eq('owner_id', user.id),
+        supabase.from('op_registrations').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
+      ])
+      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      onboardingStepsDone = {
+        profile:   !!(me?.bio && me?.star_citizen_handle),
+        ship:      (shipResult.count ?? 0) > 0,
+        operation: (opResult.count ?? 0) > 0,
+      }
+    } else if (roleKey === 'consacre') {
+      const [progressResult, profileResult, eventResult] = await Promise.all([
+        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
+        supabase.from('profiles').select('discord_id').eq('id', user.id).single(),
+        supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).eq('status', 'confirme'),
+      ])
+      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      onboardingStepsDone = {
+        discord_joined: !!(profileResult.data?.discord_id),
+        first_event:    (eventResult.count ?? 0) > 0,
+      }
     }
   }
 
@@ -140,8 +154,12 @@ export default async function DashboardPage() {
         <RecruitmentStatusCard open={orgSettings?.recruitment_open ?? true} canToggle={privilege >= 600} index={3} />
       </div>
 
-      {onboardingProps && (
-        <OnboardingChecklist {...onboardingProps} />
+      {onboardingConfig && (
+        <OnboardingChecklist
+          config={onboardingConfig}
+          completedSteps={onboardingCompletedSteps}
+          stepsDone={onboardingStepsDone}
+        />
       )}
 
       {canViewBank && (

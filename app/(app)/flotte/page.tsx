@@ -25,7 +25,6 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
     supabase
       .from('ships')
       .select(`*, owner:profiles(username, display_name, avatar_url)`)
-      .order('is_org_ship', { ascending: false })
       .order('name', { ascending: true }),
     user
       ? supabase.from('profiles').select('role, star_citizen_handle').eq('id', user.id).single()
@@ -35,7 +34,13 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
       .select('name, image_url'),
   ])
 
-  const allShips = (shipsResult.data as unknown as ShipWithOwner[]) ?? []
+  // Tri par propriétaire A→Z (ships sans owner = org, mis en tête), puis par nom de vaisseau
+  const allShips = ((shipsResult.data as unknown as ShipWithOwner[]) ?? []).sort((a, b) => {
+    const nameA = a.owner ? (a.owner.display_name ?? a.owner.username).toLowerCase() : ''
+    const nameB = b.owner ? (b.owner.display_name ?? b.owner.username).toLowerCase() : ''
+    if (nameA !== nameB) return nameA.localeCompare(nameB, 'fr')
+    return a.name.localeCompare(b.name, 'fr')
+  })
   const profile = profileResult.data
   const isAdmin = getRolePrivilege(profile?.role ?? '') >= PRIVILEGE.SYNC_MATRIX
 

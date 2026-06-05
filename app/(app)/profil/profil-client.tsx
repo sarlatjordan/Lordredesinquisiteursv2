@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import {
   User, Shield, Rocket, Lock, CheckCircle, AlertCircle,
   Loader2, Eye, EyeOff, ExternalLink, Bookmark, ChevronRight,
-  Eye as EyeIcon, Scroll, Download,
+  Eye as EyeIcon, Scroll, Download, CalendarDays, Copy, Check as CheckIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,8 @@ interface ProfilClientProps {
     instructions: string | null
     created_at: string
   } | null
+  icsParams: { uid: string; token: string } | null
+  appOrigin: string
 }
 
 type SaveStatus = 'idle' | 'saving' | 'success' | 'error'
@@ -418,6 +420,65 @@ function SectionProgression({
   )
 }
 
+// ─── Section abonnement calendrier ───────────────────────────────────────────
+
+function SectionCalendrier({ icsParams, appOrigin }: { icsParams: { uid: string; token: string }; appOrigin: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const icsPath = `/api/calendrier/ics?uid=${icsParams.uid}&token=${icsParams.token}`
+  const icsUrl  = `${appOrigin}${icsPath}`
+  const webcalUrl = icsUrl.replace(/^https?:\/\//, 'webcal://')
+  const googleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`
+
+  async function copyUrl() {
+    await navigator.clipboard.writeText(icsUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Section icon={<CalendarDays className="h-4 w-4" />} title="Abonnement calendrier">
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Abonne-toi à ton calendrier personnalisé pour recevoir les événements INQFR directement dans Google Agenda, Apple Calendar ou tout autre client compatible.
+      </p>
+      <div className="flex items-center gap-2 p-2.5 rounded-md bg-muted/50 border border-border">
+        <code className="flex-1 text-[11px] text-muted-foreground truncate select-all font-mono">
+          {icsUrl}
+        </code>
+        <button
+          type="button"
+          onClick={copyUrl}
+          aria-label="Copier l'URL"
+          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+        >
+          {copied ? <CheckIcon className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={googleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Ajouter à Google Agenda
+        </a>
+        <a
+          href={webcalUrl}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground hover:underline"
+        >
+          <CalendarDays className="h-3.5 w-3.5" />
+          Ouvrir dans Apple Calendar / Thunderbird
+        </a>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Cette URL est personnelle — ne la partagez pas. Les événements affichés correspondent à votre rang actuel.
+      </p>
+    </Section>
+  )
+}
+
 // ─── Section données personnelles (RGPD) ─────────────────────────────────────
 
 function SectionDonnees() {
@@ -573,7 +634,7 @@ function SectionSecurite({ email }: { email: string }) {
 
 // ─── Page principale ──────────────────────────────────────────────────────────
 
-export function ProfilClient({ profile, email, activeEvaluation }: ProfilClientProps) {
+export function ProfilClient({ profile, email, activeEvaluation, icsParams, appOrigin }: ProfilClientProps) {
   const router = useRouter()
 
   function handleSaved() {
@@ -593,6 +654,7 @@ export function ProfilClient({ profile, email, activeEvaluation }: ProfilClientP
       <SectionProgression profile={profile} activeEvaluation={activeEvaluation} />
       <SectionStarCitizen profile={profile} onSaved={handleSaved} />
       <SectionSecurite email={email} />
+      {icsParams && <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />}
       <SectionDonnees />
     </div>
   )

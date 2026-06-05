@@ -273,6 +273,7 @@ export const InitiateEvaluationSchema = z.object({
 export type InitiateEvaluationInput = z.infer<typeof InitiateEvaluationSchema>
 
 export type OnboardingStep = 'profile' | 'ship' | 'operation'
+export type ExtendedOnboardingStep = OnboardingStep | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
 
 // FEAT-20 : soumission photo de profil en attente de validation
 export const AvatarSubmitSchema = z.object({

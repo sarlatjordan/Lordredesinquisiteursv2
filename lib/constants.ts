@@ -1,3 +1,5 @@
+import type { ExtendedOnboardingStep } from '@/types'
+
 export const APP_NAME = "L'Ordre des Inquisiteurs"
 export const APP_ABBREVIATION = 'INQFR'
 export const APP_TAGLINE = 'Organisation Star Citizen — Alpha Quadrant'
@@ -416,3 +418,40 @@ export const RESOURCE_CATEGORIES = [
   'Recrutement',
   'Histoire',
 ] as const
+
+// ─── Onboarding par rang ──────────────────────────────────────────────────────
+
+export interface OnboardingStepConfig {
+  key: ExtendedOnboardingStep
+  label: string
+  href: string
+}
+
+export interface RankOnboardingConfig {
+  steps: OnboardingStepConfig[]
+  bonusStep: ExtendedOnboardingStep
+  pointsPerStep: number
+  bonusPoints: number
+}
+
+export const ONBOARDING_CONFIGS: Partial<Record<Role, RankOnboardingConfig>> = {
+  aspirant: {
+    steps: [
+      { key: 'profile',   label: 'Compléter son profil (bio + handle Star Citizen)', href: '/profil'     },
+      { key: 'ship',      label: 'Enregistrer son premier vaisseau',                  href: '/flotte'     },
+      { key: 'operation', label: "S'inscrire à une opération",                        href: '/operations' },
+    ],
+    bonusStep: 'bonus',
+    pointsPerStep: 10,
+    bonusPoints: 30,
+  },
+  consacre: {
+    steps: [
+      { key: 'discord_joined', label: 'Lier son compte Discord au profil',                href: '/profil'     },
+      { key: 'first_event',    label: "Confirmer sa présence à un événement de l'Ordre", href: '/evenements' },
+    ],
+    bonusStep: 'consacre_bonus',
+    pointsPerStep: 15,
+    bonusPoints: 50,
+  },
+}

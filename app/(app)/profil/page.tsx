@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { ProfilClient } from './profil-client'
 import { redirect } from 'next/navigation'
+import { generateIcsToken } from '@/lib/ics-token'
 
 export const metadata: Metadata = { title: 'Mon profil' }
 export const dynamic = 'force-dynamic'
@@ -29,11 +31,26 @@ export default async function ProfilPage() {
   ])
   const activeEval = evalResult.data as ActiveEval | null
 
+  // Génération du token ICS pour l'abonnement calendrier
+  let icsParams: { uid: string; token: string } | null = null
+  try {
+    icsParams = { uid: user.id, token: generateIcsToken(user.id) }
+  } catch {
+    // ICS_HMAC_SECRET non configuré — section masquée
+  }
+
+  const headersList = await headers()
+  const host = headersList.get('host') ?? 'localhost:3000'
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
+  const appOrigin = `${protocol}://${host}`
+
   return (
     <ProfilClient
       profile={profile}
       email={user.email ?? ''}
       activeEvaluation={activeEval ?? null}
+      icsParams={icsParams}
+      appOrigin={appOrigin}
     />
   )
 }
