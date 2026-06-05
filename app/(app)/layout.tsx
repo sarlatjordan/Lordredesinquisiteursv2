@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { headers } from 'next/headers'
 import { Sidebar } from '@/components/layout/sidebar'
 import { MobileNav } from '@/components/layout/mobile-nav'
 import { TopBar } from '@/components/layout/top-bar'
@@ -9,6 +10,10 @@ import { getRolePrivilege } from '@/lib/constants'
 import type { Notification, Profile } from '@/types'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
+  const headersList = await headers()
+  const pathname = headersList.get('x-pathname') ?? ''
+  const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
+
   const supabase = await createClient()
 
   const {
@@ -62,7 +67,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <div className="lg:pl-64 flex flex-col min-h-screen">
         <TopBar unreadCount={unreadCount} notifications={notifications} />
         <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6">
-          {getRolePrivilege(profile?.role ?? '') <= 50
+          {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile
             ? <RedactedContent />
             : <PageTransition>{children}</PageTransition>}
         </main>

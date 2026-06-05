@@ -24,6 +24,7 @@ export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('x-pathname', request.nextUrl.pathname)
 
   let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } })
 
