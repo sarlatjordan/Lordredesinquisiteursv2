@@ -93,16 +93,16 @@
 <!-- Stats -->
 <div class="global">
   <div class="stat"><div class="stat-value c-p0">2</div><div class="stat-label">P0 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-p1">1</div><div class="stat-label">P1 ouverts</div></div>
+  <div class="stat"><div class="stat-value c-p1">0</div><div class="stat-label">P1 ouverts</div></div>
   <div class="stat"><div class="stat-value c-p2">0</div><div class="stat-label">P2 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-done">75</div><div class="stat-label">Terminés (total)</div></div>
-  <div class="stat"><div class="stat-value c-cyan">96%</div><div class="stat-label">Complétion globale</div></div>
+  <div class="stat"><div class="stat-value c-done">76</div><div class="stat-label">Terminés (total)</div></div>
+  <div class="stat"><div class="stat-value c-cyan">97%</div><div class="stat-label">Complétion globale</div></div>
 </div>
 
 <!-- Barre progression -->
 <div class="progress-wrap">
-  <div class="progress-label"><span>Progression globale (75 / 78 items)</span><span style="color:#4ade80">96%</span></div>
-  <div class="bar-bg"><div class="bar-fill" style="width:96%"></div></div>
+  <div class="progress-label"><span>Progression globale (76 / 78 items)</span><span style="color:#4ade80">97%</span></div>
+  <div class="bar-bg"><div class="bar-fill" style="width:97%"></div></div>
   <div style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
     <div class="bar-row">
       <span class="bar-label" style="color:#f87171">P0</span>
@@ -111,8 +111,8 @@
     </div>
     <div class="bar-row">
       <span class="bar-label" style="color:#818cf8">P1</span>
-      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:5%"></div></div>
-      <span class="bar-count">1 ouvert</span>
+      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:0%"></div></div>
+      <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
     <div class="bar-row">
       <span class="bar-label" style="color:#94a3b8">P2</span>
@@ -176,25 +176,18 @@
   </div>
 </div>
 
-<!-- 🏗 Architecture + TypeScript — tout corrigé sauf TECH-05 -->
+<!-- 🏗 Architecture + TypeScript — tout corrigé -->
 <div class="section">
   <div class="section-header">
     <span class="section-icon">🏗</span>
     <span class="section-title t-arch">Architecture — P1</span>
-    <span class="section-count" style="color:#f59e0b">1 en attente · 4 corrigés ✓</span>
+    <span class="section-count" style="color:#4ade80">0 en attente · 5 corrigés ✓</span>
   </div>
   <div class="items">
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-04 · getAuth() ×5 → lib/auth-helpers.ts</div></div></div>
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-05 · Double fetch generateMetadata — React.cache()</div></div></div>
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-07 · operations/page — countData + commanderProfiles en Promise.all</div></div></div>
-    <div class="item item-ops">
-      <div class="badge b-ops">⏳</div>
-      <div class="item-body">
-        <div class="item-label">TECH-05 · CI GitHub Actions</div>
-        <div class="item-sub">.github/workflows/ci.yml — tsc + build sur push/PR</div>
-      </div>
-      <div class="item-meta"><span class="tag tag-ops">Push requis</span></div>
-    </div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-05 · CI GitHub Actions — tsc + build sur push/PR</div><div class="item-sub">.github/workflows/ci.yml · Push sarlatjordan/Lordredesinquisiteursv2</div></div></div>
   </div>
 </div>
 
@@ -235,7 +228,7 @@
   <div class="section-header">
     <span class="section-icon">✅</span>
     <span class="section-title c-done" style="text-transform:uppercase;font-size:11px;letter-spacing:.1em">Corrigés par les agents — 2026-06-04</span>
-    <span class="section-count">50 items</span>
+    <span class="section-count">51 items</span>
   </div>
   <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px">
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-08 · membres/[username] — 9 RTT → 3 vagues (JOINs + Promise.all)</div></div></div>
@@ -288,6 +281,7 @@
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-09 · MembreDetail 13 props → 6 (stats + permissions)</div></div></div>
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-10 · typeCount sur allShips avant filtre (boutons stables)</div></div></div>
     <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P01 · Textarea + Tabs + Select shadcn (admin)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-05 · CI GitHub Actions — git init + push + workflow tsc/build</div></div></div>
   </div>
 </div>
 

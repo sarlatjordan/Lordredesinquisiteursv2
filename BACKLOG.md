@@ -249,7 +249,7 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 
 ## Backlog original (archive)
 
-> Items du backlog initial P0→P2, tous traités sauf TECH-05.
+> Items du backlog initial P0→P2, tous traités.
 
 | # | Item | Priorité | Statut |
 |---|---|---|---|
@@ -269,7 +269,7 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 | TECH-01 | Batch N+1 releaseAllOpResources | P1 | ✅ |
 | TECH-02 | Supprimer revalidate=60 no-op | P1 | ✅ |
 | TECH-03 | Refactorer bookmarklet | P1 | ✅ |
-| TECH-05 | CI GitHub Actions | P1 | ○ En attente push GitHub |
+| TECH-05 | CI GitHub Actions | P1 | ✅ Push GitHub + workflow |
 | UX-03 | Skeleton loading pages | P1 | ✅ |
 | UX-04 | Progression visible profil | P1 | ✅ |
 | UX-05 | Page 404 personnalisée | P1 | ✅ |
@@ -325,5 +325,5 @@ Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `prof
 | ~~UX-P01~~ | ~~Composants natifs au lieu de shadcn ×3~~ | UX | ~~P2~~ | ✅ 2026-06-04 |
 
 **Total P0 nouveaux :** 7 items (dont BUG-02) — **7 corrigés ✅**
-**Total P1 nouveaux :** 20 items · ~13h — **21 corrigés (+UX-D01, UX-D02, UX-D04, ARCH-05, ARCH-07) — TOUS FERMÉS ✅** (sauf TECH-05 en attente push GitHub)
+**Total P1 nouveaux :** 20 items · ~13h — **21 corrigés (+UX-D01, UX-D02, UX-D04, ARCH-05, ARCH-07) — TOUS FERMÉS ✅**
 **Total P2 nouveaux :** 9 items · ~3h30 — **9 corrigés — TOUS FERMÉS ✅**
