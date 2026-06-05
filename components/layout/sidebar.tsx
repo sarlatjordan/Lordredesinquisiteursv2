@@ -134,6 +134,7 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
             {[
               { href: '/admin/candidatures', label: 'Candidatures', Icon: ClipboardList },
               { href: '/admin/galerie',      label: 'Galerie',       Icon: ImageIcon },
+              { href: '/admin/avatars',      label: 'Avatars',       Icon: ImageIcon },
               { href: '/admin/activite',     label: 'Activité',      Icon: Activity },
               { href: '/admin/points',       label: 'Points',         Icon: Zap },
             ].map(({ href, label, Icon }) => (

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Users, Shield, Trash2, Loader2 } from 'lucide-react'
+import { Rocket, Users, Shield, Trash2, Loader2, ShoppingBag } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { SHIP_TYPES, SHIP_STATUS, SHIP_STATUS_COLORS, type ShipType, type ShipStatus } from '@/lib/constants'
@@ -119,6 +119,16 @@ export function ShipCard({ ship, index = 0, currentUserId, isAdmin, imageUrl }: 
                 <Users className="h-3 w-3" />
                 {ship.crew_size}
               </span>
+              {ship.purchased_in_game && (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0 text-green-400 border-green-400/30 bg-green-400/10 flex items-center gap-0.5"
+                  title="Acheté en jeu avec des UEC"
+                >
+                  <ShoppingBag className="h-2.5 w-2.5" />
+                  Achat IG
+                </Badge>
+              )}
             </div>
           </div>
         </div>

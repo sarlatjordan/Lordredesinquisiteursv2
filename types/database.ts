@@ -20,6 +20,7 @@ export interface Database {
           username: string
           display_name: string | null
           avatar_url: string | null
+          avatar_pending_url: string | null
           role: 'visiteur' | 'aspirant' | 'consacre' | 'gardien' | 'inquisiteur' | 'maitre_inquisiteur' | 'sage'
           star_citizen_handle: string | null
           discord_id: string | null
@@ -35,6 +36,7 @@ export interface Database {
           username: string
           display_name?: string | null
           avatar_url?: string | null
+          avatar_pending_url?: string | null
           role?: 'visiteur' | 'aspirant' | 'consacre' | 'gardien' | 'inquisiteur' | 'maitre_inquisiteur' | 'sage'
           star_citizen_handle?: string | null
           discord_id?: string | null
@@ -50,6 +52,7 @@ export interface Database {
           username?: string
           display_name?: string | null
           avatar_url?: string | null
+          avatar_pending_url?: string | null
           role?: 'visiteur' | 'aspirant' | 'consacre' | 'gardien' | 'inquisiteur' | 'maitre_inquisiteur' | 'sage'
           star_citizen_handle?: string | null
           discord_id?: string | null
@@ -148,6 +151,7 @@ export interface Database {
           owner_id: string | null
           crew_size: number
           is_org_ship: boolean
+          purchased_in_game: boolean
           notes: string | null
           image_url: string | null
           created_at: string
@@ -163,6 +167,7 @@ export interface Database {
           owner_id?: string | null
           crew_size?: number
           is_org_ship?: boolean
+          purchased_in_game?: boolean
           notes?: string | null
           image_url?: string | null
           created_at?: string
@@ -178,6 +183,7 @@ export interface Database {
           owner_id?: string | null
           crew_size?: number
           is_org_ship?: boolean
+          purchased_in_game?: boolean
           notes?: string | null
           image_url?: string | null
           created_at?: string

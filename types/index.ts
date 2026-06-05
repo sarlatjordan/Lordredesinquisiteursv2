@@ -115,6 +115,7 @@ export const ShipCreateSchema = z.object({
   ship_type: z.enum(['combat', 'transport', 'minage', 'exploration', 'support', 'multirole', 'autre']),
   crew_size: z.preprocess((v) => Number(v), z.number().int().min(1).max(100)),
   is_org_ship: z.boolean().default(false),
+  purchased_in_game: z.boolean().default(false),
   notes: z.string().max(500).optional(),
 })
 export type ShipCreateInput = z.infer<typeof ShipCreateSchema>
@@ -272,6 +273,14 @@ export const InitiateEvaluationSchema = z.object({
 export type InitiateEvaluationInput = z.infer<typeof InitiateEvaluationSchema>
 
 export type OnboardingStep = 'profile' | 'ship' | 'operation'
+
+// FEAT-20 : soumission photo de profil en attente de validation
+export const AvatarSubmitSchema = z.object({
+  url: z.string().url('URL invalide').max(500, 'URL trop longue'),
+})
+export type AvatarSubmitInput = z.infer<typeof AvatarSubmitSchema>
+
+export type ProfileWithPendingAvatar = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'avatar_pending_url'>
 
 export type ActionResult<T = void> =
   | { success: true; data: T }

@@ -27,12 +27,13 @@ export const ROLE_PRIVILEGES: Record<Role, number> = {
 
 // Seuils de privilège pour les actions clés
 export const PRIVILEGE = {
-  CREATE_EVENTS:    300,
+  CREATE_EVENTS:    100,  // FEAT-09 : Aspirant+ peut créer un événement
+  MANAGE_EVENTS:    300,  // Gardien+ peut modifier/supprimer/gérer les participants
   MANAGE_FLEET:     300,
   MANAGE_RESOURCES: 600,
   SYNC_MATRIX:     1000,
   MANAGE_MEMBERS:  1000,
-  CREATE_OPS:       300,
+  CREATE_OPS:       600,  // FEAT-12 : MI+ requis pour créer une opération
   MANAGE_OPS:       300,
   // Solde corporatif UEC visible dès Aspirant.
   // Pour restreindre (ex: Gardien+), changer 100 → 300.
@@ -394,6 +395,17 @@ export const INVENTORY_TX_STATUS_COLORS: Record<InventoryTxStatus, string> = {
   approved: 'text-green-400 bg-green-400/10 border-green-400/30',
   rejected: 'text-red-400 bg-red-400/10 border-red-400/30',
   direct:   'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
+}
+
+// FEAT-16 : paliers déclenchant la notification "un Sage peut te contacter"
+export const POINTS_MILESTONE_THRESHOLDS = [100, 250, 500, 1000] as const
+
+// FEAT-15 : points requis par rang pour accéder à l'épreuve suivante
+export const RANK_EVALUATION_THRESHOLDS: Partial<Record<Role, number>> = {
+  aspirant:           50,   // → Consacré
+  consacre:          150,   // → Gardien
+  gardien:           300,   // → Inquisiteur
+  inquisiteur:       500,   // → Maître Inquisiteur
 }
 
 export const RESOURCE_CATEGORIES = [

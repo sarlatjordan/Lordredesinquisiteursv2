@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getRolePrivilege } from '@/lib/constants'
+import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
 import { NewOpClient } from './new-op-client'
 import { ArrowLeft } from 'lucide-react'
 
@@ -15,7 +15,7 @@ export default async function NewOperationPage() {
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(profile?.role ?? '') < 600) redirect('/operations')
+  if (getRolePrivilege(profile?.role ?? '') < PRIVILEGE.CREATE_OPS) redirect('/operations')
 
   const { data: members } = await supabase
     .from('profiles')

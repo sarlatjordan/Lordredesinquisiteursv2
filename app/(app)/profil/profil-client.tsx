@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { updateProfile } from '@/actions/members'
+import { updateProfile, submitAvatarForApproval } from '@/actions/members'
 import { createClient } from '@/lib/supabase/client'
 import { ROLES, ROLE_COLORS, type Role } from '@/lib/constants'
 import { getInitials, formatDate } from '@/lib/utils'
@@ -86,6 +86,11 @@ function SectionIdentite({ profile, onSaved }: { profile: Profile | null; onSave
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
 
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [avatarStatus, setAvatarStatus] = useState<SaveStatus>('idle')
+  const [avatarError, setAvatarError] = useState('')
+  const [isPendingAvatar, startAvatarTransition] = useTransition()
+
   const { register, handleSubmit } = useForm({
     defaultValues: {
       display_name: profile?.display_name ?? '',
@@ -104,6 +109,19 @@ function SectionIdentite({ profile, onSaved }: { profile: Profile | null; onSave
       else { setStatus('error'); setError(res.error) }
     })
   }
+
+  function handleAvatarSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setAvatarStatus('saving')
+    setAvatarError('')
+    startAvatarTransition(async () => {
+      const res = await submitAvatarForApproval({ url: avatarUrl.trim() })
+      if (res.success) { setAvatarStatus('success'); setAvatarUrl('') }
+      else { setAvatarStatus('error'); setAvatarError(res.error) }
+    })
+  }
+
+  const hasPending = !!profile?.avatar_pending_url
 
   return (
     <Section icon={<User className="h-4 w-4" />} title="Identité">
@@ -150,6 +168,53 @@ function SectionIdentite({ profile, onSaved }: { profile: Profile | null; onSave
           <Feedback status={status} error={error} />
         </div>
       </form>
+
+      {/* Photo de profil en attente de validation (FEAT-20) */}
+      <div className="border-t border-border pt-4 space-y-3">
+        <p className="text-sm font-medium text-foreground">Photo de profil</p>
+        {hasPending ? (
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={profile.avatar_pending_url!}
+              alt="Aperçu en attente"
+              className="h-10 w-10 rounded-full object-cover border border-border shrink-0"
+            />
+            <div>
+              <p className="text-xs font-medium text-amber-400">Photo en cours de validation</p>
+              <p className="text-[11px] text-muted-foreground">Le Conseil examinera votre photo prochainement.</p>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleAvatarSubmit} className="space-y-2">
+            <p className="text-[11px] text-muted-foreground">
+              Soumettez une URL d&apos;image pour validation par le Conseil (formats : JPG, PNG, WebP).
+            </p>
+            <div className="flex gap-2">
+              <Input
+                placeholder="https://..."
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                disabled={isPendingAvatar}
+              />
+              <Button type="submit" size="sm" disabled={isPendingAvatar || !avatarUrl.trim()} className="shrink-0">
+                {isPendingAvatar && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+                Soumettre
+              </Button>
+            </div>
+            {avatarStatus === 'success' && (
+              <p className="flex items-center gap-1.5 text-xs text-green-400">
+                <CheckCircle className="h-3.5 w-3.5" /> Photo soumise — en attente de validation
+              </p>
+            )}
+            {avatarStatus === 'error' && (
+              <p className="flex items-center gap-1.5 text-xs text-destructive">
+                <AlertCircle className="h-3.5 w-3.5" /> {avatarError}
+              </p>
+            )}
+          </form>
+        )}
+      </div>
     </Section>
   )
 }

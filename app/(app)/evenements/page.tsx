@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { EventsClient } from './events-client'
 import type { EventWithDetails, EventAttendee } from '@/types'
-import { getRolePrivilege } from '@/lib/constants'
+import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
 
 export const metadata: Metadata = { title: 'Événements' }
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,8 @@ export default async function EvenementsPage() {
 
   // Récupérer le privilège de l'utilisateur connecté
   let userPrivilege = 0
-  let isOrganizer = false
+  let canCreate = false   // Aspirant+ : peut créer un événement (FEAT-09)
+  let canManage = false   // Gardien+ : peut modifier/gérer les participants
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -22,7 +23,8 @@ export default async function EvenementsPage() {
       .eq('id', user.id)
       .single()
     userPrivilege = getRolePrivilege(profile?.role ?? '')
-    isOrganizer = userPrivilege >= 300 // Gardien+
+    canCreate = userPrivilege >= PRIVILEGE.CREATE_EVENTS
+    canManage = userPrivilege >= PRIVILEGE.MANAGE_EVENTS
   }
 
   // Un événement est "à venir" si son statut est actif ET sa date est dans le futur.
@@ -97,7 +99,8 @@ export default async function EvenementsPage() {
       upcomingEvents={enrichEvents(upcomingRaw)}
       pastEvents={enrichEvents(pastRaw)}
       currentUserId={user?.id}
-      isOrganizer={isOrganizer}
+      canCreate={canCreate}
+      canManage={canManage}
     />
   )
 }

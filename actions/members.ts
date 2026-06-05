@@ -2,7 +2,8 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { ProfileUpdateSchema, type ProfileUpdateInput, type ActionResult } from '@/types'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { ProfileUpdateSchema, AvatarSubmitSchema, type ProfileUpdateInput, type AvatarSubmitInput, type ActionResult } from '@/types'
 import type { Profile } from '@/types'
 import { ROLES } from '@/lib/constants'
 import { createNotification } from '@/lib/notifications'
@@ -31,6 +32,104 @@ export async function updateProfile(input: ProfileUpdateInput): Promise<ActionRe
   revalidateTag('public-stats', { expire: 0 })
   return { success: true, data: data as Profile }
 }
+
+// ─── FEAT-20 : Workflow validation photo de profil ───────────────────────────
+
+export async function submitAvatarForApproval(input: AvatarSubmitInput): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const parsed = AvatarSubmitSchema.safeParse(input)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'URL invalide' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar_pending_url: parsed.data.url })
+    .eq('id', user.id)
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/profil')
+  return { success: true, data: undefined }
+}
+
+export async function approveAvatar(profileId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (me?.role !== 'sage') return { success: false, error: 'Droits insuffisants — Sage requis' }
+
+  const { data: target } = await supabase
+    .from('profiles')
+    .select('avatar_pending_url, username')
+    .eq('id', profileId)
+    .single()
+
+  if (!target) return { success: false, error: 'Membre introuvable' }
+  if (!target.avatar_pending_url) return { success: false, error: 'Aucune photo en attente' }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('profiles')
+    .update({ avatar_url: target.avatar_pending_url, avatar_pending_url: null })
+    .eq('id', profileId)
+
+  if (error) return { success: false, error: error.message }
+
+  await createNotification(supabase, {
+    profile_id: profileId,
+    type: 'avatar_approved',
+    title: 'Photo de profil approuvée',
+    message: 'Votre photo de profil a été validée par le Conseil.',
+    link: '/profil',
+  })
+
+  revalidatePath('/profil')
+  revalidatePath('/membres')
+  revalidatePath(`/membres/${target.username}`)
+  return { success: true, data: undefined }
+}
+
+export async function rejectAvatar(profileId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (me?.role !== 'sage') return { success: false, error: 'Droits insuffisants — Sage requis' }
+
+  const { data: target } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', profileId)
+    .single()
+
+  if (!target) return { success: false, error: 'Membre introuvable' }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('profiles')
+    .update({ avatar_pending_url: null })
+    .eq('id', profileId)
+
+  if (error) return { success: false, error: error.message }
+
+  await createNotification(supabase, {
+    profile_id: profileId,
+    type: 'avatar_rejected',
+    title: 'Photo de profil refusée',
+    message: 'Votre photo de profil n\'a pas été retenue. Vous pouvez en soumettre une nouvelle depuis votre profil.',
+    link: '/profil',
+  })
+
+  revalidatePath('/profil')
+  return { success: true, data: undefined }
+}
+
+// ─── Gestion des rôles ────────────────────────────────────────────────────────
 
 export async function updateMemberRole(
   memberId: string,

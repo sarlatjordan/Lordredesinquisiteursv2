@@ -18,10 +18,11 @@ interface EventsClientProps {
   upcomingEvents: EventWithDetails[]
   pastEvents: EventWithDetails[]
   currentUserId?: string
-  isOrganizer?: boolean
+  canCreate?: boolean  // Aspirant+ : peut créer un événement
+  canManage?: boolean  // Gardien+ : peut modifier/gérer participants
 }
 
-export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrganizer = false }: EventsClientProps) {
+export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false }: EventsClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [managedEvent, setManagedEvent] = useState<EventWithDetails | null>(null)
   const [viewedEvent, setViewedEvent] = useState<EventWithDetails | null>(null)
@@ -71,7 +72,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
           </p>
         </div>
 
-        {isOrganizer && (
+        {canCreate && (
           <Dialog open={isCreateOpen} onOpenChange={(v) => { setIsCreateOpen(v); if (!v) setCreateError(null) }}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-1.5">
@@ -121,10 +122,10 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
                   key={event.id}
                   event={event}
                   currentUserId={currentUserId}
-                  isOrganizer={isOrganizer}
+                  isOrganizer={canManage}
                   onRegister={handleRegister}
                   onUnregister={handleUnregister}
-                  onManage={isOrganizer ? setManagedEvent : undefined}
+                  onManage={canManage ? setManagedEvent : undefined}
                   onView={setViewedEvent}
                   index={i}
                 />
@@ -143,8 +144,8 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, isOrga
                   key={event.id}
                   event={event}
                   currentUserId={currentUserId}
-                  isOrganizer={isOrganizer}
-                  onManage={isOrganizer ? setManagedEvent : undefined}
+                  isOrganizer={canManage}
+                  onManage={canManage ? setManagedEvent : undefined}
                   onView={setViewedEvent}
                   index={i}
                 />

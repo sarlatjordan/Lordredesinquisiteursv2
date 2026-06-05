@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { ShipModelCombobox } from './ship-model-combobox'
 import { SHIP_TYPES } from '@/lib/constants'
-import type { ShipModel } from '@/types'
+import type { ShipModel, ShipCreateInput } from '@/types'
 
 interface ShipFormValues {
   name: string
@@ -21,21 +21,12 @@ interface ShipFormValues {
   ship_type: 'combat' | 'transport' | 'minage' | 'exploration' | 'support' | 'multirole' | 'autre'
   crew_size: string
   is_org_ship: boolean
-  notes?: string
-}
-
-interface ShipCreateData {
-  name: string
-  model: string
-  manufacturer?: string
-  ship_type: 'combat' | 'transport' | 'minage' | 'exploration' | 'support' | 'multirole' | 'autre'
-  crew_size: number
-  is_org_ship: boolean
+  purchased_in_game: boolean
   notes?: string
 }
 
 interface ShipFormProps {
-  onSubmit: (data: ShipCreateData) => Promise<void>
+  onSubmit: (data: ShipCreateInput) => Promise<void>
   isPending?: boolean
   onCancel?: () => void
 }
@@ -53,7 +44,7 @@ export function ShipForm({ onSubmit, isPending = false, onCancel }: ShipFormProp
     formState: { errors },
     setError,
   } = useForm<ShipFormValues>({
-    defaultValues: { ship_type: 'multirole', crew_size: '1', is_org_ship: false },
+    defaultValues: { ship_type: 'multirole', crew_size: '1', is_org_ship: false, purchased_in_game: false },
   })
 
   const watchedModel = watch('model')
@@ -89,7 +80,7 @@ export function ShipForm({ onSubmit, isPending = false, onCancel }: ShipFormProp
       setError('model', { message: 'Modèle requis (min. 2 caractères)' })
       return
     }
-    const data: ShipCreateData = {
+    const data: ShipCreateInput = {
       ...raw,
       crew_size: parseInt(raw.crew_size, 10) || 1,
     }
@@ -197,6 +188,23 @@ export function ShipForm({ onSubmit, isPending = false, onCancel }: ShipFormProp
             <Label htmlFor="is_org_ship" className="cursor-pointer">
               Vaisseau de l&apos;organisation
             </Label>
+          </div>
+        )}
+      />
+
+      {/* Acheté en jeu (SC 1.0) */}
+      <Controller
+        name="purchased_in_game"
+        control={control}
+        render={({ field }) => (
+          <div className="flex items-center gap-3">
+            <Switch id="purchased_in_game" checked={field.value} onCheckedChange={field.onChange} />
+            <div>
+              <Label htmlFor="purchased_in_game" className="cursor-pointer">
+                Acheté en jeu (UEC)
+              </Label>
+              <p className="text-[11px] text-muted-foreground">Acquis avec des UEC in-game, pas via le Pledge Store</p>
+            </div>
           </div>
         )}
       />

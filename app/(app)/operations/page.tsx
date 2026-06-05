@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getRolePrivilege } from '@/lib/constants'
+import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { OpCard } from '@/components/operations/op-card'
@@ -25,7 +25,7 @@ export default async function OperationsPage() {
       .eq('id', user.id)
       .single()
     userPrivilege = getRolePrivilege(profile?.role ?? '')
-    canManage = userPrivilege >= 600
+    canManage = userPrivilege >= PRIVILEGE.CREATE_OPS
   }
 
   const cols = 'id, title, description, type, status, risk_level, system_name, departure_at, commander_id, estimated_duration_min, min_privilege'

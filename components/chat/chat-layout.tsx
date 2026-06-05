@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ChannelList } from './channel-list'
 import { ChatWindow } from './chat-window'
 import { MessageInput } from './message-input'
@@ -46,6 +47,7 @@ export function ChatLayout({
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [newChannelName, setNewChannelName] = useState('')
   const [newChannelDesc, setNewChannelDesc] = useState('')
+  const [newChannelPrivilege, setNewChannelPrivilege] = useState<number>(100)
   const [createError, setCreateError] = useState<string | null>(null)
   const [isCreating, startCreateTransition] = useTransition()
 
@@ -140,7 +142,7 @@ export function ChatLayout({
   function handleCreateChannel() {
     setCreateError(null)
     startCreateTransition(async () => {
-      const result = await createChannel({ name: newChannelName, description: newChannelDesc || undefined, min_privilege: 100 })
+      const result = await createChannel({ name: newChannelName, description: newChannelDesc || undefined, min_privilege: newChannelPrivilege })
       if (!result.success) {
         setCreateError(result.error)
         return
@@ -148,6 +150,7 @@ export function ChatLayout({
       setShowCreateDialog(false)
       setNewChannelName('')
       setNewChannelDesc('')
+      setNewChannelPrivilege(100)
       // The new channel will appear on next server render — user can refresh or we refetch
       window.location.reload()
     })
@@ -206,6 +209,7 @@ export function ChatLayout({
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Nouveau canal</DialogTitle>
+            <DialogDescription>Créez un canal de discussion avec une visibilité par rang.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
@@ -225,6 +229,24 @@ export function ChatLayout({
                 value={newChannelDesc}
                 onChange={(e) => setNewChannelDesc(e.target.value)}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="channel-privilege" id="channel-privilege-label">Visible par</Label>
+              <Select
+                value={String(newChannelPrivilege)}
+                onValueChange={(v) => setNewChannelPrivilege(Number(v))}
+              >
+                <SelectTrigger id="channel-privilege" aria-labelledby="channel-privilege-label">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="100">Aspirant+ (tous les membres)</SelectItem>
+                  <SelectItem value="150">Consacré+</SelectItem>
+                  <SelectItem value="300">Gardien+</SelectItem>
+                  <SelectItem value="400">Inquisiteur+</SelectItem>
+                  <SelectItem value="600">Maître Inquisiteur+</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {createError && (
               <p className="text-xs text-destructive bg-destructive/10 px-3 py-2 rounded-md border border-destructive/20">

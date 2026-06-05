@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { getAuthWithPrivilege } from '@/lib/auth-helpers'
+import { PRIVILEGE } from '@/lib/constants'
 import {
   OperationCreateSchema,
   OpRegisterSchema,
@@ -20,7 +21,7 @@ import type { Database } from '@/types/database'
 export async function createOperation(input: OperationCreateInput): Promise<ActionResult<Operation>> {
   const { supabase, user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }
-  if (privilege < 300) return { success: false, error: 'Privilege insuffisant (Gardien requis)' }
+  if (privilege < PRIVILEGE.CREATE_OPS) return { success: false, error: 'Privilege insuffisant (Maître Inquisiteur requis)' }
 
   const parsed = OperationCreateSchema.safeParse(input)
   if (!parsed.success) {

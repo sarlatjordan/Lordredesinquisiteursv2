@@ -22,7 +22,7 @@ export async function createEvent(input: EventCreateInput): Promise<ActionResult
   const parsed = EventCreateSchema.safeParse(input)
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Données invalides' }
 
-  if (privilege < PRIVILEGE.CREATE_EVENTS) return { success: false, error: 'Droits insuffisants — Gardien requis' }
+  if (privilege < PRIVILEGE.CREATE_EVENTS) return { success: false, error: 'Droits insuffisants — Aspirant requis' }
 
   const { data, error } = await supabase
     .from('events')
