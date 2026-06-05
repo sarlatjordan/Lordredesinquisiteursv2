@@ -42,7 +42,7 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
   // Vague 2 : me (dépend de user.id)
   const { data: profileMe } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   const userPrivilege = getRolePrivilege(profileMe?.role ?? '')
-  const canManage = userPrivilege >= 300
+  const canManage = userPrivilege >= 600
   if (userPrivilege < opRaw.min_privilege) redirect('/operations')
 
   const op = opRaw as unknown as typeof opRaw & {

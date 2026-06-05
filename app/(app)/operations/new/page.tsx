@@ -15,7 +15,7 @@ export default async function NewOperationPage() {
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(profile?.role ?? '') < 300) redirect('/operations')
+  if (getRolePrivilege(profile?.role ?? '') < 600) redirect('/operations')
 
   const { data: members } = await supabase
     .from('profiles')
