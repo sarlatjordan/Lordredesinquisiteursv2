@@ -39,8 +39,22 @@ export async function GET() {
       .order('created_at', { ascending: false }),
   ])
 
+  const identities = (user.identities ?? []).map((i) => ({
+    provider: i.provider,
+    email: (i.identity_data as Record<string, unknown> | null)?.email ?? null,
+    name: (i.identity_data as Record<string, unknown> | null)?.name ?? (i.identity_data as Record<string, unknown> | null)?.full_name ?? null,
+    linked_at: i.created_at,
+  }))
+
   const payload = {
     exported_at: new Date().toISOString(),
+    account: {
+      email: user.email ?? null,
+      email_confirmed: user.email_confirmed_at ?? null,
+      created_at: user.created_at,
+      last_sign_in: user.last_sign_in_at ?? null,
+      linked_identities: identities,
+    },
     profile,
     ships: ships ?? [],
     operation_registrations: registrations ?? [],
