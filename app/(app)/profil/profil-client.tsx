@@ -789,6 +789,7 @@ function SectionDonnees() {
   const [sent, setSent]               = useState(false);
   const [error, setError]             = useState("");
   const [isPending, startTransition]  = useTransition();
+  const router = useRouter();
 
   function handleRequest() {
     setError("");
@@ -796,6 +797,7 @@ function SectionDonnees() {
       const res = await requestDataExport();
       if (!res.success) { setError(res.error ?? "Erreur"); return; }
       setSent(true);
+      router.refresh();
     });
   }
 
