@@ -112,7 +112,7 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
         ))}
       </div>
 
-      {/* Grille de vaisseaux */}
+      {/* Grille de vaisseaux — groupés par propriétaire */}
       {ships.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <Rocket className="h-10 w-10 text-muted-foreground/40" />
@@ -123,13 +123,40 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
             </a>
           )}
         </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {ships.map((ship, i) => (
-            <ShipCard key={ship.id} ship={ship} index={i} currentUserId={user?.id} isAdmin={isAdmin} imageUrl={modelImageMap[ship.model] ?? null} />
-          ))}
-        </div>
-      )}
+      ) : (() => {
+        // Regroupement par propriétaire (clé = display_name ?? username, ou 'Organisation')
+        const groups: { ownerName: string; ships: typeof ships }[] = []
+        for (const ship of ships) {
+          const key = ship.owner
+            ? (ship.owner.display_name ?? ship.owner.username)
+            : 'Organisation'
+          const grp = groups.find(g => g.ownerName === key)
+          if (grp) grp.ships.push(ship)
+          else groups.push({ ownerName: key, ships: [ship] })
+        }
+        return (
+          <div className="space-y-8">
+            {groups.map((grp) => (
+              <div key={grp.ownerName} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                    {grp.ownerName}
+                  </span>
+                  <span className="text-xs text-muted-foreground/50">
+                    — {grp.ships.length} vaisseau{grp.ships.length > 1 ? 'x' : ''}
+                  </span>
+                  <div className="flex-1 border-t border-border/50 ml-1" />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {grp.ships.map((ship, i) => (
+                    <ShipCard key={ship.id} ship={ship} index={i} currentUserId={user?.id} isAdmin={isAdmin} imageUrl={modelImageMap[ship.model] ?? null} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      })()}
     </div>
   )
 }

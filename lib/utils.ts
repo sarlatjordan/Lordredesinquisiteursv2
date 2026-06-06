@@ -71,6 +71,26 @@ export function approxCount(n: number): { value: number; suffix: string } {
 // Valide qu'un redirect destination est un chemin relatif interne.
 // Rejette tout ce qui commence par '//' ou qui n'est pas '/' (URLs externes).
 // Empêche les attaques open redirect : /login?redirectTo=https://evil.com
+export function buildGoogleCalendarUrl(event: {
+  title: string
+  start_at: string
+  end_at: string | null
+  description?: string | null
+  location?: string | null
+}): string {
+  function toGDate(iso: string) {
+    return new Date(iso).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+  }
+  const start = toGDate(event.start_at)
+  const end = event.end_at
+    ? toGDate(event.end_at)
+    : toGDate(new Date(new Date(event.start_at).getTime() + 3_600_000).toISOString())
+  const params = new URLSearchParams({ action: 'TEMPLATE', text: event.title, dates: `${start}/${end}` })
+  if (event.description) params.set('details', event.description)
+  if (event.location) params.set('location', event.location)
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
 export function safeRedirect(to: string | null | undefined, fallback = '/dashboard'): string {
   if (!to || typeof to !== 'string') return fallback
   if (!to.startsWith('/') || to.startsWith('//')) return fallback

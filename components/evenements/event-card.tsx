@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { CalendarDays, MapPin, Users, Clock, CheckCircle2, HelpCircle, Settings2, CalendarPlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDateTime, formatRelativeTime } from '@/lib/utils'
+import { formatDateTime, formatRelativeTime, buildGoogleCalendarUrl } from '@/lib/utils'
 import { EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_STATUS, type EventType, type EventStatus } from '@/lib/constants'
 import { Lock } from 'lucide-react'
 import type { EventWithDetails } from '@/types'
@@ -167,13 +167,14 @@ export function EventCard({
 
         {!isPast && !isCancelled && (
           <a
-            href={`/api/evenements/${event.id}/ics`}
-            download
+            href={buildGoogleCalendarUrl(event)}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
           >
             <CalendarPlus className="h-3 w-3" />
-            Ajouter au calendrier
+            Ajouter à Google Agenda
           </a>
         )}
       </div>

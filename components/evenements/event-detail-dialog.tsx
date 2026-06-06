@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus } from 'lucide-react'
+import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus, ExternalLink } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -21,6 +21,7 @@ import {
 } from '@/actions/events'
 import { ROLES, ROLE_PRIVILEGES, type Role } from '@/lib/constants'
 import type { EventWithDetails, AttendeeWithProfile, Profile } from '@/types'
+import { buildGoogleCalendarUrl } from '@/lib/utils'
 
 interface EventDetailDialogProps {
   event: EventWithDetails | null
@@ -170,14 +171,25 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
         </DialogHeader>
 
         {event.status !== 'annule' && event.status !== 'termine' && (
-          <a
-            href={`/api/evenements/${event.id}/ics`}
-            download
-            className="self-start inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary border border-border rounded-md px-2.5 py-1.5 transition-colors -mt-1"
-          >
-            <CalendarPlus className="h-3.5 w-3.5" />
-            Ajouter au calendrier
-          </a>
+          <div className="flex flex-wrap gap-2 -mt-1">
+            <a
+              href={buildGoogleCalendarUrl(event)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="self-start inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary border border-border rounded-md px-2.5 py-1.5 transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Ajouter à Google Agenda
+            </a>
+            <a
+              href={`/api/evenements/${event.id}/ics`}
+              download
+              className="self-start inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1.5 transition-colors"
+            >
+              <CalendarPlus className="h-3.5 w-3.5" />
+              Télécharger .ics
+            </a>
+          </div>
         )}
 
         <Tabs defaultValue="edit" className="mt-2">

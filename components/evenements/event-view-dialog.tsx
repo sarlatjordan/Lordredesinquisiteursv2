@@ -1,9 +1,9 @@
 'use client'
 
-import { CalendarDays, MapPin, Users, Clock, FileText, CalendarPlus, Lock } from 'lucide-react'
+import { CalendarDays, MapPin, Users, Clock, FileText, CalendarPlus, Lock, ExternalLink } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { formatDateTime, formatRelativeTime } from '@/lib/utils'
+import { formatDateTime, formatRelativeTime, buildGoogleCalendarUrl } from '@/lib/utils'
 import { EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_STATUS, type EventType, type EventStatus } from '@/lib/constants'
 import type { EventWithDetails } from '@/types'
 
@@ -119,14 +119,23 @@ export function EventViewDialog({ event, open, onClose }: EventViewDialogProps) 
           )}
 
           {!isPast && !isCancelled && (
-            <div className="border-t border-border pt-4">
+            <div className="border-t border-border pt-4 flex flex-wrap gap-2">
+              <a
+                href={buildGoogleCalendarUrl(event)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary border border-border rounded-md px-2.5 py-1.5 transition-colors"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Ajouter à Google Agenda
+              </a>
               <a
                 href={`/api/evenements/${event.id}/ics`}
                 download
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary border border-border rounded-md px-2.5 py-1.5 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1.5 transition-colors"
               >
                 <CalendarPlus className="h-3.5 w-3.5" />
-                Ajouter au calendrier
+                Télécharger .ics
               </a>
             </div>
           )}
