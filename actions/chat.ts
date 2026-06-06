@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getRolePrivilege } from '@/lib/constants'
 import {
   SendMessageSchema,
@@ -81,12 +82,15 @@ export async function markChannelSeen(channelId: string): Promise<ActionResult> 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  const { error } = await supabase.from('chat_member_seen').upsert(
+  // adminClient : auth.uid() non résolu en Server Action → RLS bloque silencieusement
+  const admin = createAdminClient()
+  const { error } = await admin.from('chat_member_seen').upsert(
     { profile_id: user.id, channel_id: channelId, last_seen_at: new Date().toISOString() },
     { onConflict: 'profile_id,channel_id' }
   )
 
   if (error) return { success: false, error: error.message }
+  revalidatePath('/', 'layout')
   return { success: true, data: undefined }
 }
 
@@ -96,13 +100,15 @@ export async function markChannelsRead(channelIds: string[]): Promise<ActionResu
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
+  const admin = createAdminClient()
   const now = new Date().toISOString()
-  const { error } = await supabase.from('chat_member_seen').upsert(
+  const { error } = await admin.from('chat_member_seen').upsert(
     channelIds.map((id) => ({ profile_id: user.id, channel_id: id, last_seen_at: now })),
     { onConflict: 'profile_id,channel_id' }
   )
 
   if (error) return { success: false, error: error.message }
+  revalidatePath('/', 'layout')
   return { success: true, data: undefined }
 }
 
