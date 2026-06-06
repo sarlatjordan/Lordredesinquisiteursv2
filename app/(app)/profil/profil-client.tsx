@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   User, Shield, Rocket, Lock, CheckCircle, AlertCircle,
-  Loader2, Eye, EyeOff, ExternalLink, Bookmark, ChevronRight,
+  Loader2, Eye, EyeOff, ExternalLink, ChevronRight,
   Eye as EyeIcon, Scroll, Download, CalendarDays, Copy, Check as CheckIcon,
   Link2,
 } from 'lucide-react'
@@ -278,67 +278,7 @@ function SectionStarCitizen({ profile, onSaved }: { profile: Profile | null; onS
           <Feedback status={status} error={error} />
         </div>
       </form>
-
-      {/* Bookmarklet RSI */}
-      <BookmarkletSection />
     </Section>
-  )
-}
-
-// ─── Bookmarklet RSI ──────────────────────────────────────────────────────────
-
-function BookmarkletSection() {
-  const [bookmarkletHref, setBookmarkletHref] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const bookmarkletRef = useRef<HTMLAnchorElement>(null)
-
-  // Contourne la validation javascript: de React en passant par le DOM directement
-  useEffect(() => {
-    if (bookmarkletRef.current && bookmarkletHref) {
-      bookmarkletRef.current.setAttribute('href', bookmarkletHref)
-    }
-  }, [bookmarkletHref])
-
-  async function loadBookmarklet() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/hangar-bookmarklet')
-      const data = await res.json()
-      setBookmarkletHref(data.bookmarklet ?? '')
-    } finally { setLoading(false) }
-  }
-
-  return (
-    <div className="rounded-lg border border-dashed border-border p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <Bookmark className="h-4 w-4 text-primary" />
-        <p className="text-sm font-medium text-foreground">Bookmarklet RSI</p>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Importe tes vaisseaux directement depuis la page RSI <code className="bg-muted px-1 rounded">My Hangar → My Gear</code>, sans avoir à entrer ton mot de passe RSI.
-      </p>
-      {!bookmarkletHref ? (
-        <Button size="sm" variant="outline" onClick={loadBookmarklet} disabled={loading} className="gap-1.5">
-          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bookmark className="h-3.5 w-3.5" />}
-          Générer le bookmarklet
-        </Button>
-      ) : (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            1. Glisse ce bouton dans ta barre de favoris :<br />
-            2. Va sur <strong>robertsspaceindustries.com/en/account/pledges</strong><br />
-            3. Clique sur le favori → confirme l&apos;import
-          </p>
-          <a
-            ref={bookmarkletRef}
-            className="inline-flex items-center gap-1.5 rounded px-3 py-1.5 border border-primary/30 bg-primary/10 text-primary text-xs font-medium cursor-grab hover:bg-primary/20 transition-colors"
-            style={{ textDecoration: 'none' }}
-          >
-            🚀 INQFR — Import RSI
-          </a>
-        </div>
-      )}
-    </div>
   )
 }
 
