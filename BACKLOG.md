@@ -373,3 +373,30 @@ Vérification `signInWithPassword` avant `updateUser`. Champ `autoComplete="curr
 
 ### ~~UX-07 · Background visuel thème SC~~ ✅ TERMINÉ 2026-06-05
 CSS-only sur `app/(auth)/layout.tsx` : 22 étoiles (radial-gradient), halo planétaire (coin droit), nébuleuse indigo, sol de hangar quadrillé. Zéro image externe, contraste login card inchangé.
+
+---
+
+## 🚀 Nouvelles features L — Sprint 2026-06-06
+
+| ID | Item | Domaine | Priorité | Statut |
+|---|---|---|---|---|
+| ~~FEAT-14~~ | ~~Parcours initiatique modulable par rang~~ | Feat | P1 | ✅ 2026-06-06 |
+| ~~FEAT-18~~ | ~~Fusion flotte org+perso + tri propriétaire + édition nom~~ | Feat | P1 | ✅ 2026-06-06 |
+| ~~FEAT-21~~ | ~~Authentification Google (OAuth via Supabase)~~ | Feat | P1 | ✅ 2026-06-06 |
+| ~~FEAT-11~~ | ~~Intégration Google Agenda (flux ICS global)~~ | Feat | P1 | ✅ 2026-06-06 |
+| ~~FEAT-22~~ | ~~MFA TOTP — enrollment + challenge universel~~ | Sécurité | P1 | ✅ 2026-06-06 |
+
+### ~~FEAT-14 · Parcours initiatique modulable par rang~~ ✅ TERMINÉ 2026-06-06
+Config en code (`ONBOARDING_CONFIGS` dans `lib/constants.ts`). Aspirant : profile/ship/operation (+10 pts, +30 bonus). Consacré : discord_joined/first_event (+15 pts, +50 bonus). Migration 031 — CHECK constraint étendue sur `onboarding_progress.step`. `ExtendedOnboardingStep` exporté depuis `types/index.ts`. `claimOnboardingStep` adapté au rang courant. Checklist générique par rang dans `dashboard/page.tsx`.
+
+### ~~FEAT-18 · Fusion flotte org+perso + tri propriétaire + édition nom~~ ✅ TERMINÉ 2026-06-06
+Vue unifiée — tri JS par nom de propriétaire A→Z (ships sans owner = org, en tête). `updateShipName(shipId, name)` dans `actions/ships.ts` — Zod min2/max100, owner OU Gardien+. Édition inline dans `ship-card.tsx` : icône crayon → input → Enter/✓/✗.
+
+### ~~FEAT-21 · Authentification Google (OAuth via Supabase)~~ ✅ TERMINÉ 2026-06-06
+Bouton "Continuer avec Google" dans `login-client.tsx` — SVG inline, loading state, séparateur "ou". Flow PKCE — `/auth/callback` existant gère le `?code=`. Activer manuellement : Supabase Dashboard → Authentication → Providers → Google.
+
+### ~~FEAT-11 · Intégration Google Agenda (flux ICS global)~~ ✅ TERMINÉ 2026-06-06
+Route `app/api/calendrier/ics/route.ts` — auth HMAC stateless (`?uid=&token=`), RFC 5545, `Cache-Control: no-store`. `lib/ics-token.ts` — `generateIcsToken` / `verifyIcsToken` (timing-safe). Section "Abonnement calendrier" sur `/profil` — URL copiable, lien Google Agenda, lien `webcal://`. Variable env requise : `ICS_HMAC_SECRET`.
+
+### ~~FEAT-22 · MFA TOTP — enrollment + challenge universel~~ ✅ TERMINÉ 2026-06-06
+Section MFA sur `/profil` — QR code Supabase, vérification code, unenroll. Challenge inline dans `/login` après auth email/mdp. Page `/mfa` universelle pour OAuth (Google, Discord) — redirect automatique depuis `app/(app)/layout.tsx` si `nextLevel=aal2`. Supabase Dashboard : TOTP Enabled + "Limit duration of AAL1 sessions" ON.
