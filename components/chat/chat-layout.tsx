@@ -16,7 +16,6 @@ import {
   getChannelMessages,
   loadMoreMessages,
   markChannelSeen,
-  markChannelsRead,
   createChannel,
 } from '@/actions/chat'
 import type { ChatChannel, ChatMessageWithAuthor } from '@/types'
@@ -54,14 +53,12 @@ export function ChatLayout({
   // Tracks the "intended" channel to discard stale async results when switching fast
   const intentRef = useRef(initialChannelId)
   const realtimeRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
-  // Stable ref for initial channel IDs — used to mark all channels read on mount
-  const initialChannelIdsRef = useRef(initialChannels.map((c) => c.id))
-
-  // Mark all visible channels as read on initial mount — clears the sidebar badge
+  // Marque uniquement le canal initialement affiché comme lu au montage
   useEffect(() => {
-    if (!currentUserId || initialChannelIdsRef.current.length === 0) return
-    markChannelsRead(initialChannelIdsRef.current)
-  }, [currentUserId])
+    if (!currentUserId || !initialChannelId) return
+    markChannelSeen(initialChannelId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const activeChannel = channels.find((c) => c.id === activeChannelId) ?? null
   const canCreateChannel = userPrivilege >= 600
