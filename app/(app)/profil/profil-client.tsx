@@ -420,6 +420,209 @@ function SectionProgression({
   )
 }
 
+// ─── Section MFA ─────────────────────────────────────────────────────────────
+
+type MFAStatus = 'loading' | 'not_enrolled' | 'enrolling' | 'enrolled'
+
+function SectionMFA() {
+  const [status, setStatus]         = useState<MFAStatus>('loading')
+  const [factorId, setFactorId]     = useState('')
+  const [qrCode, setQrCode]         = useState('')
+  const [secret, setSecret]         = useState('')
+  const [code, setCode]             = useState('')
+  const [error, setError]           = useState('')
+  const [isPending, setIsPending]   = useState(false)
+
+  useEffect(() => { void loadStatus() }, [])
+
+  async function loadStatus() {
+    const supabase = createClient()
+    const { data } = await supabase.auth.mfa.listFactors()
+    const verified   = data?.totp?.find(f => f.status === 'verified')
+    // `all` contient aussi les facteurs non-vérifiés que `totp` n'expose pas
+    const unverified = data?.all?.find(f => f.factor_type === 'totp' && f.status === 'unverified')
+    if (verified) {
+      setFactorId(verified.id)
+      setStatus('enrolled')
+    } else {
+      // Nettoie un éventuel enrôlement incomplet
+      if (unverified) await supabase.auth.mfa.unenroll({ factorId: unverified.id })
+      setStatus('not_enrolled')
+    }
+  }
+
+  async function startEnroll() {
+    setIsPending(true)
+    setError('')
+    const supabase = createClient()
+    const { data, error: enrollErr } = await supabase.auth.mfa.enroll({
+      factorType: 'totp',
+      friendlyName: 'INQFR',
+    })
+    if (enrollErr || !data) {
+      setError(enrollErr?.message ?? 'Erreur lors de l\'initialisation')
+      setIsPending(false)
+      return
+    }
+    setFactorId(data.id)
+    setQrCode(data.totp.qr_code)
+    setSecret(data.totp.secret)
+    setStatus('enrolling')
+    setIsPending(false)
+  }
+
+  async function verifyEnroll() {
+    if (code.length !== 6) { setError('Code à 6 chiffres requis'); return }
+    setIsPending(true)
+    setError('')
+    const supabase = createClient()
+    const { data: challenge, error: challengeErr } = await supabase.auth.mfa.challenge({ factorId })
+    if (challengeErr || !challenge) {
+      setError(challengeErr?.message ?? 'Erreur challenge')
+      setIsPending(false)
+      return
+    }
+    const { error: verifyErr } = await supabase.auth.mfa.verify({
+      factorId,
+      challengeId: challenge.id,
+      code,
+    })
+    if (verifyErr) {
+      setError('Code incorrect ou expiré')
+      setIsPending(false)
+      return
+    }
+    setCode('')
+    setStatus('enrolled')
+    setIsPending(false)
+  }
+
+  async function cancelEnroll() {
+    setIsPending(true)
+    const supabase = createClient()
+    if (factorId) await supabase.auth.mfa.unenroll({ factorId })
+    setFactorId(''); setQrCode(''); setSecret(''); setCode(''); setError('')
+    setStatus('not_enrolled')
+    setIsPending(false)
+  }
+
+  async function unenroll() {
+    setIsPending(true)
+    setError('')
+    const supabase = createClient()
+    const { error: unenrollErr } = await supabase.auth.mfa.unenroll({ factorId })
+    if (unenrollErr) { setError(unenrollErr.message); setIsPending(false); return }
+    setFactorId('')
+    setStatus('not_enrolled')
+    setIsPending(false)
+  }
+
+  return (
+    <Section icon={<Shield className="h-4 w-4" />} title="Double authentification (MFA)">
+
+      {status === 'loading' && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
+        </div>
+      )}
+
+      {status === 'not_enrolled' && (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Protège ton compte avec une application d&apos;authentification (Google Authenticator, Authy…).
+            Un code à 6 chiffres sera demandé à chaque connexion.
+          </p>
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <Button size="sm" onClick={startEnroll} disabled={isPending} className="gap-2">
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
+            Activer la 2FA
+          </Button>
+        </div>
+      )}
+
+      {status === 'enrolling' && (
+        <div className="space-y-5">
+          <p className="text-sm text-muted-foreground">
+            Scanne ce QR code avec <strong className="text-foreground">Google Authenticator</strong> ou <strong className="text-foreground">Authy</strong>, puis saisis le code généré.
+          </p>
+
+          {/* QR code — Supabase retourne un SVG en data URI */}
+          <div className="flex justify-center">
+            <div className="rounded-xl border border-border bg-white p-3 w-44 h-44">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={qrCode} alt="QR code 2FA" className="w-full h-full" />
+            </div>
+          </div>
+
+          <details className="text-xs text-muted-foreground cursor-pointer">
+            <summary className="hover:text-foreground transition-colors select-none">
+              Entrer la clé manuellement
+            </summary>
+            <code className="mt-2 block font-mono text-xs text-foreground select-all break-all bg-muted/50 rounded p-2">
+              {secret}
+            </code>
+          </details>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="mfa-code-enroll">Code de vérification</Label>
+            <div className="flex gap-2">
+              <Input
+                id="mfa-code-enroll"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                value={code}
+                onChange={e => { setCode(e.target.value.replace(/\D/g, '')); setError('') }}
+                onKeyDown={e => e.key === 'Enter' && verifyEnroll()}
+                className="font-mono text-center text-lg tracking-widest w-36"
+                autoFocus
+              />
+              <Button onClick={verifyEnroll} disabled={isPending || code.length !== 6} size="sm">
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Vérifier'}
+              </Button>
+            </div>
+            {error && <p className="text-xs text-destructive">{error}</p>}
+          </div>
+
+          <button
+            type="button"
+            onClick={cancelEnroll}
+            disabled={isPending}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Annuler
+          </button>
+        </div>
+      )}
+
+      {status === 'enrolled' && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-green-400">
+            <CheckCircle className="h-4 w-4" />
+            <p className="text-sm font-medium">Double authentification activée</p>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Un code TOTP est demandé à chaque connexion par email/mot de passe.
+          </p>
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={unenroll}
+            disabled={isPending}
+            className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+          >
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            Désactiver la 2FA
+          </Button>
+        </div>
+      )}
+
+    </Section>
+  )
+}
+
 // ─── Section abonnement calendrier ───────────────────────────────────────────
 
 function SectionCalendrier({ icsParams, appOrigin }: { icsParams: { uid: string; token: string }; appOrigin: string }) {
@@ -654,6 +857,7 @@ export function ProfilClient({ profile, email, activeEvaluation, icsParams, appO
       <SectionProgression profile={profile} activeEvaluation={activeEvaluation} />
       <SectionStarCitizen profile={profile} onSaved={handleSaved} />
       <SectionSecurite email={email} />
+      <SectionMFA />
       {icsParams && <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />}
       <SectionDonnees />
     </div>

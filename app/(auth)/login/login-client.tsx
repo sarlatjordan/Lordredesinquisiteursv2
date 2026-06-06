@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, Mail, Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Mail, Lock, AlertCircle, CheckCircle2, Eye, EyeOff, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -68,9 +68,13 @@ interface PasswordFormValues {
 }
 
 function PasswordForm({ redirectTo }: { redirectTo?: string }) {
-  const [state, setState] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'loading' | 'error' | 'mfa'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [mfaFactorId, setMfaFactorId] = useState('')
+  const [mfaCode, setMfaCode] = useState('')
+  const [mfaError, setMfaError] = useState('')
+  const [mfaPending, setMfaPending] = useState(false)
   const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm<PasswordFormValues>()
@@ -94,8 +98,104 @@ function PasswordForm({ redirectTo }: { redirectTo?: string }) {
       )
       return
     }
+
+    // Vérifie si une 2FA TOTP est requise (AAL2)
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (aal?.nextLevel === 'aal2') {
+      const { data: factors } = await supabase.auth.mfa.listFactors()
+      const totp = factors?.totp?.find(f => f.status === 'verified')
+      if (totp) {
+        setMfaFactorId(totp.id)
+        setState('mfa')
+        return
+      }
+    }
+
     router.push(redirectTo || '/dashboard')
     router.refresh()
+  }
+
+  async function submitMFA() {
+    if (mfaCode.length !== 6) return
+    setMfaPending(true)
+    setMfaError('')
+    const supabase = createClient()
+    const { data: challenge, error: challengeErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId })
+    if (challengeErr || !challenge) {
+      setMfaError(challengeErr?.message ?? 'Erreur challenge')
+      setMfaPending(false)
+      return
+    }
+    const { error: verifyErr } = await supabase.auth.mfa.verify({
+      factorId: mfaFactorId,
+      challengeId: challenge.id,
+      code: mfaCode,
+    })
+    if (verifyErr) {
+      setMfaError('Code incorrect ou expiré')
+      setMfaPending(false)
+      return
+    }
+    router.push(redirectTo || '/dashboard')
+    router.refresh()
+  }
+
+  // ─── Écran MFA ────────────────────────────────────────────────────────────────
+  if (state === 'mfa') {
+    return (
+      <div className="space-y-5">
+        <div className="text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 border border-primary/20 mx-auto mb-3">
+            <Shield className="h-6 w-6 text-primary" />
+          </div>
+          <p className="text-sm font-semibold text-foreground">Vérification en deux étapes</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Saisis le code à 6 chiffres de ton application d&apos;authentification
+          </p>
+        </div>
+
+        <Input
+          type="text"
+          inputMode="numeric"
+          maxLength={6}
+          placeholder="000 000"
+          value={mfaCode}
+          onChange={e => { setMfaCode(e.target.value.replace(/\D/g, '')); setMfaError('') }}
+          onKeyDown={e => e.key === 'Enter' && mfaCode.length === 6 && submitMFA()}
+          className="font-mono text-center text-2xl tracking-[0.4em] h-14"
+          autoFocus
+        />
+
+        {mfaError && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {mfaError}
+          </motion.div>
+        )}
+
+        <Button
+          className="w-full"
+          onClick={submitMFA}
+          disabled={mfaPending || mfaCode.length !== 6}
+        >
+          {mfaPending
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification…</>
+            : 'Confirmer'}
+        </Button>
+
+        <button
+          type="button"
+          onClick={() => { setState('idle'); setMfaCode(''); setMfaError('') }}
+          className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
+        >
+          ← Retour à la connexion
+        </button>
+      </div>
+    )
   }
 
   return (
