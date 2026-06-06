@@ -77,7 +77,7 @@ export default async function DashboardPage() {
     return sum + stocks.reduce((s, st) => s + (st.quantity - st.reserved_quantity), 0)
   }, 0)
 
-  // Onboarding par rang — Aspirant (100) et Consacré (150)
+  // Onboarding par rang — Aspirant / Consacré / Gardien / Inquisiteur
   let onboardingConfig: RankOnboardingConfig | null = null
   let onboardingCompletedSteps: string[] = []
   let onboardingStepsDone: Record<string, boolean> = {}
@@ -90,27 +90,72 @@ export default async function DashboardPage() {
     const stepKeys = rankConfig.steps.map(s => s.key)
 
     if (roleKey === 'aspirant') {
-      const [progressResult, shipResult, opResult] = await Promise.all([
+      const [progressResult, shipResult, opResult, importantOpsResult, eventResult] = await Promise.all([
         supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
         supabase.from('ships').select('*', { count: 'exact', head: true }).eq('owner_id', user.id),
         supabase.from('op_registrations').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
-      ])
-      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
-      onboardingStepsDone = {
-        profile:   !!(me?.bio && me?.star_citizen_handle),
-        ship:      (shipResult.count ?? 0) > 0,
-        operation: (opResult.count ?? 0) > 0,
-      }
-    } else if (roleKey === 'consacre') {
-      const [progressResult, profileResult, eventResult] = await Promise.all([
-        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
-        supabase.from('profiles').select('discord_id').eq('id', user.id).single(),
+        supabase.from('op_registrations').select('operations!inner(estimated_duration_min)').eq('profile_id', user.id).limit(100),
         supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).eq('status', 'confirme'),
       ])
       onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      const hasImportantOp = (importantOpsResult.data ?? []).some(r => {
+        const op = (r as unknown as { operations: { estimated_duration_min: number | null } | null }).operations
+        return (op?.estimated_duration_min ?? 0) >= 120
+      })
       onboardingStepsDone = {
-        discord_joined: !!(profileResult.data?.discord_id),
-        first_event:    (eventResult.count ?? 0) > 0,
+        profile:             !!(me?.bio && me?.star_citizen_handle),
+        ship:                (shipResult.count ?? 0) > 0,
+        operation:           (opResult.count ?? 0) > 0,
+        operation_important: hasImportantOp,
+        first_event:         (eventResult.count ?? 0) > 0,
+      }
+    } else if (roleKey === 'consacre') {
+      const [progressResult, eventsResult, opsResult, logisticsResult, resourceResult] = await Promise.all([
+        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
+        supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).eq('status', 'confirme'),
+        supabase.from('op_registrations').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
+        supabase.from('inventory_transactions').select('*', { count: 'exact', head: true }).eq('member_id', user.id),
+        supabase.from('org_resources').select('*', { count: 'exact', head: true }).eq('author_id', user.id),
+      ])
+      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      onboardingStepsDone = {
+        consacre_events_5:    (eventsResult.count ?? 0) >= 5,
+        consacre_op_5:        (opsResult.count ?? 0) >= 5,
+        consacre_logistics:   (logisticsResult.count ?? 0) > 0,
+        consacre_resource:    (resourceResult.count ?? 0) > 0,
+        consacre_recruitment: onboardingCompletedSteps.includes('consacre_recruitment'),
+      }
+    } else if (roleKey === 'gardien') {
+      const [progressResult, opLeadResult, eventsResult, logisticsResult, resourceResult] = await Promise.all([
+        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
+        supabase.from('operations').select('*', { count: 'exact', head: true }).eq('commander_id', user.id),
+        supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).eq('status', 'confirme'),
+        supabase.from('inventory_transactions').select('*', { count: 'exact', head: true }).eq('member_id', user.id),
+        supabase.from('org_resources').select('*', { count: 'exact', head: true }).eq('author_id', user.id),
+      ])
+      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      onboardingStepsDone = {
+        gardien_op_lead:     (opLeadResult.count ?? 0) > 0,
+        gardien_events_10:   (eventsResult.count ?? 0) >= 10,
+        gardien_logistics:   (logisticsResult.count ?? 0) > 0,
+        gardien_resource:    (resourceResult.count ?? 0) > 0,
+        gardien_recruitment: onboardingCompletedSteps.includes('gardien_recruitment'),
+      }
+    } else if (roleKey === 'inquisiteur') {
+      const [progressResult, opLeadResult, eventOrganizeResult, eventsResult, partnershipResult] = await Promise.all([
+        supabase.from('onboarding_progress').select('step').eq('profile_id', user.id).in('step', [...stepKeys, rankConfig.bonusStep]),
+        supabase.from('operations').select('*', { count: 'exact', head: true }).eq('commander_id', user.id),
+        supabase.from('events').select('*', { count: 'exact', head: true }).eq('created_by', user.id),
+        supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).eq('status', 'confirme'),
+        supabase.from('partnerships').select('*', { count: 'exact', head: true }).eq('created_by', user.id),
+      ])
+      onboardingCompletedSteps = (progressResult.data ?? []).map(r => r.step).filter(s => s !== rankConfig.bonusStep)
+      onboardingStepsDone = {
+        inquisiteur_op_lead_3:      (opLeadResult.count ?? 0) >= 3,
+        inquisiteur_event_organize: (eventOrganizeResult.count ?? 0) > 0,
+        inquisiteur_training:       onboardingCompletedSteps.includes('inquisiteur_training'),
+        inquisiteur_events_25:      (eventsResult.count ?? 0) >= 25,
+        inquisiteur_partnership:    (partnershipResult.count ?? 0) > 0,
       }
     }
   }
