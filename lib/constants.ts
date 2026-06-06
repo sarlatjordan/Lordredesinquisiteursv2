@@ -425,6 +425,7 @@ export interface OnboardingStepConfig {
   key: ExtendedOnboardingStep
   label: string
   href: string
+  manual?: boolean
 }
 
 export interface RankOnboardingConfig {
@@ -437,21 +438,50 @@ export interface RankOnboardingConfig {
 export const ONBOARDING_CONFIGS: Partial<Record<Role, RankOnboardingConfig>> = {
   aspirant: {
     steps: [
-      { key: 'profile',   label: 'Compléter son profil (bio + handle Star Citizen)', href: '/profil'     },
-      { key: 'ship',      label: 'Enregistrer son premier vaisseau',                  href: '/flotte'     },
-      { key: 'operation', label: "S'inscrire à une opération",                        href: '/operations' },
+      { key: 'profile',             label: 'Compléter son profil (bio + handle Star Citizen)', href: '/profil'     },
+      { key: 'ship',                label: 'Enregistrer son premier vaisseau',                  href: '/flotte'     },
+      { key: 'operation',           label: "S'inscrire à une opération",                        href: '/operations' },
+      { key: 'operation_important', label: 'Participer à une opération importante (2h+)',        href: '/operations' },
+      { key: 'first_event',         label: "Participer à un événement de l'Ordre",              href: '/evenements' },
     ],
     bonusStep: 'bonus',
     pointsPerStep: 10,
-    bonusPoints: 30,
+    bonusPoints: 25,
   },
   consacre: {
     steps: [
-      { key: 'discord_joined', label: 'Lier son compte Discord au profil',                href: '/profil'     },
-      { key: 'first_event',    label: "Confirmer sa présence à un événement de l'Ordre", href: '/evenements' },
+      { key: 'consacre_events_5',    label: 'Participer à 5 événements',                        href: '/evenements'          },
+      { key: 'consacre_op_5',        label: 'Participer à 5 opérations',                        href: '/operations'          },
+      { key: 'consacre_logistics',   label: 'Effectuer une aide logistique',                     href: '/logistique'          },
+      { key: 'consacre_resource',    label: 'Publier une ressource dans le wiki',                href: '/ressources'          },
+      { key: 'consacre_recruitment', label: "Participer à la validation d'un recrutement",       href: '/admin/candidatures', manual: true },
     ],
     bonusStep: 'consacre_bonus',
-    pointsPerStep: 15,
-    bonusPoints: 50,
+    pointsPerStep: 10,
+    bonusPoints: 40,
+  },
+  gardien: {
+    steps: [
+      { key: 'gardien_op_lead',     label: 'Commander sa première sortie',              href: '/operations'          },
+      { key: 'gardien_events_10',   label: 'Participer à 10 événements',                href: '/evenements'          },
+      { key: 'gardien_logistics',   label: 'Effectuer une aide logistique',             href: '/logistique'          },
+      { key: 'gardien_resource',    label: 'Publier une ressource dans le wiki',        href: '/ressources'          },
+      { key: 'gardien_recruitment', label: 'Valider un recrutement',                    href: '/admin/candidatures', manual: true },
+    ],
+    bonusStep: 'gardien_bonus',
+    pointsPerStep: 10,
+    bonusPoints: 60,
+  },
+  inquisiteur: {
+    steps: [
+      { key: 'inquisiteur_op_lead_3',      label: 'Commander 3 opérations',       href: '/operations'   },
+      { key: 'inquisiteur_event_organize', label: 'Organiser un événement',        href: '/evenements'   },
+      { key: 'inquisiteur_training',       label: 'Former un nouveau membre',      href: '/membres',      manual: true },
+      { key: 'inquisiteur_events_25',      label: 'Participer à 25 événements',    href: '/evenements'   },
+      { key: 'inquisiteur_partnership',    label: 'Établir un partenariat',        href: '/partenariats' },
+    ],
+    bonusStep: 'inquisiteur_bonus',
+    pointsPerStep: 10,
+    bonusPoints: 80,
   },
 }

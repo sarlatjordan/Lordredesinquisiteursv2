@@ -926,17 +926,29 @@ export interface Database {
       onboarding_progress: {
         Row: {
           profile_id: string
-          step: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
+          step: 'profile' | 'ship' | 'operation' | 'operation_important' | 'first_event' | 'bonus'
+            | 'discord_joined' | 'consacre_bonus'
+            | 'consacre_events_5' | 'consacre_op_5' | 'consacre_logistics' | 'consacre_resource' | 'consacre_recruitment'
+            | 'gardien_op_lead' | 'gardien_events_10' | 'gardien_logistics' | 'gardien_resource' | 'gardien_recruitment' | 'gardien_bonus'
+            | 'inquisiteur_op_lead_3' | 'inquisiteur_event_organize' | 'inquisiteur_training' | 'inquisiteur_events_25' | 'inquisiteur_partnership' | 'inquisiteur_bonus'
           completed_at: string
         }
         Insert: {
           profile_id: string
-          step: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
+          step: 'profile' | 'ship' | 'operation' | 'operation_important' | 'first_event' | 'bonus'
+            | 'discord_joined' | 'consacre_bonus'
+            | 'consacre_events_5' | 'consacre_op_5' | 'consacre_logistics' | 'consacre_resource' | 'consacre_recruitment'
+            | 'gardien_op_lead' | 'gardien_events_10' | 'gardien_logistics' | 'gardien_resource' | 'gardien_recruitment' | 'gardien_bonus'
+            | 'inquisiteur_op_lead_3' | 'inquisiteur_event_organize' | 'inquisiteur_training' | 'inquisiteur_events_25' | 'inquisiteur_partnership' | 'inquisiteur_bonus'
           completed_at?: string
         }
         Update: {
           profile_id?: string
-          step?: 'profile' | 'ship' | 'operation' | 'bonus' | 'discord_joined' | 'first_event' | 'consacre_bonus'
+          step?: 'profile' | 'ship' | 'operation' | 'operation_important' | 'first_event' | 'bonus'
+            | 'discord_joined' | 'consacre_bonus'
+            | 'consacre_events_5' | 'consacre_op_5' | 'consacre_logistics' | 'consacre_resource' | 'consacre_recruitment'
+            | 'gardien_op_lead' | 'gardien_events_10' | 'gardien_logistics' | 'gardien_resource' | 'gardien_recruitment' | 'gardien_bonus'
+            | 'inquisiteur_op_lead_3' | 'inquisiteur_event_organize' | 'inquisiteur_training' | 'inquisiteur_events_25' | 'inquisiteur_partnership' | 'inquisiteur_bonus'
           completed_at?: string
         }
         Relationships: TableRelationship[]

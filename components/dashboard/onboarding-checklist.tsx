@@ -1,19 +1,38 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { CheckCircle2, Circle, User, Rocket, Target, MessageSquare, CalendarDays } from 'lucide-react'
+import {
+  CheckCircle2, Circle, User, Rocket, Target, CalendarDays, MessageSquare,
+  Shield, Package, BookOpen, Users, Award, Star,
+} from 'lucide-react'
 import { claimOnboardingStep } from '@/actions/onboarding'
 import type { RankOnboardingConfig } from '@/lib/constants'
 import type { ExtendedOnboardingStep } from '@/types'
 
 const STEP_ICONS: Partial<Record<ExtendedOnboardingStep, React.ReactNode>> = {
-  profile:       <User          className="h-4 w-4" />,
-  ship:          <Rocket        className="h-4 w-4" />,
-  operation:     <Target        className="h-4 w-4" />,
-  discord_joined:<MessageSquare className="h-4 w-4" />,
-  first_event:   <CalendarDays  className="h-4 w-4" />,
+  profile:                    <User          className="h-4 w-4" />,
+  ship:                       <Rocket        className="h-4 w-4" />,
+  operation:                  <Target        className="h-4 w-4" />,
+  operation_important:        <Shield        className="h-4 w-4" />,
+  first_event:                <CalendarDays  className="h-4 w-4" />,
+  discord_joined:             <MessageSquare className="h-4 w-4" />,
+  consacre_events_5:          <CalendarDays  className="h-4 w-4" />,
+  consacre_op_5:              <Target        className="h-4 w-4" />,
+  consacre_logistics:         <Package       className="h-4 w-4" />,
+  consacre_resource:          <BookOpen      className="h-4 w-4" />,
+  consacre_recruitment:       <Users         className="h-4 w-4" />,
+  gardien_op_lead:            <Star          className="h-4 w-4" />,
+  gardien_events_10:          <CalendarDays  className="h-4 w-4" />,
+  gardien_logistics:          <Package       className="h-4 w-4" />,
+  gardien_resource:           <BookOpen      className="h-4 w-4" />,
+  gardien_recruitment:        <Users         className="h-4 w-4" />,
+  inquisiteur_op_lead_3:      <Star          className="h-4 w-4" />,
+  inquisiteur_event_organize: <CalendarDays  className="h-4 w-4" />,
+  inquisiteur_training:       <Users         className="h-4 w-4" />,
+  inquisiteur_events_25:      <CalendarDays  className="h-4 w-4" />,
+  inquisiteur_partnership:    <Award         className="h-4 w-4" />,
 }
 
 type Props = {
@@ -24,6 +43,7 @@ type Props = {
 
 export function OnboardingChecklist({ config, completedSteps, stepsDone }: Props) {
   const router = useRouter()
+  const [claimingStep, setClaimingStep] = useState<ExtendedOnboardingStep | null>(null)
 
   const doneCount  = config.steps.filter(s => stepsDone[s.key]).length
   const allDone    = doneCount === config.steps.length
@@ -33,7 +53,7 @@ export function OnboardingChecklist({ config, completedSteps, stepsDone }: Props
 
   useEffect(() => {
     if (hasClaimedRef.current) return
-    const unclaimed = config.steps.filter(s => stepsDone[s.key] && !completedSteps.includes(s.key))
+    const unclaimed = config.steps.filter(s => !s.manual && stepsDone[s.key] && !completedSteps.includes(s.key))
     if (unclaimed.length === 0) return
 
     hasClaimedRef.current = true
@@ -43,8 +63,14 @@ export function OnboardingChecklist({ config, completedSteps, stepsDone }: Props
     })()
   }, [config.steps, stepsDone, completedSteps, router])
 
-  // Disparaît uniquement quand toutes les étapes sont faites ET réclamées
   if (allDone && allClaimed) return null
+
+  async function handleManualClaim(stepKey: ExtendedOnboardingStep) {
+    setClaimingStep(stepKey)
+    await claimOnboardingStep(stepKey)
+    router.refresh()
+    setClaimingStep(null)
+  }
 
   return (
     <motion.div
@@ -71,6 +97,7 @@ export function OnboardingChecklist({ config, completedSteps, stepsDone }: Props
       <ul className="space-y-2.5">
         {config.steps.map((s) => {
           const done = stepsDone[s.key] ?? false
+          const icon = STEP_ICONS[s.key]
           return (
             <li key={s.key} className="flex items-center gap-3">
               {done ? (
@@ -78,10 +105,26 @@ export function OnboardingChecklist({ config, completedSteps, stepsDone }: Props
               ) : (
                 <Circle className="h-5 w-5 text-muted-foreground/40 shrink-0" />
               )}
+              {icon && (
+                <span className={done ? 'text-muted-foreground/40' : 'text-muted-foreground'}>
+                  {icon}
+                </span>
+              )}
               {done ? (
-                <span className="text-sm line-through text-muted-foreground">{s.label}</span>
+                <span className="text-sm line-through text-muted-foreground flex-1">{s.label}</span>
+              ) : s.manual ? (
+                <span className="flex-1 flex items-center gap-2">
+                  <span className="text-sm text-foreground">{s.label}</span>
+                  <button
+                    onClick={() => handleManualClaim(s.key)}
+                    disabled={claimingStep === s.key}
+                    className="text-xs text-primary border border-primary/30 rounded px-2 py-0.5 hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                  >
+                    {claimingStep === s.key ? '…' : 'Réclamer'}
+                  </button>
+                </span>
               ) : (
-                <a href={s.href} className="text-sm text-foreground hover:text-primary hover:underline transition-colors">
+                <a href={s.href} className="text-sm text-foreground hover:text-primary hover:underline transition-colors flex-1">
                   {s.label}
                 </a>
               )}
