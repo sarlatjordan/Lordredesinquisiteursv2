@@ -125,13 +125,16 @@ export async function acceptApplication(id: string): Promise<AcceptResult> {
   if (application.status !== 'pending') return { success: false, error: 'Candidature déjà traitée' }
 
   // Créer l'utilisateur auth + générer un magic link de première connexion
+  // redirectTo pointe vers /register pour que le nouveau membre complète son profil
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
+
   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
     type: 'magiclink',
     email: application.email,
     options: {
-      data: {
-        username: application.rsi_handle,
-      },
+      data: { username: application.rsi_handle },
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/register')}`,
     },
   })
 
