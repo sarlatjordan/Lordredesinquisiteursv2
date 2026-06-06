@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { MobileNav } from '@/components/layout/mobile-nav'
 import { TopBar } from '@/components/layout/top-bar'
@@ -13,12 +14,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const headersList = await headers()
   const pathname = headersList.get('x-pathname') ?? ''
   const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
+  const isMFAPage = pathname === '/mfa'
 
   const supabase = await createClient()
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // Vérifie si une élévation MFA (AAL2) est requise
+  // On laisse passer /mfa pour éviter la boucle de redirection
+  if (user && !isMFAPage) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
+      redirect('/mfa')
+    }
+  }
 
   let profile: Profile | null = null
   if (user) {
