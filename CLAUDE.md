@@ -95,7 +95,7 @@ Contrôle d'accès via `get_my_privilege()` en RLS Supabase sur **toutes** les t
 | `app/(app)/flotte/page.tsx` | Grille flotte triée par propriétaire |
 | `components/flotte/ship-card.tsx` | Card vaisseau avec édition inline nom |
 | `components/dashboard/onboarding-checklist.tsx` | Onboarding générique par rang |
-| `supabase/migrations/` | Migrations SQL numérotées — prochaine : **032** |
+| `supabase/migrations/` | Migrations SQL numérotées — prochaine : **033** |
 
 ---
 
@@ -172,7 +172,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 
 ---
 
-## Migrations appliquées (001 → 031) — prochaine : 032
+## Migrations appliquées (001 → 032) — prochaine : 033
 
 | Range | Contenu |
 |---|---|
@@ -188,6 +188,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 | 029 | ships.purchased_in_game BOOLEAN DEFAULT false |
 | 030 | profiles.avatar_pending_url TEXT |
 | 031 | onboarding_progress.step CHECK étendu (discord_joined, first_event, consacre_bonus) |
+| 032 | onboarding_progress.step CHECK étendu à 26 valeurs — 4 rangs × 5 étapes + bonus |
 
 ---
 
@@ -220,9 +221,12 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 - Landing publique, recrutement public, calendrier public, galerie publique, stats publiques
 
 ### Onboarding par rang
-- **Aspirant (100)** : profile, ship, operation — +10 pts, +30 bonus
-- **Consacré (150)** : discord_joined, first_event — +15 pts, +50 bonus
-- **Gardien+** : pas de parcours
+4 rangs couverts, 5 étapes chacun, +10 pts/étape, bonus de complétion progressif. Steps manuels réclamables via bouton « Réclamer » dans la checklist dashboard.
+- **Aspirant (100)** : profile, ship, operation, operation_important (2h+), first_event — bonus +25
+- **Consacré (150)** : consacre_events_5, consacre_op_5, consacre_logistics, consacre_resource, consacre_recruitment (manuel) — bonus +40
+- **Gardien (300)** : gardien_op_lead, gardien_events_10, gardien_logistics, gardien_resource, gardien_recruitment (manuel) — bonus +60
+- **Inquisiteur (400)** : inquisiteur_op_lead_3, inquisiteur_event_organize, inquisiteur_training (manuel), inquisiteur_events_25, inquisiteur_partnership — bonus +80
+- **Maître Inquisiteur / Sage** : pas de parcours (Sage = vote Conseil uniquement)
 
 ### Calendrier ICS global
 - Route `app/api/calendrier/ics/route.ts` : auth par HMAC stateless (`?uid=&token=`)
