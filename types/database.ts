@@ -983,6 +983,33 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      trusted_devices: {
+        Row: {
+          id: string
+          profile_id: string
+          device_id: string
+          label: string | null
+          expires_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          device_id: string
+          label?: string | null
+          expires_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          device_id?: string
+          label?: string | null
+          expires_at?: string
+          created_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
     }
     Views: EmptySchema
     Functions: {

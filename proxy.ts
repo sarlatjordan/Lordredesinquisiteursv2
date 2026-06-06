@@ -20,6 +20,62 @@ function buildCSP(nonce: string): string {
   ].join('; ')
 }
 
+function base64urlToUint8Array(b64url: string): Uint8Array {
+  const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = b64.padEnd(Math.ceil(b64.length / 4) * 4, '=')
+  const binary = atob(padded)
+  const arr = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i)
+  return arr
+}
+
+async function isTrustedDevice(request: NextRequest, userId: string): Promise<boolean> {
+  const secret = process.env.MFA_DEVICE_SECRET
+  if (!secret) return false
+
+  const rawToken = request.cookies.get('mfa_device_trust')?.value
+  if (!rawToken) return false
+
+  const dotIdx = rawToken.lastIndexOf('.')
+  if (dotIdx < 1) return false
+  const encoded = rawToken.slice(0, dotIdx)
+  const sig = rawToken.slice(dotIdx + 1)
+
+  try {
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify'],
+    )
+
+    const sigArr  = base64urlToUint8Array(sig)
+    const dataArr = new TextEncoder().encode(encoded)
+    const valid = await crypto.subtle.verify(
+      'HMAC', key,
+      sigArr.buffer.slice(sigArr.byteOffset, sigArr.byteOffset + sigArr.byteLength) as ArrayBuffer,
+      dataArr.buffer.slice(dataArr.byteOffset, dataArr.byteOffset + dataArr.byteLength) as ArrayBuffer,
+    )
+    if (!valid) return false
+
+    const decodedArr = base64urlToUint8Array(encoded)
+    const payload = JSON.parse(new TextDecoder().decode(
+      decodedArr.buffer.slice(decodedArr.byteOffset, decodedArr.byteOffset + decodedArr.byteLength) as ArrayBuffer,
+    )) as {
+      userId: string
+      expiresAt: string
+      deviceId: string
+    }
+    if (payload.userId !== userId) return false
+    if (new Date(payload.expiresAt) < new Date()) return false
+
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const requestHeaders = new Headers(request.headers)
@@ -55,9 +111,9 @@ export async function proxy(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const isLoginPage = pathname === '/login'
   const isCallbackPage = pathname === '/auth/callback'
+  const isMFAPage = pathname === '/mfa'
   const hasAuthTokens = searchParams.has('code') || searchParams.has('token_hash')
 
-  // Routes publiques — accessibles sans authentification
   const publicRoutes = ['/', '/recrutement', '/calendrier', '/galerie', '/stats']
   const isPublicRoute = publicRoutes.includes(pathname)
 
@@ -68,8 +124,6 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Rediriger vers /login si non authentifié sur une page protégée
-  // On mémorise le chemin + éventuels query params pour y revenir après connexion
   if (!user && !isLoginPage && !isPublicRoute) {
     const url = request.nextUrl.clone()
     const intended = request.nextUrl.search ? `${pathname}${request.nextUrl.search}` : pathname
@@ -81,7 +135,6 @@ export async function proxy(request: NextRequest) {
     return res
   }
 
-  // Rediriger après connexion : vers la page intentée si présente, sinon /dashboard
   if (user && isLoginPage) {
     const url = request.nextUrl.clone()
     url.pathname = safeRedirect(searchParams.get('redirectTo'))
@@ -89,6 +142,23 @@ export async function proxy(request: NextRequest) {
     const res = NextResponse.redirect(url)
     res.headers.set('Content-Security-Policy', csp)
     return res
+  }
+
+  // Enforce MFA on every protected route — le layout seul n'est pas fiable
+  // (les navigations client-side ne re-rendent pas nécessairement le layout)
+  if (user && !isLoginPage && !isPublicRoute && !isMFAPage) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
+      const trusted = await isTrustedDevice(request, user.id)
+      if (!trusted) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/mfa'
+        url.search = ''
+        const res = NextResponse.redirect(url)
+        res.headers.set('Content-Security-Policy', csp)
+        return res
+      }
+    }
   }
 
   supabaseResponse.headers.set('Content-Security-Policy', csp)
