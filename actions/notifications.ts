@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult, Notification } from '@/types'
 
 export async function markRead(notificationId: string): Promise<ActionResult> {
@@ -9,7 +10,9 @@ export async function markRead(notificationId: string): Promise<ActionResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  const { error } = await supabase
+  // adminClient pour bypasser RLS — ownership vérifié explicitement via .eq('profile_id', user.id)
+  const admin = createAdminClient()
+  const { error } = await admin
     .from('notifications')
     .update({ is_read: true })
     .eq('id', notificationId)
@@ -25,7 +28,8 @@ export async function markAllRead(): Promise<ActionResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  const { error } = await supabase
+  const admin = createAdminClient()
+  const { error } = await admin
     .from('notifications')
     .update({ is_read: true })
     .eq('profile_id', user.id)
