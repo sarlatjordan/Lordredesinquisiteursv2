@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useTransition, useState, useEffect } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Bell } from 'lucide-react'
@@ -27,7 +27,19 @@ export function NotificationsDropdown({ unreadCount, notifications }: Notificati
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
+  // État local pour mise à jour optimiste du badge et de la liste
+  const [localCount, setLocalCount] = useState(unreadCount)
+  const [localNotifs, setLocalNotifs] = useState(notifications)
+
+  // Synchronise avec les props serveur (après router.refresh())
+  useEffect(() => { setLocalCount(unreadCount) }, [unreadCount])
+  useEffect(() => { setLocalNotifs(notifications) }, [notifications])
+
   function handleMarkRead(id: string) {
+    // Mise à jour optimiste immédiate
+    setLocalNotifs(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
+    setLocalCount(prev => Math.max(0, prev - 1))
+
     startTransition(async () => {
       await markRead(id)
       router.refresh()
@@ -35,6 +47,10 @@ export function NotificationsDropdown({ unreadCount, notifications }: Notificati
   }
 
   function handleMarkAllRead() {
+    // Mise à jour optimiste immédiate
+    setLocalNotifs(prev => prev.map(n => ({ ...n, is_read: true })))
+    setLocalCount(0)
+
     startTransition(async () => {
       await markAllRead()
       router.refresh()
@@ -48,15 +64,15 @@ export function NotificationsDropdown({ unreadCount, notifications }: Notificati
           variant="ghost"
           size="icon"
           className="relative h-8 w-8 text-muted-foreground hover:text-foreground"
-          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} non lues)` : ''}`}
+          aria-label={`Notifications${localCount > 0 ? ` (${localCount} non lues)` : ''}`}
         >
           <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
+          {localCount > 0 && (
             <Badge
               className="absolute -top-0.5 -right-0.5 h-4 w-4 p-0 text-[9px] flex items-center justify-center bg-destructive border-0"
               aria-hidden
             >
-              {unreadCount > 9 ? '9+' : unreadCount}
+              {localCount > 9 ? '9+' : localCount}
             </Badge>
           )}
         </Button>
@@ -65,7 +81,7 @@ export function NotificationsDropdown({ unreadCount, notifications }: Notificati
       <DropdownMenuContent align="end" className="w-80" sideOffset={8}>
         <div className="flex items-center justify-between px-3 py-2">
           <p className="text-sm font-semibold">Notifications</p>
-          {unreadCount > 0 && (
+          {localCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
@@ -81,12 +97,12 @@ export function NotificationsDropdown({ unreadCount, notifications }: Notificati
         <DropdownMenuSeparator className="mb-0" />
 
         <div className="max-h-[380px] overflow-y-auto">
-          {notifications.length === 0 ? (
+          {localNotifs.length === 0 ? (
             <p className="text-center text-xs text-muted-foreground py-8">
               Aucune notification
             </p>
           ) : (
-            notifications.map((notif) => (
+            localNotifs.map((notif) => (
               <div key={notif.id}>
                 <div
                   className={cn(
