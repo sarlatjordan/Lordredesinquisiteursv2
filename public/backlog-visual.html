@@ -2,111 +2,107 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>INQFR — Backlog fusionné</title>
+<title>INQFR — Backlog</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0a0a0f; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; padding: 32px; min-height: 100vh; }
-  h1 { font-size: 22px; font-weight: 800; color: #818cf8; letter-spacing: .05em; margin-bottom: 4px; }
-  .subtitle { font-size: 12px; color: #475569; margin-bottom: 32px; }
 
-  /* Stats globales */
-  .global { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+  h1 { font-size: 22px; font-weight: 800; color: #818cf8; letter-spacing: .05em; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #475569; margin-bottom: 28px; }
+
+  /* Stats */
+  .global { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
   .stat { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 14px 20px; min-width: 120px; }
   .stat-value { font-size: 28px; font-weight: 900; }
   .stat-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
-  .c-done    { color: #4ade80; }
-  .c-p0      { color: #f87171; }
-  .c-p1      { color: #818cf8; }
-  .c-p2      { color: #94a3b8; }
-  .c-ops     { color: #f59e0b; }
-  .c-cyan    { color: #22d3ee; }
+  .c-done { color: #4ade80; }
+  .c-p0   { color: #f87171; }
+  .c-p1   { color: #818cf8; }
+  .c-warn { color: #fbbf24; }
 
-  /* Barre progression */
+  /* Progress */
   .progress-wrap { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 18px 22px; margin-bottom: 28px; }
   .progress-label { font-size: 12px; color: #64748b; margin-bottom: 10px; display: flex; justify-content: space-between; }
   .bar-bg { background: #1e1e2e; border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 8px; }
   .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4ade80, #22d3ee); }
-  .bar-row { display: flex; gap: 8px; align-items: center; }
+  .bar-row { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
   .bar-bg-sm { background: #1e1e2e; border-radius: 999px; height: 5px; flex: 1; overflow: hidden; }
-  .bar-fill-p0 { height: 100%; border-radius: 999px; background: #f87171; }
   .bar-fill-p1 { height: 100%; border-radius: 999px; background: #818cf8; }
-  .bar-fill-p2 { height: 100%; border-radius: 999px; background: #94a3b8; }
   .bar-label { font-size: 10px; color: #475569; width: 28px; text-align: right; }
-  .bar-count { font-size: 10px; color: #475569; width: 40px; }
+  .bar-count { font-size: 10px; color: #475569; width: 72px; }
 
-  /* Sections */
-  .sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 1000px) { .sections-grid { grid-template-columns: 1fr; } }
+  /* Grid */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+  .full { grid-column: 1 / -1; }
+
+  /* Section */
   .section { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 12px; padding: 18px; }
   .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
   .section-icon { font-size: 15px; }
   .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
-  .t-bug   { color: #fb7185; }
-  .t-sec   { color: #f87171; }
-  .t-perf  { color: #fbbf24; }
-  .t-arch  { color: #34d399; }
-  .t-ts    { color: #60a5fa; }
-  .t-ux    { color: #c084fc; }
-  .t-orig  { color: #94a3b8; }
-  .section-count { margin-left: auto; font-size: 10px; color: #475569; background: #1e1e2e; border-radius: 6px; padding: 2px 8px; }
+  .section-count { margin-left: auto; font-size: 10px; color: #475569; background: #1e1e2e; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+
+  .t-active { color: #fbbf24; }
+  .t-sec    { color: #f87171; }
+  .t-feat   { color: #818cf8; }
+  .t-perf   { color: #fbbf24; }
+  .t-arch   { color: #34d399; }
+  .t-ux     { color: #c084fc; }
+  .t-done   { color: #4ade80; }
 
   /* Items */
   .items { display: flex; flex-direction: column; gap: 5px; }
+  .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 5px; }
+
   .item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border-radius: 7px; font-size: 12px; border: 1px solid transparent; }
-  .item-done    { background: rgba(74,222,128,.04); border-color: rgba(74,222,128,.1); }
-  .item-p0      { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.18); }
-  .item-p1      { background: rgba(129,140,248,.04); border-color: rgba(129,140,248,.12); }
-  .item-p2      { background: rgba(148,163,184,.03); border-color: rgba(148,163,184,.08); }
-  .item-ops     { background: rgba(245,158,11,.04); border-color: rgba(245,158,11,.12); }
+  .item-active { background: rgba(251,191,36,.06); border-color: rgba(251,191,36,.2); }
+  .item-done   { background: rgba(74,222,128,.04); border-color: rgba(74,222,128,.1); }
+  .item-p0     { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.18); }
 
   .badge { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; margin-top: 1px; }
-  .b-done { background: rgba(74,222,128,.2);   color: #4ade80; }
-  .b-p0   { background: rgba(248,113,113,.2);  color: #f87171; }
-  .b-p1   { background: rgba(129,140,248,.2);  color: #818cf8; }
-  .b-p2   { background: rgba(148,163,184,.15); color: #94a3b8; }
-  .b-ops  { background: rgba(245,158,11,.2);   color: #f59e0b; }
+  .b-done   { background: rgba(74,222,128,.2);  color: #4ade80; }
+  .b-active { background: rgba(251,191,36,.2);  color: #fbbf24; }
+  .b-p0     { background: rgba(248,113,113,.2); color: #f87171; }
 
-  .item-body { flex: 1; min-width: 0; }
+  .item-body  { flex: 1; min-width: 0; }
   .item-label { color: #cbd5e1; line-height: 1.4; }
   .item-label.crossed { text-decoration: line-through; color: #374151; }
-  .item-sub { font-size: 10px; color: #4b5563; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item-meta { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .item-sub   { font-size: 10px; color: #4b5563; margin-top: 2px; }
+  .item-meta  { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
   .tag { font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
-  .tag-p0   { background: rgba(248,113,113,.15); color: #f87171; }
-  .tag-p1   { background: rgba(129,140,248,.15); color: #818cf8; }
-  .tag-p2   { background: rgba(148,163,184,.1);  color: #94a3b8; }
-  .tag-ops  { background: rgba(245,158,11,.15);  color: #f59e0b; }
-  .effort   { font-size: 10px; color: #475569; white-space: nowrap; }
+  .tag-p0 { background: rgba(248,113,113,.15); color: #f87171; }
+  .tag-p1 { background: rgba(129,140,248,.15); color: #818cf8; }
+  .tag-p2 { background: rgba(148,163,184,.1);  color: #94a3b8; }
 
-  /* Section full-width */
-  .full { grid-column: 1 / -1; }
+  .divider { border: none; border-top: 1px solid #1e1e2e; margin: 20px 0; grid-column: 1/-1; }
 
-  /* Divider */
-  .divider { border: none; border-top: 1px solid #1e1e2e; margin: 24px 0; }
+  .sprint-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #334155; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #1e1e2e; }
 </style>
 </head>
 <body>
 
-<h1>INQFR — Backlog fusionné</h1>
-<p class="subtitle">Audit multi-agents 2026-06-04 · Sécurité · Performance · Architecture · TypeScript · UX</p>
+<h1>INQFR — Backlog</h1>
+<p class="subtitle">Mise à jour 2026-06-06 · Next.js 16 · Supabase · TypeScript strict · Tailwind v4</p>
 
-<!-- Stats -->
+<!-- Stats globales -->
 <div class="global">
   <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P0 ouverts</div></div>
   <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P1 ouverts</div></div>
   <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P2 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-done">85</div><div class="stat-label">Terminés (total)</div></div>
-  <div class="stat"><div class="stat-value c-done">100%</div><div class="stat-label">Complétion globale</div></div>
+  <div class="stat"><div class="stat-value c-done">92</div><div class="stat-label">Terminés</div></div>
+  <div class="stat"><div class="stat-value c-done">100%</div><div class="stat-label">Complétion</div></div>
 </div>
 
-<!-- Barre progression -->
+<!-- Progression -->
 <div class="progress-wrap">
-  <div class="progress-label"><span>Progression globale (85 / 85 items)</span><span style="color:#4ade80">100% 🎉</span></div>
+  <div class="progress-label"><span>Progression globale (92 / 92 items)</span><span style="color:#4ade80">100% 🎉</span></div>
   <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
-  <div style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
+  <div style="margin-top:10px">
     <div class="bar-row">
       <span class="bar-label" style="color:#4ade80">P0</span>
-      <div class="bar-bg-sm"><div class="bar-fill-p0" style="width:0%"></div></div>
+      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:0%;background:#f87171"></div></div>
       <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
     <div class="bar-row">
@@ -116,221 +112,113 @@
     </div>
     <div class="bar-row">
       <span class="bar-label" style="color:#4ade80">P2</span>
-      <div class="bar-bg-sm"><div class="bar-fill-p2" style="width:0%"></div></div>
+      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:0%;background:#94a3b8"></div></div>
       <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
   </div>
 </div>
 
-<div class="sections-grid">
+<div class="grid">
 
-<!-- 🐛 Bugs & P0 critique -->
+<!-- ✅ Tous terminés -->
+<div class="section full" style="border-color:rgba(74,222,128,.2);background:rgba(74,222,128,.03)">
+  <div class="section-header">
+    <span class="section-icon">🎉</span>
+    <span class="section-title t-done">Backlog entièrement terminé — 92 / 92 items</span>
+    <span class="section-count" style="color:#4ade80">100%</span>
+  </div>
+  <p style="font-size:12px;color:#475569">Aucun item ouvert. Tous les P0, P1 et P2 sont fermés.</p>
+</div>
+
+<hr class="divider" />
+
+<!-- 🔒 Sprint 2026-06-06 — Sécurité & Auth -->
 <div class="section full">
   <div class="section-header">
-    <span class="section-icon">🐛</span>
-    <span class="section-title t-bug">Bugs actifs & P0 critique</span>
-    <span class="section-count" style="color:#4ade80">0 ouvert · tout ✓</span>
+    <span class="section-icon">🔒</span>
+    <span class="section-title t-sec">Sécurité & Auth — Sprint 2026-06-06</span>
+    <span class="section-count" style="color:#4ade80">7 terminés ✓</span>
   </div>
-  <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:5px">
+  <div class="items-grid">
     <div class="item item-done">
       <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label crossed">SEC-02 · Comptes de test — vérifiés et supprimés</div>
-        <div class="item-sub">Guard anti-prod ajouté dans scripts/seed-test-users.ts</div>
+        <div class="item-label crossed">SEC-05 · MFA bypass — enforcement middleware + remember device</div>
+        <div class="item-sub">Check AAL déplacé dans proxy.ts · cookie HMAC-SHA256 HttpOnly · table trusted_devices · migration 033 · sélecteur 1h/1j/1s/1m/1a</div>
       </div>
+      <div class="item-meta"><span class="tag tag-p0">P0</span></div>
     </div>
     <div class="item item-done">
       <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label crossed">OPS-01 · 2FA TOTP activé (Sage+)</div>
-        <div class="item-sub">MFA TOTP activé sur Supabase Dashboard — communiqué aux Sages+</div>
+        <div class="item-label crossed">FEAT-22 · MFA TOTP — enrollment + challenge universel</div>
+        <div class="item-sub">Section MFA /profil · QR code Supabase · /mfa universel · redirect AAL2 depuis layout · 2026-06-06</div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ⚡ Performance P1 — tout corrigé -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">⚡</span>
-    <span class="section-title t-perf">Performance — P1</span>
-    <span class="section-count" style="color:#4ade80">0 ouvert · 2 corrigés ✓</span>
-  </div>
-  <div class="items">
-    <div class="item item-done">
-      <div class="badge b-done">✓</div>
-      <div class="item-body">
-        <div class="item-label crossed">PERF-08 · membres/[username] — 9 RTT → 3 vagues</div>
-        <div class="item-sub">getUser()+profile ‖ me → Promise.all progression/promotions(JOIN)/points(JOIN)/stats</div>
-      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
     </div>
     <div class="item item-done">
       <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label crossed">PERF-09 · operations/[id] — waterfall → 3 vagues</div>
-        <div class="item-sub">getUser()+op(JOIN cmdr) ‖ me → Promise.all slots(JOIN)/regs(JOIN)/membres/resources/inventory</div>
+        <div class="item-label crossed">FEAT-21 · Authentification Google OAuth (PKCE)</div>
+        <div class="item-sub">Bouton SVG inline · loading state · séparateur · /auth/callback existant · 2026-06-06</div>
       </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-11 · Flux ICS global (Google Agenda)</div>
+        <div class="item-sub">Route /api/calendrier/ics · auth HMAC stateless · RFC 5545 · section /profil · ICS_HMAC_SECRET · 2026-06-06</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-14 · Parcours initiatique 4 rangs × 5 étapes</div>
+        <div class="item-sub">ONBOARDING_CONFIGS · migrations 031–032 · steps manuels réclamables · auto-détection Promise.all · 2026-06-06</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-18 · Fusion flotte org+perso + tri propriétaire + édition nom</div>
+        <div class="item-sub">Vue unifiée · tri JS A→Z · updateShipName Zod · édition inline ship-card · 2026-06-06</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-23 · Bouton Discord OAuth sur /login</div>
+        <div class="item-sub">DiscordButton dans login-client.tsx · modèle Google · PKCE via /auth/callback existant · 2026-06-06</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
     </div>
   </div>
 </div>
 
-<!-- 🏗 Architecture + TypeScript — tout corrigé -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">🏗</span>
-    <span class="section-title t-arch">Architecture — P1</span>
-    <span class="section-count" style="color:#4ade80">0 en attente · 5 corrigés ✓</span>
-  </div>
-  <div class="items">
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-04 · getAuth() ×5 → lib/auth-helpers.ts</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-05 · Double fetch generateMetadata — React.cache()</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-07 · operations/page — countData + commanderProfiles en Promise.all</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-05 · CI GitHub Actions — tsc + build sur push/PR</div><div class="item-sub">.github/workflows/ci.yml · Push sarlatjordan/Lordredesinquisiteursv2</div></div></div>
-  </div>
-</div>
-
-<!-- 🎨 UX — tout corrigé -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">🎨</span>
-    <span class="section-title t-ux">UX & Accessibilité — P1</span>
-    <span class="section-count" style="color:#4ade80">0 ouvert · 3 corrigés ✓</span>
-  </div>
-  <div class="items">
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D01 · loading.tsx créés (8 pages)</div><div class="item-sub">dashboard, evenements, flotte, partenariats, messages, profil, admin/candidatures, admin/promotions</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D02 · Mobile nav — 5 primaires + Sheet "Plus" (min 44px)</div><div class="item-sub">Profil accessible · SheetDescription sr-only · WCAG 2.5.5 ✓</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D04 · aria-labelledby sur 10 SelectTrigger</div><div class="item-sub">op-form ×4, op-register, award-points, transaction ×3, progression</div></div></div>
-  </div>
-</div>
-
-<!-- P2 — Tous corrigés -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">🗓</span>
-    <span class="section-title t-orig">P2 — Long terme</span>
-    <span class="section-count" style="color:#4ade80">0 ouvert · 5 corrigés ✓</span>
-  </div>
-  <div class="items">
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-10 · member_points → RPC SQL get_member_points_totals()</div><div class="item-sub">Migration 027 — O(n_membres) confirmé</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-11 · membre-detail.tsx — useRouter().refresh() supprimé</div><div class="item-sub">revalidatePath suffit — use client conservé pour framer-motion</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-09 · Props MembreDetail 13 → 6 (stats + permissions)</div><div class="item-sub">totalPoints absorbé dans profile.total_points · currentUserId supprimé</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-10 · typeCount calculé avant filtre JS (boutons type stables)</div><div class="item-sub">allShips pour agrégats · ships filtré pour la grille</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P01 · Textarea + Tabs + Select shadcn (admin candidatures + promotions)</div><div class="item-sub">ARIA + navigation clavier · validation explicite memberId</div></div></div>
-  </div>
-</div>
-
-<hr class="divider" style="grid-column:1/-1" />
-
-<!-- ✅ Corrections agents 2026-06-04 -->
+<!-- 🚀 Sprint 2026-06-05 — Features & Tech -->
 <div class="section full">
   <div class="section-header">
-    <span class="section-icon">✅</span>
-    <span class="section-title c-done" style="text-transform:uppercase;font-size:11px;letter-spacing:.1em">Corrigés par les agents — 2026-06-04</span>
-    <span class="section-count">51 items</span>
+    <span class="section-icon">🚀</span>
+    <span class="section-title t-feat">Features & Tech — Sprint 2026-06-05</span>
+    <span class="section-count" style="color:#4ade80">7 terminés ✓</span>
   </div>
-  <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px">
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-08 · membres/[username] — 9 RTT → 3 vagues (JOINs + Promise.all)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-09 · operations/[id] — 10+ RTT → 3 vagues (JOINs + Promise.all)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-04 · getAuth() ×5 → lib/auth-helpers.ts getAuthWithPrivilege()</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-05 · React.cache() membres/[username] — zéro double fetch</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-07 · operations/page — countData + commanderProfiles en Promise.all</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D01 · loading.tsx ×8 pages (dashboard, événements, flotte…)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D02 · Mobile nav — 5 primaires + Sheet "Plus" WCAG 44px</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D04 · aria-labelledby sur 10 SelectTrigger (5 fichiers)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-07 · useRef guard — eslint-disable supprimé, deps explicites</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D03 · title → aria-label (×5) + aria-label ajouté (×2)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D06 · loadingStatus par bouton — spinner ciblé Lancer/Terminer/Annuler</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BUG-02 · cached-org-settings — cookies() dans unstable_cache → createAdminClient</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-05 · force-dynamic manquant ×6 pages</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-06 · OnboardingStep déplacé dans types/index.ts</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-08 · catch(err: unknown) — hangar-sync ×3 + ship-matrix ×1</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-09 · InventoryStockRow exporté depuis types/index.ts</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D05 · Spinner Loader2 sur OpForm submit</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P02 · aria-expanded sur toggle historique logistique</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-12 · tags: ['public-stats'] + revalidateTag dans 3 actions</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-02 · Dashboard — attendeeCounts dans Promise.all</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-03 · org_settings — unstable_cache 60s + revalidateTag</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-04 · Événements — 2 requêtes séquentielles → Promise.all</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-05 · Opérations list — colonnes explicites (sans debrief)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-06 · Membres list — colonnes spécifiques</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-07 · Hooks TanStack morts supprimés (×3)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-B01 · Erreurs silencieuses — 10 handlers, 8 fichiers</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BUG-01 · Flotte blanche — Suspense autour RsiBookmarkletImport</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-01 · Crash Realtime chat — fetch par payload.new.id (déjà en place)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-02 · Upsert onboarding sans .error check</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-03 · Cast Promise-level rank_evaluations → post-await</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-01 · layout.tsx select('*') → colonnes spécifiques</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-A01 · RLS event_attendees sans WITH CHECK</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-A02 · Notifications INSERT libre (spam)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B01 · Route ICS bypass min_privilege</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B02 · Ships UPDATE sans WITH CHECK</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B03 · Notifications UPDATE sans WITH CHECK</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B04 · Réservation inventaire TOCTOU</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-C01 · isUUID manquant route ICS</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-01 · Mutation DB dans Server Component</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-02 · Admin client sans cache pages publiques</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-03 · Fichier fantôme promotion-requests.ts</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-04 · Erreurs silencieuses releaseAllOpResources</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-11 · Promise.resolve() superflu calendrier</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BONUS-01 · getPublicStats crash → /stats blanche</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-C02 · CSP unsafe-inline style-src (documenté)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-10 · member_points → RPC SQL get_member_points_totals() — migration 027</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-11 · useRouter().refresh() supprimé de membre-detail.tsx</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-09 · MembreDetail 13 props → 6 (stats + permissions)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-10 · typeCount sur allShips avant filtre (boutons stables)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P01 · Textarea + Tabs + Select shadcn (admin)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-05 · CI GitHub Actions — git init + push + workflow tsc/build</div></div></div>
-  </div>
-</div>
-
-<!-- ✅ Backlog original terminé -->
-<div class="section full">
-  <div class="section-header">
-    <span class="section-icon">📦</span>
-    <span class="section-title c-done" style="text-transform:uppercase;font-size:11px;letter-spacing:.1em">Backlog original — Terminés</span>
-    <span class="section-count">25 items</span>
-  </div>
-  <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:5px">
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-01 · RLS auto-promotion profiles</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-03 · Turnstile formulaire candidature</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-04 · console.log hangar-sync</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-01 · Redirect post-login</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-02 · Visiteur bloqué sans explication</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-01 · Messagerie instantanée</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-02 · Centre de notifications</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-03 · Onboarding checklist aspirant</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-04 · Membres inactifs (Sage)</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-05 · Export .ics calendrier</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-06 · Épreuves de rang MI+</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-01 · Batch N+1 releaseAllOpResources</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-02 · Supprimer revalidate=60 no-op</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-03 · Refactorer bookmarklet</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-03 · Skeleton loading pages</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-04 · Progression visible profil</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-05 · Page 404 personnalisée</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-01 · Stats publiques landing</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-02 · CSP headers nonce + statiques</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-03 · Validation UUID routes</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-04 · Runbook rotation clés Supabase</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-05 · Export données membres RGPD</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-06 · Page publique /stats</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-07 · Transitions Framer Motion</div></div></div>
-    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-04bis · CSP unsafe-eval dev-only</div></div></div>
-  </div>
-</div>
-
-<!-- 🎨 Sprint UX — 2026-06-05 -->
-<div class="section full" style="margin-top:20px">
-  <div class="section-header">
-    <span class="section-icon">🎨</span>
-    <span class="section-title t-ux">Sprint UX — 2026-06-05</span>
-    <span class="section-count" style="color:#4ade80">3 terminés ✓</span>
-  </div>
-  <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:5px">
+  <div class="items-grid">
     <div class="item item-done">
       <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label crossed">FEAT-08 · Fiche événement cliquable — dialog lecture seule</div>
+        <div class="item-label crossed">FEAT-07 · Profil accessible aux Visiteurs</div>
+        <div class="item-sub">proxy.ts x-pathname · layout isMembreProfile exception · 2026-06-05</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-08 · Fiche événement → dialog lecture seule</div>
         <div class="item-sub">EventViewDialog · cards cliquables · stopPropagation inscription · 2026-06-05</div>
       </div>
       <div class="item-meta"><span class="tag tag-p1">P1</span></div>
@@ -338,7 +226,31 @@
     <div class="item item-done">
       <div class="badge b-done">✓</div>
       <div class="item-body">
-        <div class="item-label crossed">UX-06 · Champ "mot de passe actuel" requis</div>
+        <div class="item-label crossed">FEAT-09 · Seuil commandement → Maître Inquisiteur</div>
+        <div class="item-sub">canManage >= 300 → >= 600 dans ×4 fichiers operations · 2026-06-05</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-17 · Audit des points (Sage+)</div>
+        <div class="item-sub">admin/points — 200 dernières attributions · sidebar Zap · 2026-06-05</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">TECH-06 · Supprimer bookmarklet RSI</div>
+        <div class="item-sub">rsi-bookmarklet-import + route API supprimés · flotte nettoyée · 2026-06-05</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">UX-06 · Champ mot de passe actuel requis</div>
         <div class="item-sub">signInWithPassword avant updateUser · autoComplete · 44px · 2026-06-05</div>
       </div>
       <div class="item-meta"><span class="tag tag-p1">P1</span></div>
@@ -347,53 +259,144 @@
       <div class="badge b-done">✓</div>
       <div class="item-body">
         <div class="item-label crossed">UX-07 · Background visuel thème SC</div>
-        <div class="item-sub">Étoiles + planète + hangar CSS-only · login · contraste préservé · 2026-06-05</div>
+        <div class="item-sub">Étoiles + planète + hangar CSS-only · login · 2026-06-05</div>
       </div>
       <div class="item-meta"><span class="tag tag-p2">P2</span></div>
     </div>
   </div>
 </div>
 
-<!-- 🚀 Sprint Features & Tech — 2026-06-05 -->
-<div class="section full" style="margin-top:20px">
+<!-- ✅ Audit agents 2026-06-04 — left (Sécurité + Bugs) -->
+<div class="section">
   <div class="section-header">
-    <span class="section-icon">🚀</span>
-    <span class="section-title t-arch">Sprint Features & Tech — 2026-06-05</span>
-    <span class="section-count" style="color:#4ade80">4 terminés ✓</span>
+    <span class="section-icon">🔒</span>
+    <span class="section-title t-sec">Sécurité & Bugs — Audit 2026-06-04</span>
+    <span class="section-count" style="color:#4ade80">14 corrigés ✓</span>
   </div>
-  <div class="items" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:5px">
-    <div class="item item-done">
-      <div class="badge b-done">✓</div>
-      <div class="item-body">
-        <div class="item-label crossed">FEAT-07 · Profil accessible aux Visiteurs</div>
-        <div class="item-sub">proxy.ts — x-pathname header · layout.tsx — isMembreProfile exception · 2026-06-05</div>
-      </div>
-      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
-    </div>
-    <div class="item item-done">
-      <div class="badge b-done">✓</div>
-      <div class="item-body">
-        <div class="item-label crossed">FEAT-09 · Seuil commandement → Maître Inquisiteur</div>
-        <div class="item-sub">operations ×4 — canManage >= 300 → >= 600 · redirect guards mis à jour · 2026-06-05</div>
-      </div>
-      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
-    </div>
-    <div class="item item-done">
-      <div class="badge b-done">✓</div>
-      <div class="item-body">
-        <div class="item-label crossed">TECH-06 · Supprimer le bookmarklet RSI</div>
-        <div class="item-sub">rsi-bookmarklet-import.tsx + route API supprimés · flotte/page.tsx nettoyé · 2026-06-05</div>
-      </div>
-      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
-    </div>
-    <div class="item item-done">
-      <div class="badge b-done">✓</div>
-      <div class="item-body">
-        <div class="item-label crossed">FEAT-17 · Audit des points (Sage+)</div>
-        <div class="item-sub">admin/points — 200 attributions, membre + montant + raison + auteur · sidebar Zap · 2026-06-05</div>
-      </div>
-      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
-    </div>
+  <div class="items">
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BUG-01 · Flotte blanche — Suspense autour RsiBookmarkletImport</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BUG-02 · cached-org-settings — cookies() dans unstable_cache → createAdminClient</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-01 · RLS auto-promotion profiles — migration 020</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-02 · Comptes de test prod supprimés + guard anti-prod</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-A01 · RLS event_attendees — UPDATE sans WITH CHECK</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-A02 · Notifications INSERT libre (spam)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B01 · Route ICS bypass min_privilege</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B02 · Ships UPDATE sans WITH CHECK</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B03 · Notifications UPDATE sans WITH CHECK</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-B04 · Réservation inventaire TOCTOU → RPC SECURITY DEFINER</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-C01 · isUUID manquant route ICS param id</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-C02 · CSP unsafe-inline style-src — documenté</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-03 · Turnstile formulaire candidature</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">OPS-01 · MFA TOTP activé (Sage+)</div></div></div>
+  </div>
+</div>
+
+<!-- ✅ Audit agents 2026-06-04 — right (Perf + Arch) -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <span class="section-title t-perf">Performance & Architecture — Audit 2026-06-04</span>
+    <span class="section-count" style="color:#4ade80">20 corrigés ✓</span>
+  </div>
+  <div class="items">
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-01 · layout.tsx select('*') → colonnes explicites</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-02 · Dashboard — attendeeCounts dans Promise.all</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-03 · org_settings — unstable_cache 60s + revalidateTag</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-04 · Événements — 2 requêtes séquentielles → Promise.all</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-05 · Opérations list — colonnes explicites (sans debrief)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-06 · Membres list — colonnes spécifiques</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-07 · Hooks TanStack Query morts supprimés (×3)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-08 · membres/[username] — 9 RTT → 3 vagues parallèles</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-09 · operations/[id] — waterfall → 3 vagues parallèles</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-10 · member_points → RPC SQL get_member_points_totals()</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-11 · membre-detail.tsx — useRouter().refresh() supprimé</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">PERF-12 · public-stats.ts — tags cache + revalidateTag</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-01 · Mutation DB dans Server Component (messages)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-02 · createAdminClient sans cache pages publiques</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-03 · Fichier fantôme promotion-requests.ts supprimé</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-04 · Erreurs silencieuses releaseAllOpResources</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-05 · React.cache() membres — zéro double fetch generateMetadata</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-07 · operations/page — countData + commanderProfiles en Promise.all</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-09 · MembreDetail 13 props → 6</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-10 · typeCount sur allShips avant filtre JS</div></div></div>
+  </div>
+</div>
+
+<!-- ✅ Audit agents 2026-06-04 — TypeScript -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">📘</span>
+    <span class="section-title" style="color:#60a5fa">TypeScript / Qualité — Audit 2026-06-04</span>
+    <span class="section-count" style="color:#4ade80">9 corrigés ✓</span>
+  </div>
+  <div class="items">
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-01 · Crash Realtime chat — payload sans JOIN</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-02 · Upsert onboarding sans .error check</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-03 · Cast Promise-level rank_evaluations → post-await</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-04 · getAuth() ×5 → lib/auth-helpers.ts getAuthWithPrivilege()</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-05 · force-dynamic manquant ×6 pages</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-06 · OnboardingStep déplacé dans types/index.ts</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-07 · useRef guard — eslint-disable supprimé</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-08 · catch(err: unknown) — ×4 occurrences</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TS-09 · InventoryStockRow exporté depuis types/index.ts</div></div></div>
+  </div>
+</div>
+
+<!-- ✅ Audit agents 2026-06-04 — UX -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-icon">🎨</span>
+    <span class="section-title t-ux">UX & Accessibilité — Audit 2026-06-04</span>
+    <span class="section-count" style="color:#4ade80">11 corrigés ✓</span>
+  </div>
+  <div class="items">
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-B01 · Erreurs silencieuses — 10 handlers, 8 fichiers</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D01 · loading.tsx créés ×8 pages</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D02 · Mobile nav — 5 primaires + Sheet "Plus" WCAG 44px</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D03 · title → aria-label ×7 boutons</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D04 · aria-labelledby sur 10 SelectTrigger (5 fichiers)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D05 · Spinner Loader2 sur OpForm submit</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-D06 · loadingStatus par bouton Lancer/Terminer/Annuler</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P01 · Textarea + Tabs + Select shadcn (admin ×3)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-P02 · aria-expanded sur toggle historique logistique</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">ARCH-11 · Promise.resolve() superflu calendrier/page.tsx</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">BONUS-01 · getPublicStats crash → /stats blanche</div></div></div>
+  </div>
+</div>
+
+<!-- ✅ Backlog original -->
+<div class="section full">
+  <div class="section-header">
+    <span class="section-icon">📦</span>
+    <span class="section-title t-done">Backlog original — Tous terminés</span>
+    <span class="section-count">25 items</span>
+  </div>
+  <div class="items-grid">
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-01 · Messagerie instantanée — migrations 021–022</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-02 · Centre de notifications</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-03 · Onboarding checklist aspirant — migration 023</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-04 · Membres inactifs (Sage)</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-05 · Export .ics calendrier</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">FEAT-06 · Épreuves de rang MI+</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-01 · Batch N+1 releaseAllOpResources</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-02 · Supprimer revalidate=60 no-op</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-03 · Refactorer bookmarklet</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">TECH-05 · CI GitHub Actions</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-01 · Redirect post-login</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-02 · Visiteur bloqué sans explication</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-03 · Skeleton loading pages</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-04 · Progression visible profil</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">UX-05 · Page 404 personnalisée</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-01 · Stats publiques landing</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-02 · CSP headers nonce + statiques</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-03 · Validation UUID routes dynamiques</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-04 · Runbook rotation clés Supabase</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-05 · Export données membres RGPD</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-06 · Page publique /stats</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">P2-07 · Transitions Framer Motion</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-01 · RLS auto-promotion profiles — migration 020</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-03 · Turnstile formulaire candidature</div></div></div>
+    <div class="item item-done"><div class="badge b-done">✓</div><div class="item-body"><div class="item-label crossed">SEC-04 · console.log hangar-sync — guard NODE_ENV</div></div></div>
   </div>
 </div>
 

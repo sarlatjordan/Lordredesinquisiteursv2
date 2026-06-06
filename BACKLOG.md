@@ -1,12 +1,11 @@
-# INQFR — Backlog produit (fusionné)
+# INQFR — Backlog produit
 
-> Généré suite aux audits multi-agents du 2026-06-04.
-> Fusionne : backlog original P0→P2 + audits Sécurité, Performance, Architecture, TypeScript, UX.
 > Stack : Next.js 16 App Router · TypeScript strict · Supabase (Auth + RLS) · Tailwind v4 · shadcn/ui · pnpm
+> Déploiement : Vercel · GitHub : `sarlatjordan/Lordredesinquisiteursv2` · Branche : `main`
 
 ---
 
-## Légende priorités
+## Légende
 
 | Priorité | Signification |
 |---|---|
@@ -16,407 +15,142 @@
 
 ---
 
-## 🐛 Bugs actifs — P0
+## ⏳ Items actifs
 
-### ~~BUG-01 · Page `/flotte` blanche intermittente~~ ✅ CORRIGÉ 2026-06-04
-`<Suspense fallback={null}>` ajouté autour de `<RsiBookmarkletImport />` dans `app/(app)/flotte/page.tsx`.
-
-### ~~BUG-02 · `cached-org-settings.ts` — `cookies()` interdit dans `unstable_cache()`~~ ✅ CORRIGÉ 2026-06-04
-`createClient()` appelle `await cookies()`, interdit dans un scope `unstable_cache()` depuis Next.js 15+. Fix : `createAdminClient()` (pas de cookies, `org_settings` est SELECT anon).
+Aucun item ouvert. 🎉
 
 ---
 
-## 🔒 Sécurité — P0 (findings audit 2026-06-04)
+## ✅ Items terminés
 
-### ~~SEC-A01 · RLS `event_attendees` — UPDATE sans WITH CHECK~~ ✅ CORRIGÉ 2026-06-04
-Falsification de présence à un événement via l'API REST. Fix : migration `025` avec `WITH CHECK (profile_id = auth.uid() OR get_my_privilege() >= 300)`.
+### 🔒 Sécurité & Auth
 
-### ~~SEC-A02 · RLS `notifications` — INSERT WITH CHECK(true)~~ ✅ CORRIGÉ 2026-06-04
-N'importe quel membre pouvait spammer les notifications d'un autre. Fix : migration `025`, INSERT limité à `get_my_privilege() >= 300`.
+| ID | Item | Terminé |
+|---|---|---|
+| SEC-01 | RLS auto-promotion profiles — migration 020 | 2026-06-04 |
+| SEC-02 | Comptes de test en prod supprimés + guard anti-prod dans seed | 2026-06-04 |
+| SEC-03 | Turnstile formulaire candidature | 2026-06-04 |
+| SEC-04 | `console.log` hangar-sync encadrés `NODE_ENV` | 2026-06-04 |
+| SEC-A01 | RLS `event_attendees` — UPDATE sans WITH CHECK | 2026-06-04 |
+| SEC-A02 | RLS `notifications` — INSERT WITH CHECK(true) | 2026-06-04 |
+| SEC-B01 | Route ICS — bypass du `min_privilege` des événements | 2026-06-04 |
+| SEC-B02 | RLS `ships` — UPDATE sans WITH CHECK | 2026-06-04 |
+| SEC-B03 | RLS `notifications` — UPDATE sans WITH CHECK | 2026-06-04 |
+| SEC-B04 | Réservation inventaire non-atomique (TOCTOU) — RPC SECURITY DEFINER | 2026-06-04 |
+| SEC-C01 | Route ICS — `isUUID()` absent sur param `id` | 2026-06-04 |
+| SEC-C02 | CSP `unsafe-inline` sur `style-src` — risque documenté, compromis Tailwind v4 | 2026-06-04 |
+| OPS-01 | MFA TOTP activé sur comptes privilégiés | 2026-06-04 |
+| **SEC-05** | **MFA bypass par navigation directe + remember device (migration 033)** | **2026-06-06** |
 
-### ~~SEC-B01 · Route ICS — bypass du `min_privilege` des événements~~ ✅ CORRIGÉ 2026-06-04
-Un Aspirant pouvait exporter le `.ics` d'un événement MI+. Fix : vérification privilege après fetch.
-
-### ~~SEC-B02 · RLS `ships` — UPDATE sans WITH CHECK~~ ✅ CORRIGÉ 2026-06-04
-Transfert forcé de vaisseau entre membres. Fix : `WITH CHECK (owner_id = auth.uid() OR get_my_privilege() >= 300)`.
-
-### ~~SEC-B03 · RLS `notifications` — UPDATE sans WITH CHECK~~ ✅ CORRIGÉ 2026-06-04
-Déplacement de notification vers la boîte d'un autre membre.
-
-### ~~SEC-B04 · Réservation d'inventaire non-atomique (TOCTOU)~~ ✅ CORRIGÉ 2026-06-04
-Sur-réservation possible sous concurrence. Fix : RPC `SECURITY DEFINER` avec `SELECT ... FOR UPDATE`.
-
-### ~~SEC-C01 · Route ICS — `isUUID()` absent sur le param `id`~~ ✅ CORRIGÉ 2026-06-04
-
-### ~~SEC-C02 · CSP `unsafe-inline` sur `style-src`~~ ✅ RISQUE DOCUMENTÉ 2026-06-04
-Compromis pragmatique avec Tailwind v4 — acceptable si nonce scripts reste strict.
-
-### ~~SEC-02 · Vérifier/supprimer comptes de test en prod~~ ✅ CORRIGÉ 2026-06-04
-Comptes `test.*@inqfr.test` vérifiés et supprimés. Guard anti-prod ajouté dans `scripts/seed-test-users.ts`.
-
-### ~~OPS-01 · Activer 2FA TOTP sur les comptes privilégiés~~ ✅ CORRIGÉ 2026-06-04
-MFA TOTP activé sur Supabase Dashboard. Communicé aux Sages+.
+> **SEC-05** : check AAL déplacé dans `proxy.ts` (middleware, tourne sur chaque requête). Cookie `mfa_device_trust` HMAC-SHA256 vérifié via Web Crypto (Edge). Page `/mfa` : sélecteur de durée 1h/1j/1s/1m/1a après vérification. Table `trusted_devices` + env var `MFA_DEVICE_SECRET` requise.
 
 ---
 
-## ⚡ Performance — P0/P1/P2
+### 🐛 Bugs
 
-### ~~PERF-01 · `layout.tsx` — `select('*')` sur chaque requête authentifiée~~ ✅ CORRIGÉ 2026-06-04
-`select('id, role, display_name, username, avatar_url')` dans `app/(app)/layout.tsx`.
-
----
-
-### ~~PERF-02 · Dashboard — `attendeeCounts` hors `Promise.all`~~ ✅ CORRIGÉ 2026-06-04
-Intégré dans le `Promise.all` principal de `dashboard/page.tsx`.
+| ID | Item | Terminé |
+|---|---|---|
+| BUG-01 | Page `/flotte` blanche intermittente — `<Suspense>` autour de `RsiBookmarkletImport` | 2026-06-04 |
+| BUG-02 | `cached-org-settings.ts` — `cookies()` interdit dans `unstable_cache()` → `createAdminClient()` | 2026-06-04 |
 
 ---
 
-### ~~PERF-03 · Dashboard — `org_settings` sans cache~~ ✅ CORRIGÉ 2026-06-04
-`lib/cached-org-settings.ts` créé (`unstable_cache` 60s, tag `org-settings`). `revalidateTag` ajouté dans `actions/org-settings.ts`.
+### 🚀 Features
+
+| ID | Item | Terminé |
+|---|---|---|
+| FEAT-01 | Messagerie instantanée — migrations 021–022 | 2026-06-04 |
+| FEAT-02 | Centre de notifications | 2026-06-04 |
+| FEAT-03 | Onboarding checklist aspirant — migration 023 | 2026-06-04 |
+| FEAT-04 | Membres inactifs (Sage) | 2026-06-04 |
+| FEAT-05 | Export `.ics` calendrier | 2026-06-04 |
+| FEAT-06 | Épreuves de rang (MI+) — migration 024 | 2026-06-04 |
+| FEAT-07 | Page profil accessible aux Visiteurs | 2026-06-05 |
+| FEAT-08 | Fiche événement cliquable → dialog lecture seule | 2026-06-05 |
+| FEAT-09 | Seuil commandement opérations : Gardien → Maître Inquisiteur | 2026-06-05 |
+| FEAT-11 | Intégration Google Agenda (flux ICS global, auth HMAC stateless) | 2026-06-06 |
+| FEAT-14 | Parcours initiatique 4 rangs × 5 étapes — migrations 031–032 | 2026-06-06 |
+| FEAT-17 | Audit des points attribués aux membres (Sage+) | 2026-06-05 |
+| FEAT-18 | Fusion flotte org+perso, tri propriétaire, édition nom inline | 2026-06-06 |
+| FEAT-21 | Authentification Google OAuth (PKCE) | 2026-06-06 |
+| FEAT-22 | MFA TOTP — enrollment `/profil` + challenge universel `/mfa` | 2026-06-06 |
+| FEAT-23 | Bouton Discord OAuth sur `/login` | 2026-06-06 |
 
 ---
 
-### ~~PERF-04 · Événements — 2 requêtes `event_attendees` séquentielles~~ ✅ CORRIGÉ 2026-06-04
-`userAttendees` et `countData` intégrés dans le `Promise.all` de `evenements/page.tsx`.
+### ⚡ Performance
+
+| ID | Item | Terminé |
+|---|---|---|
+| PERF-01 | `layout.tsx` — `select('*')` → colonnes explicites | 2026-06-04 |
+| PERF-02 | Dashboard — `attendeeCounts` hors `Promise.all` | 2026-06-04 |
+| PERF-03 | Dashboard — `org_settings` sans cache → `unstable_cache` 60s | 2026-06-04 |
+| PERF-04 | Événements — 2 requêtes `event_attendees` séquentielles → `Promise.all` | 2026-06-04 |
+| PERF-05 | Opérations list — `select('*')` sur textes longs | 2026-06-04 |
+| PERF-06 | Membres list — `select('*')` → colonnes explicites | 2026-06-04 |
+| PERF-07 | Hooks TanStack Query inutilisés supprimés | 2026-06-04 |
+| PERF-08 | `/membres/[username]` — waterfall → 3 vagues parallèles | 2026-06-04 |
+| PERF-09 | `/operations/[id]` — waterfall → 2 vagues parallèles | 2026-06-04 |
+| PERF-10 | `member_points` — full-scan JS → RPC SQL `get_member_points_totals()` | 2026-06-04 |
+| PERF-11 | `membre-detail.tsx` — `use client` inutile + `router.refresh()` supprimé | 2026-06-04 |
+| PERF-12 | `public-stats.ts` — tags cache manquants | 2026-06-04 |
 
 ---
 
-### ~~PERF-05 · Opérations list — `select('*')` sur textes longs~~ ✅ CORRIGÉ 2026-06-04
-Colonnes explicites (sans `debrief`) dans `operations/page.tsx`.
+### 🏗 Architecture
+
+| ID | Item | Terminé |
+|---|---|---|
+| ARCH-01 | Mutation DB dans un Server Component (messages) | 2026-06-04 |
+| ARCH-02 | `createAdminClient()` sans cache pages publiques (galerie, calendrier) | 2026-06-04 |
+| ARCH-03 | Fichier fantôme `actions/promotion-requests.ts` supprimé | 2026-06-04 |
+| ARCH-04 | Erreurs silencieuses dans `releaseAllOpResources` | 2026-06-04 |
+| ARCH-05 | Double fetch `generateMetadata` + body page → `React.cache()` | 2026-06-04 |
+| ARCH-07 | Requêtes multi-passes `operations/page.tsx` → `Promise.all` | 2026-06-04 |
+| ARCH-09 | Props trop granulaires sur `MembreDetail` (13 → 6 props) | 2026-06-04 |
+| ARCH-10 | Filtrage flotte côté JS — tri calculé avant filtre | 2026-06-04 |
+| ARCH-11 | `Promise.resolve()` superflu dans `calendrier/page.tsx` | 2026-06-04 |
+| TECH-01 | Batch N+1 `releaseAllOpResources` | 2026-06-04 |
+| TECH-02 | Supprimer `revalidate=60` no-op | 2026-06-04 |
+| TECH-03 | Refactorer bookmarklet | 2026-06-04 |
+| TECH-05 | CI GitHub Actions — workflow push | 2026-06-04 |
+| TECH-06 | Supprimer le bookmarklet RSI | 2026-06-05 |
 
 ---
 
-### ~~PERF-06 · Membres list — `select('*')`~~ ✅ CORRIGÉ 2026-06-04
-`select('id, username, display_name, role, avatar_url, star_citizen_handle, joined_at, is_active, bio')` dans `membres/page.tsx`.
+### 📘 TypeScript / Qualité code
+
+| ID | Item | Terminé |
+|---|---|---|
+| TS-01 | Crash Realtime chat — payload sans relations JOIN | 2026-06-04 |
+| TS-02 | Upsert `onboarding_progress` sans vérification `.error` | 2026-06-04 |
+| TS-03 | Cast Promise-level sur `rank_evaluations` dans `/profil` | 2026-06-04 |
+| TS-04 | `getAuth()` dupliqué ×5 → `lib/auth-helpers.ts` | 2026-06-04 |
+| TS-05 | `export const dynamic = 'force-dynamic'` manquant sur 6 pages | 2026-06-04 |
+| TS-06 | `OnboardingStep` type dans `actions/` → `types/index.ts` | 2026-06-04 |
+| TS-07 | `useEffect` deps vide silencé ESLint dans `onboarding-checklist` | 2026-06-04 |
+| TS-08 | `catch(err)` sans `: unknown` (4 occurrences) | 2026-06-04 |
+| TS-09 | Type inline `inventory_stock` sans nom → `InventoryStockRow` | 2026-06-04 |
 
 ---
 
-### ~~PERF-07 · Supprimer hooks TanStack Query inutilisés~~ ✅ CORRIGÉ 2026-06-04
-`hooks/use-members.ts`, `use-events.ts`, `use-ships.ts` supprimés.
-
----
-
-### ~~PERF-08 · `/membres/[username]` — 9 aller-retours séquentiels → ~4~~ ✅ CORRIGÉ 2026-06-04
-3 vagues : `getUser()` + `profile` en parallèle → `me` → `Promise.all` progression / promotions(JOIN promoter) / points(JOIN awarder) / 3 stats. Élimine 2 in-queries séparées.
-
----
-
-### ~~PERF-09 · `/operations/[id]` — waterfall → 2 vagues parallèles~~ ✅ CORRIGÉ 2026-06-04
-3 vagues : `getUser()` + `op(JOIN commander)` en parallèle → `me` → `Promise.all` slots(JOIN profiles) / registrations(JOIN profiles) / membres / resources / inventory. Élimine commander fetch + 2 in-queries.
-
----
-
-### ~~PERF-10 · `member_points` — full-scan côté JS → RPC SQL~~ ✅ CORRIGÉ 2026-06-04
-Migration 027 — `get_member_points_totals()` SECURITY DEFINER. `membres/page.tsx` appelle `supabase.rpc()` au lieu de `.select('profile_id, points')`. O(n_membres) confirmé. Type ajouté dans `database.ts`.
-
----
-
-### ~~PERF-11 · `membre-detail.tsx` — `'use client'` inutile~~ ✅ CORRIGÉ 2026-06-04
-`useRouter` + `router.refresh()` supprimés (redondants avec `revalidatePath`). `'use client'` conservé pour framer-motion (légitime).
-
----
-
-### ~~PERF-12 · `public-stats.ts` — tags cache manquants~~ ✅ CORRIGÉ 2026-06-04
-`tags: ['public-stats']` ajouté. `revalidateTag('public-stats', { expire: 0 })` dans `members.ts` (×2), `progression.ts`, `ships.ts` (×2).
-
----
-
-## 🏗 Architecture — P0/P1/P2
-
-### ~~ARCH-05 · Double fetch profil `generateMetadata` + body page~~ ✅ CORRIGÉ 2026-06-04
-`getProfileByUsername()` mémoïsé avec `React.cache()` dans `membres/[username]/page.tsx`. Le second appel (page body) résout instantanément depuis le cache React — zéro RTT supplémentaire.
-
----
-
-### ~~ARCH-07 · Requêtes multi-passes `operations/page.tsx`~~ ✅ CORRIGÉ 2026-06-04
-`countData` + `commanderProfiles` maintenant dans un `Promise.all` après les 2 requêtes ops. 4 requêtes séquentielles → 2 vagues parallèles.
-
----
-
-### ~~ARCH-09 · Props trop granulaires sur `MembreDetail` (13 props)~~ ✅ CORRIGÉ 2026-06-04
-13 props → 6 : `{ profile, progression, promotions, points, stats, permissions }`. `totalPoints` absorbé dans `profile.total_points`. `currentUserId` supprimé (inutilisé dans le corps).
-
----
-
-### ~~ARCH-10 · Filtrage flotte côté JS~~ ✅ CORRIGÉ 2026-06-04
-`typeCount`, `orgShips`, `available` calculés sur `allShips` avant filtre — les boutons de type ne disparaissaient plus quand un filtre était actif. Filtre JS conservé pour l'affichage (évite une seconde requête).
-
----
-
-### ~~ARCH-01 · Mutation DB dans un Server Component (messages)~~ ✅ CORRIGÉ 2026-06-04
-### ~~ARCH-02 · `createAdminClient()` sans cache pages publiques (galerie, calendrier)~~ ✅ CORRIGÉ 2026-06-04
-### ~~ARCH-03 · Fichier fantôme `actions/promotion-requests.ts`~~ ✅ CORRIGÉ 2026-06-04
-### ~~ARCH-04 · Erreurs silencieuses dans `releaseAllOpResources`~~ ✅ CORRIGÉ 2026-06-04
-### ~~ARCH-11 · `Promise.resolve()` superflu dans `calendrier/page.tsx`~~ ✅ CORRIGÉ 2026-06-04
-### ~~BONUS-01 · `getPublicStats()` crash silencieux → `/stats` blanche~~ ✅ CORRIGÉ 2026-06-04
-
----
-
-## 📘 TypeScript / Qualité code — P0/P1/P2
-
-### ~~TS-01 · Crash Realtime chat — payload sans relations JOIN~~ ✅ CORRIGÉ (déjà en place)
-`chat-layout.tsx` fait un fetch DB avec JOIN author via `payload.new.id` — code déjà correct à l'audit.
-
----
-
-### ~~TS-02 · Upsert `onboarding_progress` sans vérification `.error`~~ ✅ CORRIGÉ 2026-06-04
-`error: upsertError` et `error: bonusError` ajoutés dans `actions/onboarding.ts` → early return sur erreur DB.
-
----
-
-### ~~TS-03 · Cast Promise-level sur `rank_evaluations` dans `/profil`~~ ✅ CORRIGÉ 2026-06-04
-Cast déplacé post-await : `evalResult.data as ActiveEval | null` dans `app/(app)/profil/page.tsx`.
-
----
-
-### ~~TS-04 · `getAuth()` dupliqué dans 5 fichiers actions~~ ✅ CORRIGÉ 2026-06-04
-`lib/auth-helpers.ts` créé avec `getAuthWithPrivilege()`. Migré dans `events.ts`, `logistics.ts`, `map.ts`, `partnerships.ts`, `operations.ts`. Imports `createClient` + `getRolePrivilege` inutilisés nettoyés.
-
----
-
-### ~~TS-05 · `export const dynamic = 'force-dynamic'` manquant sur 6 pages~~ ✅ CORRIGÉ 2026-06-04
-Ajouté sur les 6 pages : `ressources/[slug]`, `operations/new`, `operations/[id]/edit`, `partenariats/new`, `partenariats/[id]/edit`, `logistique/new`.
-
----
-
-### ~~TS-06 · `OnboardingStep` type défini dans `actions/` au lieu de `types/`~~ ✅ CORRIGÉ 2026-06-04
-Déplacé dans `types/index.ts`. Import mis à jour dans `actions/onboarding.ts`, `dashboard/page.tsx`, `onboarding-checklist.tsx`.
-
----
-
-### ~~TS-07 · `useEffect` deps vide silencé ESLint dans `onboarding-checklist`~~ ✅ CORRIGÉ 2026-06-04
-`useRef(false)` guard ajouté, deps explicites `[done, completedSteps, router]`, `// eslint-disable-next-line` supprimé.
-
----
-
-### ~~TS-08 · `catch(err)` sans `: unknown` (4 occurrences)~~ ✅ CORRIGÉ 2026-06-04
-`catch (err: unknown)` sur `hangar-sync.ts` (×3, `replace_all`) et `ship-matrix.ts` (×1).
-
----
-
-### ~~TS-09 · Type inline `inventory_stock` sans nom~~ ✅ CORRIGÉ 2026-06-04
-`InventoryStockRow` exporté depuis `types/index.ts`. Type inline `StockRow` supprimé de `dashboard/page.tsx`.
-
----
-
-## 🎨 UX & Accessibilité — P0/P1/P2
-
-### ~~UX-B01 · Erreurs silencieuses sur 10 handlers fire-and-forget~~ ✅ CORRIGÉ 2026-06-04
-10 handlers dans 8 fichiers — `useState` error + bandeau rouge `bg-destructive/10`. Fichiers : `events-client.tsx`, `operation-detail.tsx`, `item-detail.tsx`, `op-register-dialog.tsx`, `op-registrations-panel.tsx`, `op-role-manager.tsx`, `promotions-client.tsx`, `event-detail-dialog.tsx`.
-
----
-
-### ~~UX-D01 · `loading.tsx` manquants sur 8 pages force-dynamic~~ ✅ CORRIGÉ 2026-06-04
-Créés : `dashboard`, `evenements`, `flotte`, `partenariats`, `messages`, `profil`, `admin/candidatures`, `admin/promotions`. Skeletons Shadcn adaptés à chaque layout.
-
----
-
-### ~~UX-D02 · Mobile nav surchargée — 10 icônes, zones < 44px WCAG~~ ✅ CORRIGÉ 2026-06-04
-5 routes primaires (dashboard, messages, membres, événements, opérations) avec `min-h-[44px]` WCAG 2.5.5. Bouton "Plus" → Sheet avec les 5 routes secondaires + `/profil`. `SheetDescription` sr-only pour ARIA.
-
----
-
-### ~~UX-D03 · `title` au lieu de `aria-label` sur 7 boutons icône~~ ✅ CORRIGÉ 2026-06-04
-`title` → `aria-label` sur `op-registrations-panel` (×2), `op-role-manager`, `item-detail` (×2). `aria-label` ajouté sur `op-resources-panel` et `event-detail-dialog` (boutons sans label).
-
----
-
-### ~~UX-D04 · Labels Radix Select non associés (`htmlFor` ne fonctionne pas)~~ ✅ CORRIGÉ 2026-06-04
-`id` ajouté sur tous les `<Label>` + `aria-labelledby` correspondant sur chaque `<SelectTrigger>`. Corrigé dans `op-form.tsx` (×4), `op-register-dialog.tsx`, `award-points-dialog.tsx`, `transaction-dialog.tsx` (×3), `progression-form.tsx`.
-
----
-
-### ~~UX-D05 · Spinner manquant sur le bouton submit de `OpForm`~~ ✅ CORRIGÉ 2026-06-04
-`<Loader2 className="animate-spin" />` ajouté sur le bouton submit de `op-form.tsx`.
-
----
-
-### ~~UX-D06 · `isPending` partagé pour Lancer / Terminer / Annuler~~ ✅ CORRIGÉ 2026-06-04
-`loadingStatus: string | null` ajouté. Chaque bouton affiche `<Loader2 animate-spin />` uniquement quand il est l'action en cours.
-
----
-
-### ~~UX-P01 · Composants HTML natifs au lieu de shadcn~~ ✅ CORRIGÉ 2026-06-04
-`<textarea>` → `<Textarea>` (RefuseDialog) · `<button>` onglets → `<Tabs>`/`<TabsTrigger>` (candidatures, ARIA + navigation clavier) · `<select>` → `<Select>` shadcn + validation explicite `memberId` (promotions).
-
----
-
-### ~~UX-P02 · `aria-expanded` manquant sur le toggle historique logistique~~ ✅ CORRIGÉ 2026-06-04
-`aria-expanded={showHistory}` ajouté sur le bouton toggle dans `item-detail.tsx`.
-
----
-
-## Backlog original (archive)
-
-> Items du backlog initial P0→P2, tous traités.
-
-| # | Item | Priorité | Statut |
-|---|---|---|---|
-| SEC-01 | RLS auto-promotion profiles | P0 | ✅ Migration 020 |
-| SEC-02 | Comptes de test prod | P0 | ✅ |
-| SEC-03 | Turnstile formulaire candidature | P0 | ✅ |
-| SEC-04 | console.log hangar-sync | P0 | ✅ |
-| UX-01 | Redirect post-login | P0 | ✅ |
-| UX-02 | Visiteur bloqué sans explication | P0 | ✅ |
-| OPS-01 | 2FA TOTP Supabase | P0 | ✅ |
-| FEAT-01 | Messagerie instantanée | P1 | ✅ Migration 021-022 |
-| FEAT-02 | Centre de notifications | P1 | ✅ |
-| FEAT-03 | Onboarding checklist aspirant | P1 | ✅ Migration 023 |
-| FEAT-04 | Membres inactifs (Sage) | P1 | ✅ |
-| FEAT-05 | Export .ics calendrier | P1 | ✅ |
-| FEAT-06 | Épreuves de rang (MI+) | P1 | ✅ Migration 024 |
-| TECH-01 | Batch N+1 releaseAllOpResources | P1 | ✅ |
-| TECH-02 | Supprimer revalidate=60 no-op | P1 | ✅ |
-| TECH-03 | Refactorer bookmarklet | P1 | ✅ |
-| TECH-05 | CI GitHub Actions | P1 | ✅ Push GitHub + workflow |
-| UX-03 | Skeleton loading pages | P1 | ✅ |
-| UX-04 | Progression visible profil | P1 | ✅ |
-| UX-05 | Page 404 personnalisée | P1 | ✅ |
-| P2-01 | Stats publiques landing page | P2 | ✅ |
-| P2-02 | CSP headers (nonce + statiques) | P2 | ✅ |
-| P2-03 | Validation UUID routes dynamiques | P2 | ✅ |
-| P2-04 | Runbook rotation clés Supabase | P2 | ✅ |
-| P2-05 | Export données membres (RGPD) | P2 | ✅ |
-| P2-06 | Page publique /stats | P2 | ✅ |
-| P2-07 | Transitions Framer Motion | P2 | ✅ |
-
----
-
-## Synthèse exécutive — Nouveaux items audit
-
-| ID | Item | Domaine | Priorité | Effort |
-|---|---|---|---|---|
-| ~~BUG-01~~ | ~~Flotte blanche — `useSearchParams` sans Suspense~~ | Arch | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~BUG-02~~ | ~~`cached-org-settings` — `cookies()` dans `unstable_cache()`~~ | Arch | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~UX-B01~~ | ~~Erreurs silencieuses 10 handlers~~ | UX | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~TS-01~~ | ~~Crash Realtime chat payload sans JOIN~~ | TS | ~~**P0**~~ | ✅ déjà en place |
-| ~~TS-02~~ | ~~Upsert onboarding sans `.error` check~~ | TS | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~TS-03~~ | ~~Cast Promise-level rank_evaluations~~ | TS | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~PERF-01~~ | ~~layout.tsx — select colonnes spécifiques~~ | Perf | ~~**P0**~~ | ✅ 2026-06-04 |
-| ~~PERF-02~~ | ~~Dashboard — attendeeCounts dans Promise.all~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-03~~ | ~~Dashboard — cache org_settings~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-04~~ | ~~Événements — 2 requêtes séquentielles~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-05~~ | ~~Opérations list — select colonnes~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-06~~ | ~~Membres list — select colonnes~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-07~~ | ~~Supprimer hooks TanStack morts~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-12~~ | ~~public-stats.ts — tags cache~~ | Perf | ~~P2~~ | ✅ 2026-06-04 |
-| ~~TS-05~~ | ~~force-dynamic manquant ×6 pages~~ | TS | ~~P1~~ | ✅ 2026-06-04 |
-| ~~TS-06~~ | ~~OnboardingStep type dans actions/~~ | TS | ~~P1~~ | ✅ 2026-06-04 |
-| ~~TS-08~~ | ~~catch(err) sans : unknown ×4~~ | TS | ~~P2~~ | ✅ 2026-06-04 |
-| ~~TS-09~~ | ~~Type inline inventory_stock~~ | TS | ~~P2~~ | ✅ 2026-06-04 |
-| ~~UX-D05~~ | ~~Spinner manquant OpForm~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-P02~~ | ~~aria-expanded manquant toggle historique~~ | UX | ~~P2~~ | ✅ 2026-06-04 |
-| ~~PERF-08~~ | ~~membres/[username] — waterfall → Promise.all~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-09~~ | ~~operations/[id] — waterfall → 2 vagues~~ | Perf | ~~P1~~ | ✅ 2026-06-04 |
-| ~~TS-04~~ | ~~getAuth() dupliqué ×5 → lib/auth-helpers.ts~~ | TS | ~~P1~~ | ✅ 2026-06-04 |
-| ~~TS-07~~ | ~~useEffect deps vide silencé ESLint~~ | TS | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-D03~~ | ~~title → aria-label 7 boutons~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-D06~~ | ~~isPending partagé 3 boutons statut~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-D01~~ | ~~loading.tsx manquants 8 pages~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-D02~~ | ~~Mobile nav surchargée (10 icônes)~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~UX-D04~~ | ~~Labels Radix non-associés (10+ cas)~~ | UX | ~~P1~~ | ✅ 2026-06-04 |
-| ~~ARCH-05~~ | ~~Double fetch generateMetadata + body~~ | Arch | ~~P1~~ | ✅ 2026-06-04 |
-| ~~ARCH-07~~ | ~~Requêtes multi-passes operations/page~~ | Arch | ~~P1~~ | ✅ 2026-06-04 |
-| ~~PERF-10~~ | ~~member_points → RPC SQL agrégation~~ | Perf | ~~P2~~ | ✅ 2026-06-04 |
-| ~~PERF-11~~ | ~~membre-detail.tsx — use client inutile~~ | Perf | ~~P2~~ | ✅ 2026-06-04 |
-| ~~ARCH-09~~ | ~~Props dense MembreDetail (13 props)~~ | Arch | ~~P2~~ | ✅ 2026-06-04 |
-| ~~ARCH-10~~ | ~~Filtrage flotte côté JS~~ | Arch | ~~P2~~ | ✅ 2026-06-04 |
-| ~~UX-P01~~ | ~~Composants natifs au lieu de shadcn ×3~~ | UX | ~~P2~~ | ✅ 2026-06-04 |
-
-**Total P0 nouveaux :** 7 items (dont BUG-02) — **7 corrigés ✅**
-**Total P1 nouveaux :** 20 items · ~13h — **21 corrigés (+UX-D01, UX-D02, UX-D04, ARCH-05, ARCH-07) — TOUS FERMÉS ✅**
-**Total P2 nouveaux :** 9 items · ~3h30 — **9 corrigés — TOUS FERMÉS ✅**
-
----
-
-## 🆕 Nouvelles features — sprint 2026-06-05
-
-### ~~FEAT-07 · Page profil accessible aux Visiteurs~~ ✅ TERMINÉ 2026-06-05
-`proxy.ts` — header `x-pathname` injecté sur chaque requête.
-`app/(app)/layout.tsx` — guard Visiteur bypassé pour `/membres/[username]` via `isMembreProfile`.
-
-### ~~FEAT-09 · Seuil commandement opérations : Gardien → Maître Inquisiteur~~ ✅ TERMINÉ 2026-06-05
-Seuil `>= 300` → `>= 600` dans `operations/page.tsx`, `[id]/page.tsx`, `new/page.tsx`, `[id]/edit/page.tsx`.
-Boutons Lancer / Terminer / Annuler / Modifier / Supprimer et création d'opération réservés Maître Inquisiteur+.
-
-### ~~TECH-06 · Supprimer le bookmarklet RSI~~ ✅ TERMINÉ 2026-06-05
-`components/flotte/rsi-bookmarklet-import.tsx` supprimé.
-`app/api/hangar-bookmarklet/route.ts` supprimé.
-`flotte/page.tsx` nettoyé (import + bloc `<Suspense>`).
-
-### ~~FEAT-17 · Audit des points attribués aux membres~~ ✅ TERMINÉ 2026-06-05
-`app/(app)/admin/points/page.tsx` créé — vue Sage+ listant les 200 dernières attributions (membre, rang, montant, raison, auteur, date).
-`components/layout/sidebar.tsx` — lien « Points » (icône Zap) ajouté dans la section Administration.
-
-| ID | Item | Domaine | Priorité | Statut |
-|---|---|---|---|---|
-| ~~FEAT-07~~ | ~~Profil accessible aux Visiteurs~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
-| ~~FEAT-09~~ | ~~Seuil commandement → Maître Inquisiteur~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
-| ~~TECH-06~~ | ~~Supprimer le bookmarklet RSI~~ | Tech | ~~P1~~ | ✅ 2026-06-05 |
-| ~~FEAT-17~~ | ~~Audit des points (Sage+)~~ | Feat | ~~P1~~ | ✅ 2026-06-05 |
-
----
-
-## 🎨 Nouvelles features UX — Sprint 2026-06-05
-
-| ID | Item | Domaine | Priorité | Statut |
-|---|---|---|---|---|
-| ~~FEAT-08~~ | ~~Fiche événement cliquable → dialog lecture seule~~ | UX | P1 | ✅ 2026-06-05 |
-| ~~UX-06~~ | ~~Champ "mot de passe actuel" requis pour modifier le mdp~~ | UX | P1 | ✅ 2026-06-05 |
-| ~~UX-07~~ | ~~Background visuel thème SC (hangar / planète sombre)~~ | UX | P2 | ✅ 2026-06-05 |
-
-### ~~FEAT-08 · Fiche événement cliquable → dialog lecture seule~~ ✅ TERMINÉ 2026-06-05
-`EventViewDialog` créé — dialog lecture seule accessible à tous les membres. Cards cliquables avec `stopPropagation` sur les boutons d'action.
-
-### ~~UX-06 · Champ "mot de passe actuel" requis~~ ✅ TERMINÉ 2026-06-05
-Vérification `signInWithPassword` avant `updateUser`. Champ `autoComplete="current-password"`, erreur inline, zones tactiles ≥ 44px.
-
-### ~~UX-07 · Background visuel thème SC~~ ✅ TERMINÉ 2026-06-05
-CSS-only sur `app/(auth)/layout.tsx` : 22 étoiles (radial-gradient), halo planétaire (coin droit), nébuleuse indigo, sol de hangar quadrillé. Zéro image externe, contraste login card inchangé.
-
----
-
-## 🚀 Nouvelles features L — Sprint 2026-06-06
-
-| ID | Item | Domaine | Priorité | Statut |
-|---|---|---|---|---|
-| ~~FEAT-14~~ | ~~Parcours initiatique modulable par rang~~ | Feat | P1 | ✅ 2026-06-06 |
-| ~~FEAT-18~~ | ~~Fusion flotte org+perso + tri propriétaire + édition nom~~ | Feat | P1 | ✅ 2026-06-06 |
-| ~~FEAT-21~~ | ~~Authentification Google (OAuth via Supabase)~~ | Feat | P1 | ✅ 2026-06-06 |
-| ~~FEAT-11~~ | ~~Intégration Google Agenda (flux ICS global)~~ | Feat | P1 | ✅ 2026-06-06 |
-| ~~FEAT-22~~ | ~~MFA TOTP — enrollment + challenge universel~~ | Sécurité | P1 | ✅ 2026-06-06 |
-
-### ~~FEAT-14 · Parcours initiatique modulable par rang~~ ✅ TERMINÉ 2026-06-06 (étendu 2026-06-06)
-Config en code (`ONBOARDING_CONFIGS` dans `lib/constants.ts`). **4 rangs × 5 étapes**, +10 pts/étape, bonus progressif (+25/+40/+60/+80). Migration 032 — CHECK constraint étendu à 26 valeurs. `ExtendedOnboardingStep` mis à jour dans `types/index.ts` et `types/database.ts`.
-- **Aspirant** : profile / ship / operation / operation_important (2h+) / first_event — bonus +25
-- **Consacré** : consacre_events_5 / consacre_op_5 / consacre_logistics / consacre_resource / consacre_recruitment — bonus +40
-- **Gardien** : gardien_op_lead / gardien_events_10 / gardien_logistics / gardien_resource / gardien_recruitment — bonus +60
-- **Inquisiteur** : inquisiteur_op_lead_3 / inquisiteur_event_organize / inquisiteur_training / inquisiteur_events_25 / inquisiteur_partnership — bonus +80
-Steps auto-détectés depuis la DB (ops, events, logistique, ressources, partenariats). Steps manuels (recrutement, formation) réclamables via bouton « Réclamer » dans la checklist dashboard.
-
-### ~~FEAT-18 · Fusion flotte org+perso + tri propriétaire + édition nom~~ ✅ TERMINÉ 2026-06-06
-Vue unifiée — tri JS par nom de propriétaire A→Z (ships sans owner = org, en tête). `updateShipName(shipId, name)` dans `actions/ships.ts` — Zod min2/max100, owner OU Gardien+. Édition inline dans `ship-card.tsx` : icône crayon → input → Enter/✓/✗.
-
-### ~~FEAT-21 · Authentification Google (OAuth via Supabase)~~ ✅ TERMINÉ 2026-06-06
-Bouton "Continuer avec Google" dans `login-client.tsx` — SVG inline, loading state, séparateur "ou". Flow PKCE — `/auth/callback` existant gère le `?code=`. Activer manuellement : Supabase Dashboard → Authentication → Providers → Google.
-
-### ~~FEAT-11 · Intégration Google Agenda (flux ICS global)~~ ✅ TERMINÉ 2026-06-06
-Route `app/api/calendrier/ics/route.ts` — auth HMAC stateless (`?uid=&token=`), RFC 5545, `Cache-Control: no-store`. `lib/ics-token.ts` — `generateIcsToken` / `verifyIcsToken` (timing-safe). Section "Abonnement calendrier" sur `/profil` — URL copiable, lien Google Agenda, lien `webcal://`. Variable env requise : `ICS_HMAC_SECRET`.
-
-### ~~FEAT-22 · MFA TOTP — enrollment + challenge universel~~ ✅ TERMINÉ 2026-06-06
-Section MFA sur `/profil` — QR code Supabase, vérification code, unenroll. Challenge inline dans `/login` après auth email/mdp. Page `/mfa` universelle pour OAuth (Google, Discord) — redirect automatique depuis `app/(app)/layout.tsx` si `nextLevel=aal2`. Supabase Dashboard : TOTP Enabled + "Limit duration of AAL1 sessions" ON.
-
----
-
-## 🚀 Sprint 2026-06-06 (suite)
-
-| ID | Item | Domaine | Priorité | Statut |
-|---|---|---|---|---|
-| ~~FEAT-14 suite~~ | ~~Parcours initiatique étendu — 4 rangs × 5 étapes~~ | Feat | P1 | ✅ 2026-06-06 |
-| FEAT-23 | Bouton Discord OAuth sur `/login` | Feat | P1 | ⏳ À faire |
-
-### ~~FEAT-14 suite · Parcours initiatique étendu — 4 rangs × 5 étapes~~ ✅ TERMINÉ 2026-06-06
-Migration 032. `ONBOARDING_CONFIGS` complété pour Gardien et Inquisiteur. Aspirant revu (5 étapes, bonus réduit à +25). Consacré entièrement refait (5 nouvelles étapes, bonus +40). `OnboardingStepConfig.manual?` ajouté — bouton « Réclamer » dans la checklist pour les steps sans détection automatique. Auto-détection par `Promise.all` dans `dashboard/page.tsx` pour les 4 rangs.
-
-### FEAT-23 · Bouton Discord OAuth sur `/login`
-Ajouter un bouton "Continuer avec Discord" dans `app/(auth)/login/login-client.tsx`, sur le modèle du bouton Google existant. Discord est déjà actif dans Supabase Dashboard. Le callback `/auth/callback` et `proxy.ts` gèrent déjà le flow PKCE — aucune modification backend requise.
+### 🎨 UX & Accessibilité
+
+| ID | Item | Terminé |
+|---|---|---|
+| UX-01 | Redirect post-login | 2026-06-04 |
+| UX-02 | Visiteur bloqué sans explication | 2026-06-04 |
+| UX-03 | Skeleton loading pages | 2026-06-04 |
+| UX-04 | Progression visible profil | 2026-06-04 |
+| UX-05 | Page 404 personnalisée | 2026-06-04 |
+| UX-06 | Champ "mot de passe actuel" requis pour modifier le mdp | 2026-06-05 |
+| UX-07 | Background visuel thème SC (hangar / planète sombre) | 2026-06-05 |
+| UX-B01 | Erreurs silencieuses sur 10 handlers fire-and-forget | 2026-06-04 |
+| UX-D01 | `loading.tsx` manquants sur 8 pages force-dynamic | 2026-06-04 |
+| UX-D02 | Mobile nav surchargée — 10 icônes, zones < 44px WCAG | 2026-06-04 |
+| UX-D03 | `title` au lieu de `aria-label` sur 7 boutons icône | 2026-06-04 |
+| UX-D04 | Labels Radix Select non associés (`htmlFor` ne fonctionne pas) | 2026-06-04 |
+| UX-D05 | Spinner manquant sur le bouton submit de `OpForm` | 2026-06-04 |
+| UX-D06 | `isPending` partagé pour Lancer / Terminer / Annuler | 2026-06-04 |
+| UX-P01 | Composants HTML natifs au lieu de shadcn (×3) | 2026-06-04 |
+| UX-P02 | `aria-expanded` manquant sur le toggle historique logistique | 2026-06-04 |
