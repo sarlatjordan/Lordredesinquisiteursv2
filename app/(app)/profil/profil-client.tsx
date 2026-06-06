@@ -31,16 +31,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { updateProfile, submitAvatarForApproval } from "@/actions/members";
+import { requestDataExport } from "@/actions/rgpd";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES, ROLE_COLORS, type Role } from "@/lib/constants";
 import { getInitials, formatDate } from "@/lib/utils";
@@ -793,139 +785,53 @@ function SectionCalendrier({
 
 // ─── Section données personnelles (RGPD) ─────────────────────────────────────
 
-function SectionDonnees({ email }: { email: string }) {
-  const [open, setOpen] = useState(false);
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
+function SectionDonnees() {
+  const [sent, setSent]               = useState(false);
+  const [error, setError]             = useState("");
+  const [isPending, startTransition]  = useTransition();
 
-  function handleClose(v: boolean) {
-    setOpen(v);
-    if (!v) {
-      setPassword("");
-      setError("");
-    }
-  }
-
-  function handleConfirm() {
-    if (!password) {
-      setError("Mot de passe requis");
-      return;
-    }
+  function handleRequest() {
     setError("");
     startTransition(async () => {
-      const supabase = createClient();
-      const { error: verifyErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (verifyErr) {
-        setError("Mot de passe incorrect");
-        return;
-      }
-
-      const response = await fetch("/api/profil/export");
-      if (!response.ok) {
-        setError("Erreur lors de l'export");
-        return;
-      }
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "mes-donnees-inqfr.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setOpen(false);
-      setPassword("");
+      const res = await requestDataExport();
+      if (!res.success) { setError(res.error ?? "Erreur"); return; }
+      setSent(true);
     });
   }
 
   return (
     <Section icon={<Download className="h-4 w-4" />} title="Mes données">
       <p className="text-sm text-muted-foreground leading-relaxed">
-        Téléchargez une copie de vos données personnelles : profil, vaisseaux,
-        inscriptions aux opérations et événements, historique de points.
+        Conformément au RGPD, vous pouvez demander une copie de vos données
+        personnelles. Le Conseil traitera votre demande et vous contactera.
       </p>
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="h-4 w-4" />
-            Télécharger mes données (JSON)
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmer votre identité</DialogTitle>
-            <DialogDescription>
-              Entrez votre mot de passe pour télécharger vos données
-              personnelles.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="export-password">Mot de passe</Label>
-              <div className="relative">
-                <Input
-                  id="export-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
-                  className="pr-9"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={
-                    showPassword
-                      ? "Masquer le mot de passe"
-                      : "Afficher le mot de passe"
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-            {error && (
-              <p className="flex items-center gap-1.5 text-xs text-destructive">
-                <AlertCircle className="h-3.5 w-3.5" /> {error}
-              </p>
+      {sent ? (
+        <p className="flex items-center gap-1.5 text-sm text-green-400">
+          <CheckCircle className="h-4 w-4" /> Demande transmise au Conseil.
+        </p>
+      ) : (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleRequest}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
             )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={isPending}
-            >
-              Annuler
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              disabled={isPending || !password}
-              className="gap-2"
-            >
-              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Télécharger
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            Demander mes données (RGPD)
+          </Button>
+          {error && (
+            <p className="flex items-center gap-1.5 text-xs text-destructive">
+              <AlertCircle className="h-3.5 w-3.5" /> {error}
+            </p>
+          )}
+        </>
+      )}
     </Section>
   );
 }
@@ -1359,7 +1265,7 @@ export function ProfilClient({
       {icsParams && (
         <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />
       )}
-      <SectionDonnees email={email} />
+      <SectionDonnees />
     </div>
   );
 }
