@@ -18,11 +18,13 @@ interface EventsClientProps {
   upcomingEvents: EventWithDetails[]
   pastEvents: EventWithDetails[]
   currentUserId?: string
-  canCreate?: boolean  // Aspirant+ : peut créer un événement
-  canManage?: boolean  // Gardien+ : peut modifier/gérer participants
+  canCreate?: boolean
+  canManage?: boolean
+  canDiscordSync?: boolean
+  canCreateOp?: boolean
 }
 
-export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false }: EventsClientProps) {
+export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false, canDiscordSync = false, canCreateOp = false }: EventsClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [managedEvent, setManagedEvent] = useState<EventWithDetails | null>(null)
   const [viewedEvent, setViewedEvent] = useState<EventWithDetails | null>(null)
@@ -31,10 +33,11 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  function handleCreateEvent(data: Parameters<typeof createEvent>[0]) {
+  function handleCreateEvent(data: import('@/components/evenements/event-form').EventFormData) {
     setCreateError(null)
+    const { sendToDiscord, createOperation, ...eventInput } = data
     startTransition(async () => {
-      const result = await createEvent(data)
+      const result = await createEvent(eventInput, { sendToDiscord, createOperation })
       if (result.success) {
         setIsCreateOpen(false)
         router.refresh()
@@ -90,6 +93,8 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
                 isPending={isPending}
                 onCancel={() => setIsCreateOpen(false)}
                 serverError={createError}
+                canDiscordSync={canDiscordSync}
+                canCreateOp={canCreateOp}
               />
             </DialogContent>
           </Dialog>

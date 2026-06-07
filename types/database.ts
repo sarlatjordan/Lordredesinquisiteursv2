@@ -78,6 +78,7 @@ export interface Database {
           max_attendees: number | null
           min_privilege: number
           report: string | null
+          discord_event_id: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -94,6 +95,7 @@ export interface Database {
           max_attendees?: number | null
           min_privilege?: number
           report?: string | null
+          discord_event_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -110,6 +112,7 @@ export interface Database {
           max_attendees?: number | null
           min_privilege?: number
           report?: string | null
+          discord_event_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string

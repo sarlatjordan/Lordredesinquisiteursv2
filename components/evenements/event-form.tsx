@@ -1,12 +1,13 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
-import { Loader2 } from 'lucide-react'
+import { useForm, Controller, useWatch } from 'react-hook-form'
+import { Loader2, Send, Swords } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { EVENT_TYPES, EVENT_STATUS, ROLES, ROLE_PRIVILEGES, type Role } from '@/lib/constants'
 
 interface EventFormValues {
@@ -19,6 +20,8 @@ interface EventFormValues {
   location?: string
   max_attendees?: string
   min_privilege: string
+  sendToDiscord: boolean
+  createOperation: boolean
 }
 
 export interface EventFormData {
@@ -31,6 +34,8 @@ export interface EventFormData {
   location?: string
   max_attendees?: number
   min_privilege: number
+  sendToDiscord?: boolean
+  createOperation?: boolean
 }
 
 interface EventFormProps {
@@ -41,6 +46,8 @@ interface EventFormProps {
   submitLabel?: string
   showStatus?: boolean
   serverError?: string | null
+  canDiscordSync?: boolean
+  canCreateOp?: boolean
 }
 
 export function EventForm({
@@ -51,6 +58,8 @@ export function EventForm({
   submitLabel = "Créer l'événement",
   showStatus = false,
   serverError,
+  canDiscordSync = false,
+  canCreateOp = false,
 }: EventFormProps) {
   const {
     register,
@@ -63,9 +72,13 @@ export function EventForm({
       type: 'operation',
       min_privilege: '0',
       status: 'planifie',
+      sendToDiscord: false,
+      createOperation: false,
       ...defaultValues,
     },
   })
+
+  const watchedType = useWatch({ control, name: 'type' })
 
   function handleValidSubmit(raw: EventFormValues) {
     if (!raw.title || raw.title.length < 3) {
@@ -80,6 +93,7 @@ export function EventForm({
       ...raw,
       max_attendees: raw.max_attendees ? parseInt(raw.max_attendees, 10) : undefined,
       min_privilege: parseInt(raw.min_privilege, 10) || 0,
+      createOperation: watchedType === 'operation' ? raw.createOperation : false,
     }
     return onSubmit(data)
   }
@@ -199,6 +213,45 @@ export function EventForm({
           />
         </div>
       </div>
+
+      {(canDiscordSync || (canCreateOp && watchedType === 'operation')) && (
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-3 space-y-2.5">
+          {canDiscordSync && (
+            <Controller
+              name="sendToDiscord"
+              control={control}
+              render={({ field }) => (
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <Checkbox
+                    id="sendToDiscord"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <Send className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm">Publier sur Discord</span>
+                </label>
+              )}
+            />
+          )}
+          {canCreateOp && watchedType === 'operation' && (
+            <Controller
+              name="createOperation"
+              control={control}
+              render={({ field }) => (
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <Checkbox
+                    id="createOperation"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <Swords className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm">Créer l&apos;opération liée</span>
+                </label>
+              )}
+            />
+          )}
+        </div>
+      )}
 
       {serverError && (
         <div className="rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2">

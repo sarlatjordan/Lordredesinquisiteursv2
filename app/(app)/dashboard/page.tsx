@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic'
 type RawEvent = {
   id: string; title: string; description: string | null; type: string; status: string
   start_at: string; end_at: string | null; location: string | null; max_attendees: number | null
-  min_privilege: number; report: string | null; created_by: string | null; created_at: string; updated_at: string
+  min_privilege: number; report: string | null; discord_event_id: string | null; created_by: string | null; created_at: string; updated_at: string
 }
 
 export default async function DashboardPage() {
@@ -177,6 +177,7 @@ export default async function DashboardPage() {
     max_attendees: e.max_attendees,
     min_privilege: e.min_privilege ?? 0,
     report: e.report,
+    discord_event_id: e.discord_event_id ?? null,
     created_by: e.created_by,
     created_at: e.created_at,
     updated_at: e.updated_at,

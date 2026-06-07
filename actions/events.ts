@@ -13,9 +13,17 @@ import {
 } from '@/types'
 import type { Event } from '@/types'
 import { PRIVILEGE } from '@/lib/constants'
+import { createDiscordScheduledEvent } from '@/lib/discord'
 
+interface CreateEventOptions {
+  sendToDiscord?: boolean
+  createOperation?: boolean
+}
 
-export async function createEvent(input: EventCreateInput): Promise<ActionResult<Event>> {
+export async function createEvent(
+  input: EventCreateInput,
+  options: CreateEventOptions = {},
+): Promise<ActionResult<Event>> {
   const { supabase, user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }
 
@@ -24,13 +32,45 @@ export async function createEvent(input: EventCreateInput): Promise<ActionResult
 
   if (privilege < PRIVILEGE.CREATE_EVENTS) return { success: false, error: 'Droits insuffisants — Aspirant requis' }
 
+  // Envoi Discord en premier pour récupérer le discord_event_id
+  let discordEventId: string | null = null
+  if (options.sendToDiscord) {
+    discordEventId = await createDiscordScheduledEvent({
+      name: parsed.data.title,
+      description: parsed.data.description,
+      scheduled_start_time: new Date(parsed.data.start_at).toISOString(),
+      scheduled_end_time: parsed.data.end_at ? new Date(parsed.data.end_at).toISOString() : null,
+      location: parsed.data.location,
+    })
+  }
+
   const { data, error } = await supabase
     .from('events')
-    .insert({ ...parsed.data, created_by: user.id })
+    .insert({
+      ...parsed.data,
+      created_by: user.id,
+      ...(discordEventId ? { discord_event_id: discordEventId } : {}),
+    })
     .select()
     .single()
 
   if (error) return { success: false, error: error.message }
+
+  // Création de l'opération liée (MI+ requis)
+  if (options.createOperation && parsed.data.type === 'operation' && privilege >= PRIVILEGE.CREATE_OPS) {
+    await supabase.from('operations').insert({
+      title: parsed.data.title,
+      description: parsed.data.description || null,
+      system_name: parsed.data.location || 'À définir',
+      type: 'combat',
+      status: 'planned',
+      departure_at: parsed.data.start_at,
+      risk_level: 'medium',
+      min_privilege: parsed.data.min_privilege ?? 100,
+      created_by: user.id,
+    })
+    revalidatePath('/operations')
+  }
 
   revalidatePath('/evenements')
   revalidatePath('/dashboard')

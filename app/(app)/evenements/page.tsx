@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { EventsClient } from './events-client'
 import type { EventWithDetails, EventAttendee } from '@/types'
 import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
+import { isDiscordConfigured } from '@/lib/discord'
 
 export const metadata: Metadata = { title: 'Événements' }
 export const dynamic = 'force-dynamic'
@@ -26,6 +27,9 @@ export default async function EvenementsPage() {
     canCreate = userPrivilege >= PRIVILEGE.CREATE_EVENTS
     canManage = userPrivilege >= PRIVILEGE.MANAGE_EVENTS
   }
+
+  const discordConfigured = isDiscordConfigured()
+  const canCreateOp = userPrivilege >= PRIVILEGE.CREATE_OPS
 
   // Un événement est "à venir" si son statut est actif ET sa date est dans le futur.
   // S'il est planifié/en_cours mais que la date est dépassée, il va dans "passés"
@@ -101,6 +105,8 @@ export default async function EvenementsPage() {
       currentUserId={user?.id}
       canCreate={canCreate}
       canManage={canManage}
+      canDiscordSync={discordConfigured}
+      canCreateOp={canCreateOp}
     />
   )
 }
