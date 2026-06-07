@@ -116,6 +116,7 @@ export async function proxy(request: NextRequest) {
 
   const publicRoutes = ['/', '/recrutement', '/calendrier', '/galerie', '/stats']
   const isPublicRoute = publicRoutes.includes(pathname)
+  const isApiRoute = pathname.startsWith('/api/')
 
   const csp = buildCSP(nonce)
 
@@ -124,7 +125,7 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
-  if (!user && !isLoginPage && !isPublicRoute) {
+  if (!user && !isLoginPage && !isPublicRoute && !isApiRoute) {
     const url = request.nextUrl.clone()
     const intended = request.nextUrl.search ? `${pathname}${request.nextUrl.search}` : pathname
     url.pathname = '/login'
@@ -146,7 +147,7 @@ export async function proxy(request: NextRequest) {
 
   // Enforce MFA on every protected route — le layout seul n'est pas fiable
   // (les navigations client-side ne re-rendent pas nécessairement le layout)
-  if (user && !isLoginPage && !isPublicRoute && !isMFAPage) {
+  if (user && !isLoginPage && !isPublicRoute && !isMFAPage && !isApiRoute) {
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
       const trusted = await isTrustedDevice(request, user.id)
