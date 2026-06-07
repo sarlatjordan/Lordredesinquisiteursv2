@@ -11,58 +11,96 @@ export async function GET(request: NextRequest) {
     `${request.nextUrl.protocol}//${request.nextUrl.host}`
 
   // Script exécuté sur la page RSI My Hangar.
-  // Stratégie 1 : appel fetch à l'API RSI (même session, type connu).
-  // Stratégie 2 : lecture de __NEXT_DATA__ avec filtre strict type==='ship'.
-  // Pas de fallback DOM générique — il scraperait les non-vaisseaux.
+  // Tente l'API RSI (plusieurs endpoints + POST), puis __NEXT_DATA__.
+  // Si rien trouvé : propose de naviguer vers la section PLEDGE (ships).
   const script = `(async function(){
 if(!location.hostname.includes('robertsspaceindustries.com')){
-  alert('Ce favori doit être utilisé depuis la page My Hangar RSI\\n(robertsspaceindustries.com/en/account/pledges)');
+  alert('Ce favori doit être utilisé depuis la page My Hangar RSI');
   return;
 }
 var s=[];
 
-function isShip(item){
-  var t=(item.type||item.kind||'').toLowerCase();
-  return t==='ship'||item.is_ship===true||item.productionStatus!=null;
+function isShip(o){
+  var t=(o.type||o.kind||o.itemType||'').toLowerCase();
+  return t==='ship';
 }
-function extract(pledges){
-  (pledges||[]).forEach(function(p){
-    var items=Array.isArray(p.contains)?p.contains:[p];
-    items.forEach(function(i){
+function fromPledges(list){
+  if(!Array.isArray(list))return;
+  list.forEach(function(p){
+    if(isShip(p)&&(p.name||p.title))s.push((p.name||p.title).trim());
+    var sub=p.contains||p.items||p.products||p.listing||[];
+    if(Array.isArray(sub))sub.forEach(function(i){
       if(isShip(i)&&(i.name||i.title))s.push((i.name||i.title).trim());
     });
   });
 }
+function pickPledges(j){
+  if(!j)return [];
+  var d=j.data;
+  if(Array.isArray(d))return d;
+  if(d){
+    if(Array.isArray(d.pledges))return d.pledges;
+    if(Array.isArray(d.data))return d.data;
+    if(Array.isArray(d.listing))return d.listing;
+    if(Array.isArray(d.items))return d.items;
+  }
+  if(Array.isArray(j.pledges))return j.pledges;
+  if(Array.isArray(j.items))return j.items;
+  return [];
+}
 
-// Stratégie 1 : API RSI pledge listing (JSON)
-var apiUrls=[
-  '/api/account/v2/pledges?platform=pledge&pagesize=1000&page=1',
+// Récupère le token RSI depuis le cookie pour les headers
+var rsiToken='';
+try{document.cookie.split(';').forEach(function(c){var p=c.trim().split('=');if(p[0]==='Rsi-Token')rsiToken=decodeURIComponent(p[1]||'');});}catch(e){}
+var hdrs={'Accept':'application/json','X-Requested-With':'XMLHttpRequest'};
+if(rsiToken)hdrs['X-Rsi-Token']=rsiToken;
+
+// GET — plusieurs variantes de query
+var gets=[
+  '/api/account/v2/pledges?platform=pledge&pagesize=1000',
+  '/api/account/v2/pledges?platform=pledge&pagesize=100&page=1',
+  '/api/account/v2/pledges?type=ship&pagesize=1000',
   '/api/account/v2/pledges?pagesize=1000',
   '/api/account/v2/pledges',
 ];
-for(var u=0;u<apiUrls.length&&!s.length;u++){
+for(var i=0;i<gets.length&&!s.length;i++){
   try{
-    var r=await fetch(apiUrls[u],{credentials:'include',headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}});
-    if(r.ok){
-      var j=await r.json();
-      var pl=(j.data&&(j.data.pledges||j.data.listing))||j.pledges||[];
-      extract(pl);
-    }
+    var r=await fetch(gets[i],{credentials:'include',headers:hdrs});
+    if(r.ok){var j=await r.json();fromPledges(pickPledges(j));}
   }catch(e){}
 }
 
-// Stratégie 2 : __NEXT_DATA__ avec filtre strict
+// POST avec body si GET échoue
+if(!s.length){
+  var postBodies=[
+    {platform:'pledge',pagesize:1000,page:1},
+    {type:'ship',pagesize:1000,page:1},
+    {pagesize:1000,page:1},
+  ];
+  for(var i=0;i<postBodies.length&&!s.length;i++){
+    try{
+      var pr=await fetch('/api/account/v2/pledges',{
+        method:'POST',credentials:'include',
+        headers:Object.assign({},hdrs,{'Content-Type':'application/json'}),
+        body:JSON.stringify(postBodies[i])
+      });
+      if(pr.ok){var pj=await pr.json();fromPledges(pickPledges(pj));}
+    }catch(e){}
+  }
+}
+
+// __NEXT_DATA__ en dernier recours
 if(!s.length){
   try{
     var nd=document.getElementById('__NEXT_DATA__');
     if(nd){
       var d=JSON.parse(nd.textContent);
-      function walk(o,depth){
-        if(depth>7||!o||typeof o!=='object')return;
-        if(Array.isArray(o)){o.forEach(function(x){walk(x,depth+1);});return;}
+      function walk(o,dep){
+        if(dep>8||!o||typeof o!=='object')return;
+        if(Array.isArray(o)){o.forEach(function(x){walk(x,dep+1);});return;}
         if(isShip(o)&&(o.name||o.title)){s.push((o.name||o.title).trim());return;}
-        ['pledges','data','contains','items','listing','ships','includes'].forEach(function(k){
-          if(o[k])walk(o[k],depth+1);
+        ['pledges','data','contains','items','listing','ships','products','includes'].forEach(function(k){
+          if(o[k])walk(o[k],dep+1);
         });
       }
       walk(d,0);
@@ -72,7 +110,9 @@ if(!s.length){
 
 s=s.filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i;});
 if(!s.length){
-  alert('Impossible de détecter des vaisseaux sur cette page.\\nUtilise le mode CSV dans la fenêtre INQFR\\n(My Hangar → Export).');
+  if(confirm('Aucun vaisseau détecté sur cette page.\\n\\nCliquez OK pour aller sur la section PLEDGE (vaisseaux) du My Hangar, puis relancez le favori Sync INQFR.\\n\\nOu Annuler → utilisez le mode CSV dans INQFR.')){
+    location.href='https://robertsspaceindustries.com/en/account/pledges?platform=pledge';
+  }
   return;
 }
 var enc;
