@@ -89,43 +89,33 @@ if(!s.length){
   }
 }
 
-// __NEXT_DATA__ en dernier recours
+// DOM — Stratégie A : items où div.kind === "Ship" dans les cards RSI (HTML classique)
+// Structure : .item > .text > div.title + div.kind
 if(!s.length){
   try{
-    var nd=document.getElementById('__NEXT_DATA__');
-    if(nd){
-      var d=JSON.parse(nd.textContent);
-      function walk(o,dep){
-        if(dep>8||!o||typeof o!=='object')return;
-        if(Array.isArray(o)){o.forEach(function(x){walk(x,dep+1);});return;}
-        if(isShip(o)&&(o.name||o.title)){s.push((o.name||o.title).trim());return;}
-        ['pledges','data','contains','items','listing','ships','products','includes'].forEach(function(k){
-          if(o[k])walk(o[k],dep+1);
-        });
+    var kinds=document.querySelectorAll('.item .kind');
+    for(var ki=0;ki<kinds.length;ki++){
+      if(kinds[ki].textContent.trim().toLowerCase()==='ship'){
+        var txt=kinds[ki].parentElement;
+        var tit=txt?txt.querySelector('.title'):null;
+        if(tit){var n=tit.textContent.trim();if(n&&s.indexOf(n)<0)s.push(n);}
       }
-      walk(d,0);
     }
   }catch(e){}
 }
 
-// DOM — cherche "Contains: [nom]" via textContent (joint les nœuds fils séparés)
-// Le nom du ship est souvent dans un <span>/<a> séparé, donc TreeWalker ne suffit pas
+// DOM — Stratégie B : .items-col "Contains: [nom] and X items"
+// Normalise les espaces/newlines avant le regex (label + text node séparés)
 if(!s.length){
-  function scrapeContains(doc){
-    try{
-      var els=doc.querySelectorAll('div,span,p,li,td,section');
-      for(var ei=0;ei<els.length;ei++){
-        var t=els[ei].textContent.trim();
-        if(t.length<5||t.length>400)continue;
-        var mc=t.match(/Contains:\s*(.+?)\s+and\s+\d+\s+items?/i);
-        if(!mc)mc=t.match(/^Contains:\s*(.{1,80})/i);
-        if(mc){var cn=mc[1].trim();if(cn.length>1&&cn.length<100&&s.indexOf(cn)<0)s.push(cn);}
-      }
-    }catch(e){}
-  }
-  scrapeContains(document);
-  var ifs=document.querySelectorAll('iframe');
-  for(var fi=0;fi<ifs.length;fi++){try{if(ifs[fi].contentDocument)scrapeContains(ifs[fi].contentDocument);}catch(e){}}
+  try{
+    var icols=document.querySelectorAll('.items-col');
+    for(var ci=0;ci<icols.length;ci++){
+      var t=icols[ci].textContent.replace(/\s+/g,' ').trim();
+      var mc=t.match(/Contains:\s*(.+?)\s+and\s+\d+\s+items?/i);
+      if(!mc)mc=t.match(/Contains:\s*(.{1,80})/i);
+      if(mc){var cn=mc[1].trim();if(cn.length>1&&cn.length<100&&s.indexOf(cn)<0)s.push(cn);}
+    }
+  }catch(e){}
 }
 
 s=s.filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i;});
