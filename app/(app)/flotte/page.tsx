@@ -4,6 +4,7 @@ import { ShipCard } from '@/components/flotte/ship-card'
 import { AddShipButton } from '@/components/flotte/add-ship-button'
 import { HangarSyncDialog } from '@/components/flotte/hangar-sync-dialog'
 import { SyncMatrixButton } from '@/components/flotte/sync-matrix-button'
+import { BookmarkletImporter } from '@/components/flotte/bookmarklet-importer'
 import { Rocket } from 'lucide-react'
 import type { ShipWithOwner } from '@/types'
 import { SHIP_TYPES, type ShipType, getRolePrivilege, PRIVILEGE } from '@/lib/constants'
@@ -12,11 +13,11 @@ export const metadata: Metadata = { title: 'Flotte' }
 export const dynamic = 'force-dynamic'
 
 interface FlottePageProps {
-  searchParams: Promise<{ type?: string; status?: string }>
+  searchParams: Promise<{ type?: string; status?: string; rsi_import?: string }>
 }
 
 export default async function FlottePage({ searchParams }: FlottePageProps) {
-  const { type, status } = await searchParams
+  const { type, status, rsi_import } = await searchParams
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -64,6 +65,7 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
 
   return (
     <div className="space-y-6">
+      {rsi_import && <BookmarkletImporter encoded={rsi_import} />}
       {/* En-tête */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
