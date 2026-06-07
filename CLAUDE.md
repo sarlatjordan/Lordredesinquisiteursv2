@@ -130,6 +130,7 @@ Contrôle d'accès via `get_my_privilege()` en RLS Supabase sur **toutes** les t
 - `cookies()` est async : `const cookieStore = await cookies()`
 - `params` dans les pages est async : `const { id } = await params`
 - `unstable_cache` : interdit d'y appeler `createClient()` (qui fait `await cookies()`)
+- **Routes `/api/*`** : exclues du check auth middleware (`isApiRoute = pathname.startsWith('/api/')`) — chaque route API gère sa propre auth
 
 ### Supabase
 - **MFA** : `listFactors().totp[].status` est toujours `'verified'` dans les types TypeScript. Pour détecter les facteurs non-vérifiés : utiliser `listFactors().all` avec filtre `factor_type='totp' && status='unverified'`
@@ -172,7 +173,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 
 ---
 
-## Migrations appliquées (001 → 032) — prochaine : 033
+## Migrations appliquées (001 → 034) — prochaine : 035
 
 | Range | Contenu |
 |---|---|
@@ -189,6 +190,8 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 | 030 | profiles.avatar_pending_url TEXT |
 | 031 | onboarding_progress.step CHECK étendu (discord_joined, first_event, consacre_bonus) |
 | 032 | onboarding_progress.step CHECK étendu à 26 valeurs — 4 rangs × 5 étapes + bonus |
+| 033 | table trusted_devices (id, profile_id, device_id UUID UNIQUE, label, expires_at, created_at) + RLS |
+| 034 | events.discord_event_id TEXT UNIQUE + index |
 
 ---
 
@@ -200,6 +203,11 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé publique (client navigateur) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Clé service — bypass RLS, server-only UNIQUEMENT |
 | `ICS_HMAC_SECRET` | `openssl rand -hex 32` — requis pour section ICS sur /profil |
+| `MFA_DEVICE_SECRET` | `openssl rand -hex 32` — requis pour trusted devices (cookie HMAC) |
+| `DISCORD_BOT_TOKEN` | Token bot Discord — création events côté site→Discord |
+| `DISCORD_GUILD_ID` | ID du serveur Discord |
+| `DISCORD_WEBHOOK_SECRET` | Secret partagé — authentifie les POST entrants Make→site |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Clé publique Cloudflare Turnstile (captcha login) |
 
 ---
 
@@ -232,6 +240,24 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 - Route `app/api/calendrier/ics/route.ts` : auth par HMAC stateless (`?uid=&token=`)
 - Retourne tous les événements futurs accessibles selon le rang
 - Cache-Control: no-store — utilise `createAdminClient()`
+
+### Discord sync bidirectionnel (FEAT-24)
+- **Site → Discord** : `createDiscordScheduledEvent()` dans `lib/discord.ts` — appelé depuis `actions/events.ts` si `sendToDiscord: true`. Crée un Scheduled Event Discord (entity_type=3 EXTERNAL, privacy_level=2). Requiert permission bot `MANAGE_EVENTS`.
+- **Discord → Site** : `POST /api/discord/events` — webhook entrant Make.com (polling 15min). Auth via header `x-webhook-secret`. Upsert events par `discord_event_id`. mapStatus : 1→planifie, 2→en_cours, 3→termine, 4→annule.
+- **Make.com** : module Discord "List Guild Events" → HTTP POST `https://inqfr.vercel.app/api/discord/events`. Body JSON string avec `formatDate()` sur les dates Discord.
+- **Gotcha middleware** : `proxy.ts` doit exclure `/api/*` du check auth — les routes API gèrent leur propre auth en interne (`isApiRoute = pathname.startsWith('/api/')`).
+
+### MFA Trusted Devices (SEC-05)
+- Check AAL déplacé dans `proxy.ts` (middleware) — s'exécute sur chaque requête HTTP
+- Cookie `mfa_device_trust` HMAC-SHA256 vérifié via Web Crypto (Edge-compatible)
+- `lib/trusted-device-token.ts` : génération/vérification token Node.js crypto
+- `actions/mfa-device.ts` : `trustCurrentDevice(duration)` — insert `trusted_devices` + pose cookie httpOnly
+- Page `/mfa` : sélecteur durée (1h/1j/1s/1m/1a) après TOTP valide
+
+### Cloudflare Turnstile (SEC-06)
+- Formulaires PasswordForm et MagicLinkForm sur `/login`
+- Token passé à `signInWithPassword()` / `signInWithOtp()` via `options.captchaToken`
+- Bouton désactivé tant que captchaToken est null
 
 ---
 
