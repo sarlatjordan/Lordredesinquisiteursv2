@@ -10,6 +10,9 @@ import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { Turnstile } from '@marsidev/react-turnstile'
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
 // ─── Bouton Google OAuth ──────────────────────────────────────────────────────
 
@@ -108,6 +111,7 @@ function PasswordForm({ redirectTo }: { redirectTo?: string }) {
   const [mfaCode, setMfaCode] = useState('')
   const [mfaError, setMfaError] = useState('')
   const [mfaPending, setMfaPending] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm<PasswordFormValues>()
@@ -119,6 +123,7 @@ function PasswordForm({ redirectTo }: { redirectTo?: string }) {
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
+      options: captchaToken ? { captchaToken } : undefined,
     })
     if (error) {
       setState('error')
@@ -283,7 +288,16 @@ function PasswordForm({ redirectTo }: { redirectTo?: string }) {
         </motion.div>
       )}
 
-      <Button type="submit" className="w-full" disabled={state === 'loading'}>
+      {TURNSTILE_SITE_KEY && (
+        <Turnstile
+          siteKey={TURNSTILE_SITE_KEY}
+          onSuccess={setCaptchaToken}
+          onExpire={() => setCaptchaToken(null)}
+          options={{ theme: 'dark', size: 'flexible' }}
+        />
+      )}
+
+      <Button type="submit" className="w-full" disabled={state === 'loading' || (!!TURNSTILE_SITE_KEY && !captchaToken)}>
         {state === 'loading'
           ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Connexion…</>
           : 'Se connecter'}
@@ -301,6 +315,7 @@ interface MagicLinkFormValues {
 function MagicLinkForm({ onBack, redirectTo }: { onBack: () => void; redirectTo?: string }) {
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const { register, handleSubmit, formState: { errors } } = useForm<MagicLinkFormValues>()
 
@@ -319,6 +334,7 @@ function MagicLinkForm({ onBack, redirectTo }: { onBack: () => void; redirectTo?
       options: {
         emailRedirectTo: callbackUrl,
         shouldCreateUser: false,
+        ...(captchaToken ? { captchaToken } : {}),
       },
     })
     if (error) {
@@ -375,7 +391,16 @@ function MagicLinkForm({ onBack, redirectTo }: { onBack: () => void; redirectTo?
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={state === 'loading'}>
+      {TURNSTILE_SITE_KEY && (
+        <Turnstile
+          siteKey={TURNSTILE_SITE_KEY}
+          onSuccess={setCaptchaToken}
+          onExpire={() => setCaptchaToken(null)}
+          options={{ theme: 'dark', size: 'flexible' }}
+        />
+      )}
+
+      <Button type="submit" className="w-full" disabled={state === 'loading' || (!!TURNSTILE_SITE_KEY && !captchaToken)}>
         {state === 'loading'
           ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Envoi…</>
           : 'Recevoir le lien'}
