@@ -464,6 +464,20 @@ export async function syncHangarFromBookmarklet(
   const profile = await getCurrentProfile()
   if (!profile) return { success: false, error: 'Non authentifié' }
   const profileId = targetProfileId ?? profile.id
+
+  // Filtrage côté serveur : garder uniquement les noms qui correspondent à un
+  // modèle RSI connu. Élimine les composants non-vaisseau (casques, armes, etc.)
+  // qu'un package peut contenir et que le bookmarklet aurait scrappé.
+  const { data: models } = await supabase.from('ship_models').select('name')
+  if (models && models.length > 0) {
+    const modelNamesLower = models.map((m) => m.name.toLowerCase())
+    const filtered = shipNames.filter((name) => {
+      const lower = name.toLowerCase()
+      return modelNamesLower.some((m) => m === lower || lower.includes(m) || m.includes(lower))
+    })
+    if (filtered.length > 0) shipNames = filtered
+  }
+
   return await upsertShipsForProfile(supabase, profileId, shipNames)
 }
 
