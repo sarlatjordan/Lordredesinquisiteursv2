@@ -108,11 +108,27 @@ if(!s.length){
   }catch(e){}
 }
 
+// DOM — lit les textes "Contains: [nom] and X items" visibles sur les cards pledge
+// Fonctionne sur MY GEAR / Standalone Ships sans dépendre de l'API RSI
+if(!s.length){
+  try{
+    var tw=document.createTreeWalker(document.body,4/*NodeFilter.SHOW_TEXT*/);
+    var tn;
+    while((tn=tw.nextNode())){
+      var tt=tn.textContent.trim();
+      var mc=tt.match(/Contains:\s*(.+?)\s+and\s+\d+\s+items?/i);
+      if(!mc)mc=tt.match(/^Contains:\s*(.+)/i);
+      if(mc){
+        var cn=mc[1].trim();
+        if(cn.length>1&&cn.length<100)s.push(cn);
+      }
+    }
+  }catch(e){}
+}
+
 s=s.filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i;});
 if(!s.length){
-  if(confirm('Aucun vaisseau détecté sur cette page.\\n\\nCliquez OK pour aller sur la section PLEDGE (vaisseaux) du My Hangar, puis relancez le favori Sync INQFR.\\n\\nOu Annuler → utilisez le mode CSV dans INQFR.')){
-    location.href='https://robertsspaceindustries.com/en/account/pledges?platform=pledge';
-  }
+  alert('Aucun vaisseau détecté.\\nAssure-toi d\\'être sur My Hangar → MY GEAR → filtre "Standalone Ships", puis relance le favori.');
   return;
 }
 var enc;
