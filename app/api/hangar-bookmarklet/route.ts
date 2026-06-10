@@ -123,7 +123,7 @@ msg+='\\n\\nImporter dans INQFR ?';
 if(!confirm(msg))return;
 var enc;
 try{enc=btoa(unescape(encodeURIComponent(JSON.stringify(ships))));}catch(e){enc=btoa(JSON.stringify(ships));}
-location.href='${siteUrl}/flotte?rsi_import='+encodeURIComponent(enc);
+window.open('${siteUrl}/flotte?rsi_import='+encodeURIComponent(enc),'_blank');
 })()`
 
   return NextResponse.json({ bookmarklet: `javascript:${encodeURIComponent(script)}` })
