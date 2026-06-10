@@ -116,14 +116,32 @@ if(!ships.length){
   alert('Aucun vaisseau détecté.\\nAssure-toi d\\'être sur la page My Hangar RSI (account/pledges).');
   return;
 }
-var msg=ships.length+' vaisseau'+(ships.length>1?'x':'')+' détecté'+(ships.length>1?'s':'')+' :\\n\\n';
-msg+=ships.slice(0,30).map(function(n,i){return(i+1)+'. '+n;}).join('\\n');
-if(ships.length>30)msg+='\\n… et '+(ships.length-30)+' autre'+(ships.length-30>1?'s':'');
-msg+='\\n\\nImporter dans INQFR ?';
-if(!confirm(msg))return;
 var enc;
 try{enc=btoa(unescape(encodeURIComponent(JSON.stringify(ships))));}catch(e){enc=btoa(JSON.stringify(ships));}
-window.open('${siteUrl}/flotte?rsi_import='+encodeURIComponent(enc),'_blank');
+var ov=document.createElement('div');
+ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.78);z-index:2147483647;display:flex;align-items:center;justify-content:center;font-family:sans-serif';
+var bx=document.createElement('div');
+bx.style.cssText='background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:10px;padding:24px;width:440px;max-width:92vw;max-height:76vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.85)';
+var h=document.createElement('p');
+h.style.cssText='margin:0 0 14px;font-size:15px;font-weight:700;color:#f0f6fc';
+h.textContent=ships.length+' vaisseau'+(ships.length>1?'x':'')+' d\\u00e9tect\\u00e9'+(ships.length>1?'s':'')+' \\u2014 Importer dans INQFR ?';
+var ol=document.createElement('ol');
+ol.style.cssText='margin:0 0 18px 20px;padding:0;font-size:13px;line-height:1.9;color:#c9d1d9';
+ships.slice(0,30).forEach(function(n){var li=document.createElement('li');li.textContent=n;ol.appendChild(li);});
+if(ships.length>30){var xli=document.createElement('li');xli.style.cssText='list-style:none;margin-left:-20px;color:#8b949e';xli.textContent='\\u2026 et '+(ships.length-30)+' autre'+(ships.length-30>1?'s':'');ol.appendChild(xli);}
+var row=document.createElement('div');
+row.style.cssText='display:flex;gap:10px;justify-content:flex-end';
+var btnC=document.createElement('button');
+btnC.textContent='Annuler';
+btnC.style.cssText='padding:7px 18px;border:1px solid #30363d;background:#21262d;color:#c9d1d9;border-radius:6px;cursor:pointer;font-size:14px';
+var btnO=document.createElement('button');
+btnO.textContent='Importer';
+btnO.style.cssText='padding:7px 18px;border:none;background:#238636;color:#fff;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700';
+btnC.onclick=function(){document.body.removeChild(ov);};
+btnO.onclick=function(){document.body.removeChild(ov);window.open('${siteUrl}/flotte?rsi_import='+encodeURIComponent(enc),'_blank');};
+row.appendChild(btnC);row.appendChild(btnO);
+bx.appendChild(h);bx.appendChild(ol);bx.appendChild(row);
+ov.appendChild(bx);document.body.appendChild(ov);
 })()`
 
   return NextResponse.json({ bookmarklet: `javascript:${encodeURIComponent(script)}` })
