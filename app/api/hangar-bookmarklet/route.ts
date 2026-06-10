@@ -11,31 +11,31 @@ export async function GET(request: NextRequest) {
     `${request.nextUrl.protocol}//${request.nextUrl.host}`
 
   // Script exécuté sur la page RSI My Hangar.
-  // Tente l'API RSI (plusieurs endpoints + POST), puis __NEXT_DATA__.
-  // Si rien trouvé : propose de naviguer vers la section PLEDGE (ships).
+  // Stratégie 1 : API RSI paginée (toutes les pages jusqu'à réponse vide).
+  // Stratégie 2 : scraping DOM — tourne TOUJOURS et merge avec les résultats API.
+  // Les deux stratégies alimentent un Set commun → zéro doublon.
   const script = `(async function(){
-if(!location.hostname.includes('robertsspaceindustries.com')){
-  alert('Ce favori doit être utilisé depuis la page My Hangar RSI');
+if(!location.hostname.includes('robertsspaceindustries.com')||!location.pathname.includes('account')){
+  alert('Ce favori doit être utilisé depuis ta page My Hangar RSI\\n(robertsspaceindustries.com/en/account/pledges)');
   return;
 }
-var s=[];
-
-function isShip(o){
-  var t=(o.type||o.kind||o.itemType||'').toLowerCase();
-  return t==='ship';
-}
-function fromPledges(list){
-  if(!Array.isArray(list))return;
-  list.forEach(function(p){
-    if(isShip(p)&&(p.name||p.title))s.push((p.name||p.title).trim());
-    var sub=p.contains||p.items||p.products||p.listing||[];
-    if(Array.isArray(sub))sub.forEach(function(i){
-      if(isShip(i)&&(i.name||i.title))s.push((i.name||i.title).trim());
+var found=new Set();
+function add(n){n=(n||'').replace(/\\s+/g,' ').trim();if(n.length>1&&n.length<150)found.add(n);}
+function scanPledge(p){
+  var t=(p.type||p.kind||p.itemType||p.pledgeType||'').toLowerCase();
+  if(t==='ship'&&(p.name||p.title))add(p.name||p.title);
+  var sub=p.contains||p.items||p.products||p.listing||[];
+  if(Array.isArray(sub))sub.forEach(function(i){
+    var it=(i.type||i.kind||i.itemType||'').toLowerCase();
+    if(it==='ship'&&(i.name||i.title))add(i.name||i.title);
+    var sub2=i.contains||i.items||[];
+    if(Array.isArray(sub2))sub2.forEach(function(j){
+      if((j.type||j.kind||'').toLowerCase()==='ship'&&(j.name||j.title))add(j.name||j.title);
     });
   });
 }
-function pickPledges(j){
-  if(!j)return [];
+function pickList(j){
+  if(!j)return[];
   var d=j.data;
   if(Array.isArray(d))return d;
   if(d){
@@ -46,85 +46,83 @@ function pickPledges(j){
   }
   if(Array.isArray(j.pledges))return j.pledges;
   if(Array.isArray(j.items))return j.items;
-  return [];
+  return[];
 }
-
-// Récupère le token RSI depuis le cookie pour les headers
 var rsiToken='';
 try{document.cookie.split(';').forEach(function(c){var p=c.trim().split('=');if(p[0]==='Rsi-Token')rsiToken=decodeURIComponent(p[1]||'');});}catch(e){}
 var hdrs={'Accept':'application/json','X-Requested-With':'XMLHttpRequest'};
 if(rsiToken)hdrs['X-Rsi-Token']=rsiToken;
-
-// GET — plusieurs variantes de query
-var gets=[
-  '/api/account/v2/pledges?platform=pledge&pagesize=1000',
-  '/api/account/v2/pledges?platform=pledge&pagesize=100&page=1',
-  '/api/account/v2/pledges?type=ship&pagesize=1000',
-  '/api/account/v2/pledges?pagesize=1000',
-  '/api/account/v2/pledges',
-];
-for(var i=0;i<gets.length&&!s.length;i++){
-  try{
-    var r=await fetch(gets[i],{credentials:'include',headers:hdrs});
-    if(r.ok){var j=await r.json();fromPledges(pickPledges(j));}
-  }catch(e){}
-}
-
-// POST avec body si GET échoue
-if(!s.length){
-  var postBodies=[
-    {platform:'pledge',pagesize:1000,page:1},
-    {type:'ship',pagesize:1000,page:1},
-    {pagesize:1000,page:1},
+var apiOk=false;
+for(var page=1;page<=20;page++){
+  var got=false;
+  var urls=[
+    '/api/account/v2/pledges?platform=pledge&pagesize=100&page='+page,
+    '/api/account/v2/pledges?pagesize=100&page='+page,
   ];
-  for(var i=0;i<postBodies.length&&!s.length;i++){
+  for(var ui=0;ui<urls.length;ui++){
+    try{
+      var r=await fetch(urls[ui],{credentials:'include',headers:hdrs});
+      if(r.ok){var j=await r.json();var list=pickList(j);if(list.length){list.forEach(scanPledge);got=true;apiOk=true;}break;}
+    }catch(e){}
+  }
+  if(!got)break;
+}
+if(!apiOk){
+  var posts=[{platform:'pledge',pagesize:1000},{pagesize:1000},{type:'ship',pagesize:1000}];
+  for(var pi=0;pi<posts.length&&!apiOk;pi++){
     try{
       var pr=await fetch('/api/account/v2/pledges',{
         method:'POST',credentials:'include',
         headers:Object.assign({},hdrs,{'Content-Type':'application/json'}),
-        body:JSON.stringify(postBodies[i])
+        body:JSON.stringify(posts[pi])
       });
-      if(pr.ok){var pj=await pr.json();fromPledges(pickPledges(pj));}
+      if(pr.ok){var pj=await pr.json();var pl=pickList(pj);if(pl.length){pl.forEach(scanPledge);apiOk=true;}}
     }catch(e){}
   }
 }
-
-// DOM — Stratégie A : items où div.kind === "Ship" dans les cards RSI (HTML classique)
-// Structure : .item > .text > div.title + div.kind
-if(!s.length){
-  try{
-    var kinds=document.querySelectorAll('.item .kind');
-    for(var ki=0;ki<kinds.length;ki++){
-      if(kinds[ki].textContent.trim().toLowerCase()==='ship'){
-        var txt=kinds[ki].parentElement;
-        var tit=txt?txt.querySelector('.title'):null;
-        if(tit){var n=tit.textContent.trim();if(n&&s.indexOf(n)<0)s.push(n);}
+try{
+  document.querySelectorAll('.item .kind').forEach(function(k){
+    if(k.textContent.trim().toLowerCase()==='ship'){
+      var p=k.closest('.item');
+      var ti=p?p.querySelector('.title'):k.parentElement?k.parentElement.querySelector('.title'):null;
+      if(ti)add(ti.textContent);
+    }
+  });
+}catch(e){}
+try{
+  document.querySelectorAll('.items-col').forEach(function(col){
+    var t=col.textContent.replace(/\\s+/g,' ').trim();
+    var mc=t.match(/Contains:\\s*(.+?)\\s+and\\s+\\d+\\s+items?/i);
+    if(!mc)mc=t.match(/Contains:\\s*([^\\n,<]{2,80})/i);
+    if(mc)add(mc[1]);
+  });
+}catch(e){}
+try{
+  var tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  var nd;
+  while((nd=tw.nextNode())){
+    if(nd.nodeValue.trim()==='Ship'){
+      var el=nd.parentElement;
+      for(var up=0;up<6&&el&&el!==document.body;up++){
+        var ti2=el.querySelector('.title');
+        if(ti2){add(ti2.textContent);break;}
+        el=el.parentElement;
       }
     }
-  }catch(e){}
-}
-
-// DOM — Stratégie B : .items-col "Contains: [nom] and X items"
-// Normalise les espaces/newlines avant le regex (label + text node séparés)
-if(!s.length){
-  try{
-    var icols=document.querySelectorAll('.items-col');
-    for(var ci=0;ci<icols.length;ci++){
-      var t=icols[ci].textContent.replace(/\s+/g,' ').trim();
-      var mc=t.match(/Contains:\s*(.+?)\s+and\s+\d+\s+items?/i);
-      if(!mc)mc=t.match(/Contains:\s*(.{1,80})/i);
-      if(mc){var cn=mc[1].trim();if(cn.length>1&&cn.length<100&&s.indexOf(cn)<0)s.push(cn);}
-    }
-  }catch(e){}
-}
-
-s=s.filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i;});
-if(!s.length){
-  alert('Aucun vaisseau détecté.\\nAssure-toi d\\'être sur My Hangar → MY GEAR → filtre "Standalone Ships", puis relance le favori.');
+  }
+}catch(e){}
+var ships=Array.from(found);
+if(!ships.length){
+  alert('Aucun vaisseau détecté.\\nAssure-toi d\\'être sur la page My Hangar RSI (account/pledges).');
   return;
 }
+var msg=ships.length+' vaisseau'+(ships.length>1?'x':'')+' détecté'+(ships.length>1?'s':'')+' :\\n\\n';
+msg+=ships.slice(0,30).map(function(n,i){return(i+1)+'. '+n;}).join('\\n');
+if(ships.length>30)msg+='\\n… et '+(ships.length-30)+' autre'+(ships.length-30>1?'s':'');
+msg+='\\n\\nImporter dans INQFR ?';
+if(!confirm(msg))return;
 var enc;
-try{enc=btoa(unescape(encodeURIComponent(JSON.stringify(s))));}catch(e){enc=btoa(JSON.stringify(s));}
+try{enc=btoa(unescape(encodeURIComponent(JSON.stringify(ships))));}catch(e){enc=btoa(JSON.stringify(ships));}
 location.href='${siteUrl}/flotte?rsi_import='+encodeURIComponent(enc);
 })()`
 
