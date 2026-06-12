@@ -95,14 +95,14 @@ Contrôle d'accès via `get_my_privilege()` en RLS Supabase sur **toutes** les t
 | `app/(app)/flotte/page.tsx` | Grille flotte triée par propriétaire |
 | `components/flotte/ship-card.tsx` | Card vaisseau avec édition inline nom |
 | `components/dashboard/onboarding-checklist.tsx` | Onboarding générique par rang |
-| `supabase/migrations/` | Migrations SQL numérotées — prochaine : **033** |
+| `supabase/migrations/` | Migrations SQL numérotées — prochaine : **036** |
 
 ---
 
 ## Règles absolues — NE JAMAIS DÉROGER
 
 1. **`pnpm tsc --noEmit` puis `pnpm build`** avant de déclarer un item terminé. Les deux doivent passer sans erreur.
-2. **Chaque nouvelle table/fonction SQL → migration numérotée** dans `supabase/migrations/` (prochaine : `032_...sql`). Appliquer : `pnpm supabase db push`
+2. **Chaque nouvelle table/fonction SQL → migration numérotée** dans `supabase/migrations/` (prochaine : `036_...sql`). Appliquer : `pnpm supabase db push`
 3. **Chaque nouvelle table → types** dans `types/database.ts` ET `types/index.ts`
 4. **Server Actions Zod-validées**, jamais de mutation client directe
 5. **RLS sur toutes les tables** via `get_my_privilege()`
@@ -173,7 +173,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 
 ---
 
-## Migrations appliquées (001 → 034) — prochaine : 035
+## Migrations appliquées (001 → 035) — prochaine : 036
 
 | Range | Contenu |
 |---|---|
@@ -192,6 +192,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 | 032 | onboarding_progress.step CHECK étendu à 26 valeurs — 4 rangs × 5 étapes + bonus |
 | 033 | table trusted_devices (id, profile_id, device_id UUID UNIQUE, label, expires_at, created_at) + RLS |
 | 034 | events.discord_event_id TEXT UNIQUE + index |
+| 035 | applications — policy INSERT TO authenticated (fix RLS pour membres connectés) |
 
 ---
 
