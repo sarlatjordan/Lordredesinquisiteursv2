@@ -134,6 +134,21 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
           )
         })}
 
+        {/* Pin corpo */}
+        {hasOrgShips && (
+          <>
+            <div className="w-px h-5 bg-border mx-1" />
+            <a
+              href={owner === 'org' ? (type ? `/flotte?type=${type}` : '/flotte') : (type ? `/flotte?type=${type}&owner=org` : '/flotte?owner=org')}
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                owner === 'org' ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card text-muted-foreground border-border hover:border-primary/20'
+              }`}
+            >
+              Corpo ({orgShipsCount})
+            </a>
+          </>
+        )}
+
         {/* Séparateur visuel */}
         <div className="w-px h-5 bg-border mx-1" />
 
