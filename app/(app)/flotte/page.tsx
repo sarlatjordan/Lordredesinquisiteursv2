@@ -5,6 +5,7 @@ import { AddShipButton } from '@/components/flotte/add-ship-button'
 import { HangarSyncDialog } from '@/components/flotte/hangar-sync-dialog'
 import { SyncMatrixButton } from '@/components/flotte/sync-matrix-button'
 import { BookmarkletImporter } from '@/components/flotte/bookmarklet-importer'
+import { FlotteOwnerFilter } from '@/components/flotte/flotte-owner-filter'
 import { Rocket } from 'lucide-react'
 import type { ShipWithOwner } from '@/types'
 import { SHIP_TYPES, type ShipType, getRolePrivilege, PRIVILEGE } from '@/lib/constants'
@@ -13,11 +14,11 @@ export const metadata: Metadata = { title: 'Flotte' }
 export const dynamic = 'force-dynamic'
 
 interface FlottePageProps {
-  searchParams: Promise<{ type?: string; status?: string; rsi_import?: string }>
+  searchParams: Promise<{ type?: string; status?: string; owner?: string; rsi_import?: string }>
 }
 
 export default async function FlottePage({ searchParams }: FlottePageProps) {
-  const { type, status, rsi_import } = await searchParams
+  const { type, status, owner, rsi_import } = await searchParams
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -35,13 +36,11 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
       .select('name, image_url'),
   ])
 
-  // Tri par propriétaire A→Z (ships sans owner = org, mis en tête), puis par nom de vaisseau
-  const allShips = ((shipsResult.data as unknown as ShipWithOwner[]) ?? []).sort((a, b) => {
-    const nameA = a.owner ? (a.owner.display_name ?? a.owner.username).toLowerCase() : ''
-    const nameB = b.owner ? (b.owner.display_name ?? b.owner.username).toLowerCase() : ''
-    if (nameA !== nameB) return nameA.localeCompare(nameB, 'fr')
-    return a.name.localeCompare(b.name, 'fr')
-  })
+  // Tri global par nom de vaisseau A→Z
+  const allShips = ((shipsResult.data as unknown as ShipWithOwner[]) ?? []).sort((a, b) =>
+    a.name.localeCompare(b.name, 'fr')
+  )
+
   const profile = profileResult.data
   const isAdmin = getRolePrivilege(profile?.role ?? '') >= PRIVILEGE.SYNC_MATRIX
 
@@ -50,8 +49,18 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
     modelImageMap[m.name] = m.image_url
   }
 
+  // Liste des propriétaires uniques pour le filtre
+  const ownerMap = new Map<string, string>()
+  for (const ship of allShips) {
+    if (ship.owner) ownerMap.set(ship.owner.username, ship.owner.display_name ?? ship.owner.username)
+  }
+  const owners = Array.from(ownerMap.entries())
+    .sort(([, a], [, b]) => a.localeCompare(b, 'fr'))
+    .map(([username, displayName]) => ({ username, displayName }))
+  const hasOrgShips = allShips.some((s) => !s.owner)
+
   // Agrégats sur la flotte complète (avant filtre d'affichage)
-  const orgShips = allShips.filter((s) => s.is_org_ship).length
+  const orgShipsCount = allShips.filter((s) => !s.owner).length
   const available = allShips.filter((s) => s.status === 'disponible').length
   const typeCount = allShips.reduce<Record<string, number>>((acc, s) => {
     acc[s.ship_type] = (acc[s.ship_type] ?? 0) + 1
@@ -60,19 +69,24 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
 
   // Filtrage pour la grille d'affichage uniquement
   let ships = allShips
-  if (type) ships = ships.filter(s => s.ship_type === type)
-  if (status) ships = ships.filter(s => s.status === status)
+  if (type) ships = ships.filter((s) => s.ship_type === type)
+  if (status) ships = ships.filter((s) => s.status === status)
+  if (owner === 'org') ships = ships.filter((s) => !s.owner)
+  else if (owner) ships = ships.filter((s) => s.owner?.username === owner)
+
+  const hasActiveFilters = type || status || owner
 
   return (
     <div className="space-y-6">
       {rsi_import && <BookmarkletImporter encoded={rsi_import} />}
+
       {/* En-tête */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Flotte</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {ships.length} vaisseau{ships.length > 1 ? 'x' : ''} enregistré{ships.length > 1 ? 's' : ''}
-            {orgShips > 0 && ` — ${orgShips} de l'org`}
+            {ships.length} vaisseau{ships.length > 1 ? 'x' : ''} affiché{ships.length > 1 ? 's' : ''}
+            {orgShipsCount > 0 && ` — ${orgShipsCount} de l'org`}
             {available > 0 && ` — ${available} disponible${available > 1 ? 's' : ''}`}
           </p>
         </div>
@@ -91,74 +105,67 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
         </div>
       )}
 
-      {/* Filtres par type */}
-      <div className="flex flex-wrap gap-2">
+      {/* Filtres */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Filtre par type */}
         <a
-          href="/flotte"
+          href={owner ? `/flotte?owner=${owner}` : '/flotte'}
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
             !type ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card text-muted-foreground border-border hover:border-primary/20'
           }`}
         >
           Tous
         </a>
-        {Object.entries(typeCount).map(([t, count]) => (
-          <a
-            key={t}
-            href={type === t ? '/flotte' : `/flotte?type=${t}`}
-            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              type === t ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card text-muted-foreground border-border hover:border-primary/20'
-            }`}
-          >
-            {SHIP_TYPES[t as ShipType] ?? t} ({count})
-          </a>
-        ))}
+        {Object.entries(typeCount).map(([t, count]) => {
+          const isActive = type === t
+          const href = isActive
+            ? (owner ? `/flotte?owner=${owner}` : '/flotte')
+            : (owner ? `/flotte?type=${t}&owner=${owner}` : `/flotte?type=${t}`)
+          return (
+            <a
+              key={t}
+              href={href}
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                isActive ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card text-muted-foreground border-border hover:border-primary/20'
+              }`}
+            >
+              {SHIP_TYPES[t as ShipType] ?? t} ({count})
+            </a>
+          )
+        })}
+
+        {/* Séparateur visuel */}
+        <div className="w-px h-5 bg-border mx-1" />
+
+        {/* Filtre par propriétaire */}
+        <FlotteOwnerFilter owners={owners} hasOrgShips={hasOrgShips} />
       </div>
 
-      {/* Grille de vaisseaux — groupés par propriétaire */}
+      {/* Grille de vaisseaux — triée par nom, à plat */}
       {ships.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <Rocket className="h-10 w-10 text-muted-foreground/40" />
           <p className="text-muted-foreground">Aucun vaisseau trouvé.</p>
-          {(type || status) && (
+          {hasActiveFilters && (
             <a href="/flotte" className="text-sm text-primary hover:underline">
               Effacer les filtres
             </a>
           )}
         </div>
-      ) : (() => {
-        // Regroupement par propriétaire (clé = display_name ?? username, ou 'Organisation')
-        const groups: { ownerName: string; ships: typeof ships }[] = []
-        for (const ship of ships) {
-          const key = ship.owner
-            ? (ship.owner.display_name ?? ship.owner.username)
-            : 'Organisation'
-          const grp = groups.find(g => g.ownerName === key)
-          if (grp) grp.ships.push(ship)
-          else groups.push({ ownerName: key, ships: [ship] })
-        }
-        return (
-          <div className="space-y-8">
-            {groups.map((grp) => (
-              <div key={grp.ownerName} className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-                    {grp.ownerName}
-                  </span>
-                  <span className="text-xs text-muted-foreground/50">
-                    — {grp.ships.length} vaisseau{grp.ships.length > 1 ? 'x' : ''}
-                  </span>
-                  <div className="flex-1 border-t border-border/50 ml-1" />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {grp.ships.map((ship, i) => (
-                    <ShipCard key={ship.id} ship={ship} index={i} currentUserId={user?.id} isAdmin={isAdmin} imageUrl={modelImageMap[ship.model] ?? null} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      })()}
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ships.map((ship, i) => (
+            <ShipCard
+              key={ship.id}
+              ship={ship}
+              index={i}
+              currentUserId={user?.id}
+              isAdmin={isAdmin}
+              imageUrl={modelImageMap[ship.model] ?? null}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
