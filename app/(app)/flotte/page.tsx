@@ -57,10 +57,10 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
   const owners = Array.from(ownerMap.entries())
     .sort(([, a], [, b]) => a.localeCompare(b, 'fr'))
     .map(([username, displayName]) => ({ username, displayName }))
-  const hasOrgShips = allShips.some((s) => !s.owner)
+  const hasOrgShips = allShips.some((s) => s.is_org_ship)
 
   // Agrégats sur la flotte complète (avant filtre d'affichage)
-  const orgShipsCount = allShips.filter((s) => !s.owner).length
+  const orgShipsCount = allShips.filter((s) => s.is_org_ship).length
   const available = allShips.filter((s) => s.status === 'disponible').length
   const typeCount = allShips.reduce<Record<string, number>>((acc, s) => {
     acc[s.ship_type] = (acc[s.ship_type] ?? 0) + 1
@@ -71,7 +71,7 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
   let ships = allShips
   if (type) ships = ships.filter((s) => s.ship_type === type)
   if (status) ships = ships.filter((s) => s.status === status)
-  if (owner === 'org') ships = ships.filter((s) => !s.owner)
+  if (owner === 'org') ships = ships.filter((s) => s.is_org_ship)
   else if (owner) ships = ships.filter((s) => s.owner?.username === owner)
 
   const hasActiveFilters = type || status || owner
