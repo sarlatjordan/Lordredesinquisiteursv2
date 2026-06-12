@@ -137,6 +137,7 @@ export const ApplicationCreateSchema = z.object({
   rsi_handle: z.string().min(2, 'Handle RSI requis').max(50),
   email: z.string().email('Adresse email invalide'),
   discord_handle: z.string().min(2, 'Handle Discord requis').max(100),
+  full_name: z.string().max(100).optional().or(z.literal('')).transform((v) => v || null),
   motivation: z.string().min(50, 'Message trop court — minimum 50 caractères').max(2000),
   how_found: z.string().min(1, 'Ce champ est requis').max(100),
 })

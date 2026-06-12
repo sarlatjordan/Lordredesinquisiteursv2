@@ -151,6 +151,14 @@ export function RecrutementForm() {
         />
       </div>
 
+      <InputField
+        label="Nom complet"
+        name="full_name"
+        placeholder="Jean Dupont"
+        error={state.fieldErrors?.full_name}
+        hint="Optionnel — votre prénom et nom réels"
+      />
+
       <div>
         <label htmlFor="how_found" className="block text-sm font-medium text-foreground mb-1.5">
           Comment avez-vous découvert l&apos;Ordre ? <span className="text-primary">*</span>

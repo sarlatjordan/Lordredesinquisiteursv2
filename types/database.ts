@@ -314,6 +314,7 @@ export interface Database {
           rsi_handle: string
           email: string
           discord_handle: string
+          full_name: string | null
           motivation: string
           how_found: string
           status: 'pending' | 'accepted' | 'refused'
@@ -327,6 +328,7 @@ export interface Database {
           rsi_handle: string
           email: string
           discord_handle: string
+          full_name?: string | null
           motivation: string
           how_found: string
           status?: 'pending' | 'accepted' | 'refused'
@@ -340,6 +342,7 @@ export interface Database {
           rsi_handle?: string
           email?: string
           discord_handle?: string
+          full_name?: string | null
           motivation?: string
           how_found?: string
           status?: 'pending' | 'accepted' | 'refused'
