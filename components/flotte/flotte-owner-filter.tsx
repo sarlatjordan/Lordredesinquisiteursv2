@@ -16,10 +16,9 @@ interface Owner {
 
 interface FlotteOwnerFilterProps {
   owners: Owner[]
-  hasOrgShips: boolean
 }
 
-export function FlotteOwnerFilter({ owners, hasOrgShips }: FlotteOwnerFilterProps) {
+export function FlotteOwnerFilter({ owners }: FlotteOwnerFilterProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentOwner = searchParams.get('owner') ?? '__all__'
@@ -38,9 +37,6 @@ export function FlotteOwnerFilter({ owners, hasOrgShips }: FlotteOwnerFilterProp
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="__all__">Tous les pilotes</SelectItem>
-        {hasOrgShips && (
-          <SelectItem value="org">Vaisseaux de la corpo</SelectItem>
-        )}
         {owners.map((o) => (
           <SelectItem key={o.username} value={o.username}>
             {o.displayName}

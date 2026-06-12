@@ -153,7 +153,7 @@ export default async function FlottePage({ searchParams }: FlottePageProps) {
         <div className="w-px h-5 bg-border mx-1" />
 
         {/* Filtre par propriétaire */}
-        <FlotteOwnerFilter owners={owners} hasOrgShips={hasOrgShips} />
+        <FlotteOwnerFilter owners={owners} />
       </div>
 
       {/* Grille de vaisseaux — triée par nom, à plat */}
