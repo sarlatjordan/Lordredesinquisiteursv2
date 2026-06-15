@@ -116,14 +116,14 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
                   {String(cell.date.getDate()).padStart(2, '0')}
                 </p>
 
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {cell.events.slice(0, 3).map(ev => (
                     <button
                       key={ev.id}
                       onClick={() => handleEvent(ev)}
                       title={ev.title}
                       className={[
-                        'w-full text-left text-[8px] font-medium px-1 py-0.5 rounded-[2px] truncate leading-tight transition-opacity hover:opacity-80',
+                        'w-full text-left text-[11px] font-semibold px-1.5 py-1 rounded-sm truncate leading-tight transition-opacity hover:opacity-80',
                         EVENT_COLORS[ev.type] ?? 'bg-primary/70 text-white',
                       ].join(' ')}
                     >
@@ -131,7 +131,7 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
                     </button>
                   ))}
                   {cell.events.length > 3 && (
-                    <p className="text-[8px] text-muted-foreground/60 font-mono pl-0.5">
+                    <p className="text-[10px] text-muted-foreground/60 font-mono pl-1">
                       +{cell.events.length - 3}
                     </p>
                   )}
