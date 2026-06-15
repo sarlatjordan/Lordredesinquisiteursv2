@@ -92,7 +92,8 @@ Contrôle d'accès via `get_my_privilege()` en RLS Supabase sur **toutes** les t
 | `app/(app)/layout.tsx` | Layout principal — récupère profil + check AAL MFA |
 | `app/(app)/mfa/page.tsx` | Challenge TOTP universel |
 | `app/(app)/profil/profil-client.tsx` | Toutes les sections profil |
-| `app/(app)/flotte/page.tsx` | Grille flotte triée par propriétaire |
+| `app/(app)/flotte/page.tsx` | Grille flotte triée par nom, filtres type + pilote + pin Corpo |
+| `components/flotte/flotte-owner-filter.tsx` | Select client — filtre par pilote (?owner=username) |
 | `components/flotte/ship-card.tsx` | Card vaisseau avec édition inline nom |
 | `components/dashboard/onboarding-checklist.tsx` | Onboarding générique par rang |
 | `supabase/migrations/` | Migrations SQL numérotées — prochaine : **037** |
@@ -138,8 +139,10 @@ Contrôle d'accès via `get_my_privilege()` en RLS Supabase sur **toutes** les t
 - **Admin client** : `createAdminClient()` pour tout ce qui bypass RLS (pages publiques, ISR, crons)
 
 ### Flotte
-- Tri propriétaire : sort JS sur `allShips` APRÈS le fetch, AVANT les filtres d'affichage
-- Propriétaire vide `''` → `localeCompare` → org ships (sans owner) en tête
+- Tri par nom A→Z : sort JS sur `allShips` APRÈS le fetch, AVANT les filtres d'affichage
+- Filtre `?owner=org` → `s.is_org_ship === true` (pas `!s.owner` — un ship corpo peut avoir un owner)
+- Filtre `?owner=username` → `s.owner?.username === owner`
+- Pin Corpo et select pilote sont combinables avec le filtre type
 
 ### MFA
 - `app/(app)/layout.tsx` : exclure `isMFAPage` du redirect pour éviter boucle infinie
@@ -220,7 +223,7 @@ z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().min(0))
 - Dashboard (stats, feed activité, carte recrutement toggle Gardien+)
 - Membres (liste, fiche Sage, progression, historique promotions/points, classement)
 - Événements (CRUD Gardien+, inscriptions, dialog lecture seule, rapports)
-- Flotte (grille, filtres type, tri propriétaire A→Z, combobox RSI 250 modèles, édition inline nom)
+- Flotte (grille plate triée par nom A→Z, filtre type, filtre pilote via select, pin Corpo basé sur is_org_ship, combobox RSI 250 modèles, édition inline nom)
 - Opérations (CRUD MI+, slots rôles, briefing/débrief, statuts)
 - Logistique (inventaire org, workflow dépôt/retrait, approbation Gardien+, réservations ops)
 - Ressources (markdown, catégories, CRUD MI+)
