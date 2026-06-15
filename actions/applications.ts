@@ -79,7 +79,9 @@ export async function submitApplication(
   const { error } = await supabase.from('applications').insert(parsed.data)
 
   if (error) {
-    console.error('[submitApplication] Supabase error:', error.code, error.message, error.details)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[submitApplication] Supabase error:', error.code, error.message, error.details)
+    }
     if (error.code === '23505') {
       if (error.message.includes('rsi_handle') || error.details?.includes('rsi_handle')) {
         return { status: 'error', message: 'Ce pseudo RSI a déjà une candidature en cours.' }

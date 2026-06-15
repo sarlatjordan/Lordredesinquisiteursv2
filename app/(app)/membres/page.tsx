@@ -20,25 +20,8 @@ export default async function MembresPage({ searchParams }: MembresPageProps) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  let userPrivilege = 0
-  let isAdmin = false
-  let canAwardPoints = false
-  if (user) {
-    const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    userPrivilege = getRolePrivilege(me?.role ?? '')
-    isAdmin = userPrivilege >= PRIVILEGE.MANAGE_MEMBERS
-    canAwardPoints = userPrivilege >= 300
-  }
-
-  // Points totaux par membre — agrégation SQL (évite full-scan JS)
-  const { data: pointsData } = await supabase.rpc('get_member_points_totals')
-  const pointsMap = (pointsData ?? []).reduce<Record<string, number>>((acc, row) => {
-    acc[row.profile_id] = row.total_points
-    return acc
-  }, {})
-
-  // Membres
-  let query = supabase
+  // Construire la query membres avant le Promise.all (pas d'await ici)
+  let membersQuery = supabase
     .from('profiles')
     .select('id, username, display_name, role, avatar_url, star_citizen_handle, joined_at, is_active, bio')
     .eq('is_active', true)
@@ -46,11 +29,32 @@ export default async function MembresPage({ searchParams }: MembresPageProps) {
     .order('joined_at', { ascending: true })
 
   const validRoles = Object.keys(ROLES)
-  if (role && validRoles.includes(role)) query = query.eq('role', role as Role)
-  if (search) query = query.or(`username.ilike.%${search}%,display_name.ilike.%${search}%,star_citizen_handle.ilike.%${search}%`)
+  if (role && validRoles.includes(role)) membersQuery = membersQuery.eq('role', role as Role)
+  if (search) membersQuery = membersQuery.or(`username.ilike.%${search}%,display_name.ilike.%${search}%,star_citizen_handle.ilike.%${search}%`)
 
-  const { data: members } = await query
-  const profiles = (members as unknown as Profile[]) ?? []
+  const [meResult, pointsResult, membersResult] = await Promise.all([
+    user
+      ? supabase.from('profiles').select('role').eq('id', user.id).single()
+      : Promise.resolve({ data: null, error: null }),
+    supabase.rpc('get_member_points_totals'),
+    membersQuery,
+  ])
+
+  let userPrivilege = 0
+  let isAdmin = false
+  let canAwardPoints = false
+  if (user && meResult.data) {
+    userPrivilege = getRolePrivilege(meResult.data.role ?? '')
+    isAdmin = userPrivilege >= PRIVILEGE.MANAGE_MEMBERS
+    canAwardPoints = userPrivilege >= 300
+  }
+
+  const pointsMap = (pointsResult.data ?? []).reduce<Record<string, number>>((acc, row) => {
+    acc[row.profile_id] = row.total_points
+    return acc
+  }, {})
+
+  const profiles = (membersResult.data as unknown as Profile[]) ?? []
 
   const byRole = profiles.reduce<Record<string, number>>((acc, p) => {
     acc[p.role] = (acc[p.role] ?? 0) + 1
