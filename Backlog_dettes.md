@@ -3,18 +3,21 @@
 > Audit du 2026-06-15 — 21 problèmes recensés, aucun critique ni élevé.
 > Résolu au 2026-06-15 : TS-01, TS-02, SA-01, SA-02 (commit d9c6c21)
 > Résolu au 2026-06-15 : PERF-01, PAT-01 (commit 70f4f47)
+> Résolu au 2026-06-15 : PAT-02, PAT-03, QUAL-01, TS-03, TS-04, SA-03, SA-04, SA-05, SA-06, PERF-02, PERF-03, RLS-01, RLS-02 (commit caee7a4)
 
 ## Résumé
 
 | Catégorie | Moyen | Faible | Total | Résolu |
 |---|:---:|:---:|:---:|:---:|
-| TypeScript (TS) | 2 | 2 | **4** | 2 |
-| Server Actions (SA) | 2 | 4 | **6** | 2 |
-| Sécurité RLS (RLS) | 0 | 2 | **2** | — |
-| Performance (PERF) | 1 | 3 | **4** | 1 |
-| Cohérence patterns (PAT) | 1 | 2 | **3** | 1 |
-| Code mort / qualité (QUAL) | 0 | 1 | **1** | — |
-| **Total** | **6** | **14** | **21** | **6** |
+| TypeScript (TS) | 2 | 2 | **4** | 4 |
+| Server Actions (SA) | 2 | 4 | **6** | 6 |
+| Sécurité RLS (RLS) | 0 | 2 | **2** | 2 |
+| Performance (PERF) | 1 | 3 | **4** | 4 |
+| Cohérence patterns (PAT) | 1 | 2 | **3** | 3 |
+| Code mort / qualité (QUAL) | 0 | 1 | **1** | 1 |
+| **Total** | **6** | **14** | **21** | **21** |
+
+**Dette résiduelle : 0 item.**
 
 ---
 
@@ -28,13 +31,13 @@
 ~~**Problème :** `data as unknown as ChatMessageWithAuthor` sans guard sur `author`.~~
 Guard `data?.author` ajouté avant le cast.
 
-### [TS-03 · FAIBLE] `actions/hangar-sync.ts:419`
-**Problème :** `{ _html: text } as unknown as RsiHangarResponse['data']` — objet non-conforme casté vers le type de réponse structurée. Hack de debug.
-**Fix :** Créer un type discriminé `HangarRawHtml` séparé de `RsiHangarResponse['data']`.
+### ~~[TS-03 · FAIBLE] `actions/hangar-sync.ts:419`~~ ✅ résolu — caee7a4
+~~**Problème :** `{ _html: text } as unknown as RsiHangarResponse['data']` — objet non-conforme casté vers le type de réponse structurée.~~
+Cast supprimé — l'index signature `[key: string]: unknown` de `RsiHangarResponse['data']` couvre directement `{ _html: text }`.
 
-### [TS-04 · FAIBLE] `components/ui/calendar.tsx:91`
-**Problème :** Seul `as any` du codebase.
-**Fix :** Typer correctement avec `Record<string, string>` ou le type shadcn approprié.
+### ~~[TS-04 · FAIBLE] `components/ui/calendar.tsx:91`~~ ✅ résolu — caee7a4
+~~**Problème :** Seul `as any` du codebase.~~
+Remplacé par `as Record<string, string>`.
 
 ---
 
@@ -48,33 +51,33 @@ Guard `data?.author` ajouté avant le cast.
 ~~**Problème :** `step` reçu sans validation Zod.~~
 `OnboardingStepSchema = z.enum([...])` valide le step avant tout accès DB.
 
-### [SA-03 · FAIBLE] `actions/org-settings.ts` — `setRecruitmentOpen`
-**Problème :** `open: boolean` passé sans `.safeParse`.
-**Fix :** `z.boolean().safeParse(open)`.
+### ~~[SA-03 · FAIBLE] `actions/org-settings.ts` — `setRecruitmentOpen`~~ ✅ résolu — caee7a4
+~~**Problème :** `open: boolean` passé sans `.safeParse`.~~
+`z.boolean().safeParse(open)` ajouté.
 
-### [SA-04 · FAIBLE] `actions/ships.ts` — `updateShipStatus`, `deleteShip`
-**Problème :** `status` (union de strings) et `shipId` (UUID) sans validation Zod.
-**Fix :** `z.string().uuid()` sur `shipId`, `z.enum([...])` sur `status`.
+### ~~[SA-04 · FAIBLE] `actions/ships.ts` — `updateShipStatus`, `deleteShip`~~ ✅ résolu — caee7a4
+~~**Problème :** `status` (union de strings) et `shipId` (UUID) sans validation Zod.~~
+`z.string().uuid()` sur `shipId`, `z.enum([...])` sur `status`.
 
-### [SA-05 · FAIBLE] `actions/members.ts` — `updateMemberRole`
-**Problème :** `role` validé par TypeScript uniquement, `memberId` pas validé comme UUID.
-**Fix :** `z.string().uuid()` sur `memberId`, `z.enum([...ROLES])` sur `role`.
+### ~~[SA-05 · FAIBLE] `actions/members.ts` — `updateMemberRole`~~ ✅ résolu — caee7a4
+~~**Problème :** `role` validé par TypeScript uniquement, `memberId` pas validé comme UUID.~~
+`z.string().uuid()` sur `memberId`, `z.enum([...ROLES])` sur `role`.
 
-### [SA-06 · FAIBLE] `actions/notifications.ts` — `createAdminClient` dans `markRead`
-**Problème :** Admin client bypass RLS pour des mutations user-scoped couvertes par la policy `notifs_update`.
-**Fix :** Utiliser `supabase` (client utilisateur) à la place.
+### ~~[SA-06 · FAIBLE] `actions/notifications.ts` — `createAdminClient` dans `markRead`~~ ✅ résolu — caee7a4
+~~**Problème :** Admin client bypass RLS pour des mutations user-scoped.~~
+Utilise maintenant `createClient()` + filtre `.eq('profile_id', user.id)`.
 
 ---
 
 ## Sécurité RLS
 
-### [RLS-01 · FAIBLE] `supabase/migrations/006_gallery.sql:22-33`
-**Problème :** Policies Storage comparent `role = 'sage'` directement au lieu de `get_my_privilege() >= 1000`. Incohérent avec le reste du projet, cassera si la hiérarchie de rangs évolue.
-**Fix :** Migration 037 — remplacer par `get_my_privilege() >= 1000`.
+### ~~[RLS-01 · FAIBLE] `supabase/migrations/006_gallery.sql:22-33`~~ ✅ résolu — caee7a4
+~~**Problème :** Policies Storage comparent `role = 'sage'` au lieu de `get_my_privilege() >= 1000`.~~
+Migration 037 — policies recrées avec `public.get_my_privilege() >= 1000`.
 
-### [RLS-02 · FAIBLE] `supabase/migrations/001_initial.sql` — Policies legacy `admin`/`officer`
-**Problème :** Policies `events_update`, `events_delete`, `ships_delete`, `resources_*` référencent des rôles inexistants. Inopérantes mais source de confusion à la lecture.
-**Fix :** Migration qui drop les policies obsolètes et recrée avec `get_my_privilege()`.
+### ~~[RLS-02 · FAIBLE] `supabase/migrations/001_initial.sql` — Policies legacy `admin`/`officer`~~ ✅ résolu — caee7a4
+~~**Problème :** Policies `events_update`, `events_delete`, `ships_delete`, `resources_*` référencent des rôles inexistants.~~
+Vérification grep : toutes ces policies sont déjà droppées par les migrations 003 et 004. Aucune policy obsolète en production.
 
 ---
 
@@ -84,13 +87,13 @@ Guard `data?.author` ajouté avant le cast.
 ~~**Problème :** 3 requêtes Supabase séquentielles après `getUser()`.~~
 `Promise.all([profiles+role, rpc points, membres query])` — query membres construite avant le `Promise.all`.
 
-### [PERF-02 · FAIBLE] `app/(app)/admin/activite/page.tsx`, `admin/avatars/page.tsx`, `admin/points/page.tsx`
-**Problème :** Pattern `getUser()` → `profiles.select('role')` séquentiel dans ces 3 pages admin.
-**Fix :** Paralléliser avec le pattern de `membres/[username]/page.tsx`.
+### ~~[PERF-02 · FAIBLE] `app/(app)/admin/activite/page.tsx`, `admin/avatars/page.tsx`, `admin/points/page.tsx`~~ ✅ résolu — caee7a4
+~~**Problème :** Pattern `getUser()` → `profiles.select('role')` séquentiel dans ces 3 pages admin.~~
+`Promise.all([profileResult, dataResult])` dans les 3 pages.
 
-### [PERF-03 · FAIBLE] `app/(app)/evenements/page.tsx:14-29`
-**Problème :** `getUser()` + `profiles.select('role')` séquentiels avant le `Promise.all` des 5 requêtes.
-**Fix :** Inclure `profiles.select('role')` dans le `Promise.all`.
+### ~~[PERF-03 · FAIBLE] `app/(app)/evenements/page.tsx:14-29`~~ ✅ résolu — caee7a4
+~~**Problème :** `getUser()` + `profiles.select('role')` séquentiels avant le `Promise.all` des requêtes événements.~~
+Deux phases : phase 1 `Promise.all([profile, attendees, count])`, phase 2 `Promise.all([upcoming, terminated, overdue])` après résolution du privilege.
 
 ---
 
@@ -100,18 +103,18 @@ Guard `data?.author` ajouté avant le cast.
 ~~**Problème :** `console.error` expose des détails d'erreur DB en production.~~
 Encadré par `if (process.env.NODE_ENV === 'development')`.
 
-### [PAT-02 · FAIBLE] `app/(app)/mfa/page.tsx` — `export const dynamic` manquant
-**Problème :** Seule page `app/(app)/` sans `export const dynamic = 'force-dynamic'` (les 29 autres l'ont).
-**Fix :** Ajouter `export const dynamic = 'force-dynamic'`.
+### ~~[PAT-02 · FAIBLE] `app/(app)/mfa/page.tsx` — `export const dynamic` manquant~~ ✅ résolu — caee7a4
+~~**Problème :** Seule page `app/(app)/` sans `export const dynamic = 'force-dynamic'`.~~
+`export const dynamic = 'force-dynamic'` ajouté.
 
-### [PAT-03 · FAIBLE] `actions/members.ts` — `updateMemberRole` séquentialité interne
-**Problème :** `profiles.select(target)` et `member_points.select` séquentiels dans la même action.
-**Fix :** `Promise.all([...])`.
+### ~~[PAT-03 · FAIBLE] `actions/members.ts` — `updateMemberRole` séquentialité interne~~ ✅ résolu — caee7a4
+~~**Problème :** `profiles.select(target)` et `member_points.select` séquentiels dans la même action.~~
+`Promise.all([update profiles, select points])` parallélisé.
 
 ---
 
 ## Code mort / qualité
 
-### [QUAL-01 · FAIBLE] `actions/hangar-sync.ts:443` — Message d'erreur trompeur
-**Problème :** `'Aucun vaisseau trouvé. Log console pour debug structure.'` fait référence à des logs console absents en production (gardés par `NODE_ENV`).
-**Fix :** `'Aucun vaisseau trouvé dans la réponse RSI.'`
+### ~~[QUAL-01 · FAIBLE] `actions/hangar-sync.ts:443` — Message d'erreur trompeur~~ ✅ résolu — caee7a4
+~~**Problème :** `'Aucun vaisseau trouvé. Log console pour debug structure.'` fait référence à des logs absents en production.~~
+Message corrigé : `'Aucun vaisseau trouvé dans la réponse RSI.'`
