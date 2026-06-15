@@ -1,0 +1,53 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="60%" r="80%">
+    <stop offset="0%" stop-color="#081528"/>
+    <stop offset="100%" stop-color="#030810"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="85%" r="65%">
+    <stop offset="0%" stop-color="#00d4ff" stop-opacity=".22"/>
+    <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="planet" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#0d3060"/>
+    <stop offset="55%" stop-color="#071828"/>
+    <stop offset="100%" stop-color="#030810"/>
+  </radialGradient>
+  <radialGradient id="nebula" cx="30%" cy="40%" r="50%">
+    <stop offset="0%" stop-color="#004466" stop-opacity=".18"/>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#nebula)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".9"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="1055" cy="133" r="1"/><circle cx="1289" cy="118" r="1.3"/><circle cx="58" cy="224" r="1.1"/><circle cx="462" cy="238" r="1.4"/><circle cx="912" cy="229" r="1"/><circle cx="1132" cy="212" r="1.5"/><circle cx="312" cy="334" r="1.3"/><circle cx="758" cy="326" r="1.5"/><circle cx="1203" cy="329" r="1.2"/><circle cx="21" cy="412" r="1.2"/><circle cx="648" cy="421" r="1.1"/><circle cx="1094" cy="428" r="1.3"/><circle cx="284" cy="502" r="1.5"/><circle cx="733" cy="508" r="1.2"/><circle cx="1178" cy="504" r="1.4"/><circle cx="483" cy="611" r="1.5"/><circle cx="932" cy="617" r="1.2"/><circle cx="1376" cy="614" r="1.4"/><circle cx="305" cy="703" r="1.3"/><circle cx="752" cy="708" r="1.5"/><circle cx="1197" cy="705" r="1.2"/><circle cx="472" cy="818" r="1.4"/><circle cx="921" cy="823" r="1"/><circle cx="1143" cy="837" r="1.5"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/><circle cx="1296" cy="89" r=".9"/><circle cx="130" cy="178" r="1.4"/><circle cx="586" cy="181" r=".9"/><circle cx="1271" cy="164" r="1.5"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/></g>
+<!-- Planet top-right -->
+<circle cx="1200" cy="200" r="220" fill="url(#planet)" opacity=".75"/>
+<ellipse cx="1200" cy="200" rx="290" ry="36" fill="none" stroke="#1a6090" stroke-width="1.5" opacity=".35"/>
+<ellipse cx="1200" cy="200" rx="260" ry="28" fill="none" stroke="#0d4060" stroke-width="1" opacity=".25"/>
+<!-- Command viewport arch -->
+<path d="M0,900 Q720,160 1440,900" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".3"/>
+<path d="M80,900 Q720,280 1360,900" fill="none" stroke="#00d4ff" stroke-width=".8" opacity=".18"/>
+<path d="M200,900 Q720,400 1240,900" fill="none" stroke="#00d4ff" stroke-width=".5" opacity=".1"/>
+<!-- Tick marks on arch -->
+<line x1="340" y1="530" x2="352" y2="542" stroke="#00d4ff" stroke-width="1.2" opacity=".6"/>
+<line x1="720" y1="200" x2="720" y2="216" stroke="#00d4ff" stroke-width="1.2" opacity=".7"/>
+<line x1="1100" y1="530" x2="1088" y2="542" stroke="#00d4ff" stroke-width="1.2" opacity=".6"/>
+<!-- Central HUD ring -->
+<circle cx="720" cy="650" r="90" fill="none" stroke="#00d4ff" stroke-width="1" opacity=".2"/>
+<circle cx="720" cy="650" r="160" fill="none" stroke="#00d4ff" stroke-width=".6" opacity=".12"/>
+<circle cx="720" cy="650" r="240" fill="none" stroke="#00d4ff" stroke-width=".4" opacity=".08"/>
+<!-- Cross hairs -->
+<line x1="630" y1="650" x2="810" y2="650" stroke="#00d4ff" stroke-width=".8" opacity=".25"/>
+<line x1="720" y1="560" x2="720" y2="740" stroke="#00d4ff" stroke-width=".8" opacity=".25"/>
+<!-- Horizontal panel lines at bottom -->
+<line x1="0" y1="780" x2="1440" y2="780" stroke="#00d4ff" stroke-width=".6" opacity=".18"/>
+<line x1="0" y1="820" x2="1440" y2="820" stroke="#00d4ff" stroke-width=".4" opacity=".1"/>
+<!-- Corner brackets -->
+<path d="M60,60 L60,30 L90,30" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,60 L1380,30 L1350,30" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5"/>
+<path d="M60,840 L60,870 L90,870" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,840 L1380,870 L1350,870" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5"/>
+</svg>

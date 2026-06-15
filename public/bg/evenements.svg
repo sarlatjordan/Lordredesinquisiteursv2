@@ -1,0 +1,57 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="60%" r="80%">
+    <stop offset="0%" stop-color="#0c0814"/>
+    <stop offset="100%" stop-color="#040206"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+    <stop offset="0%" stop-color="#7c3aed" stop-opacity=".2"/>
+    <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="planet" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#2d1b69"/>
+    <stop offset="60%" stop-color="#150d35"/>
+    <stop offset="100%" stop-color="#040206"/>
+  </radialGradient>
+  <radialGradient id="nebula" cx="70%" cy="30%" r="45%">
+    <stop offset="0%" stop-color="#4c1d95" stop-opacity=".2"/>
+    <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#nebula)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".88"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="1055" cy="133" r="1"/><circle cx="1289" cy="118" r="1.3"/><circle cx="58" cy="224" r="1.1"/><circle cx="462" cy="238" r="1.4"/><circle cx="912" cy="229" r="1"/><circle cx="1132" cy="212" r="1.5"/><circle cx="312" cy="334" r="1.3"/><circle cx="758" cy="326" r="1.5"/><circle cx="1203" cy="329" r="1.2"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/><circle cx="1296" cy="89" r=".9"/><circle cx="130" cy="178" r="1.4"/><circle cx="586" cy="181" r=".9"/><circle cx="1271" cy="164" r="1.5"/></g>
+<!-- Planet upper-left -->
+<circle cx="260" cy="220" r="190" fill="url(#planet)" opacity=".7"/>
+<circle cx="260" cy="220" r="190" fill="none" stroke="#6d28d9" stroke-width="1" opacity=".3"/>
+<!-- Station promenade arched windows -->
+<!-- Left arch -->
+<path d="M100,900 L100,400 Q100,250 250,250 Q400,250 400,400 L400,900" fill="#0e0818" stroke="#7c3aed" stroke-width="1.2" opacity=".6"/>
+<path d="M140,900 L140,420 Q140,300 250,300 Q360,300 360,420 L360,900" fill="none" stroke="#7c3aed" stroke-width=".6" opacity=".3"/>
+<!-- Center arch -->
+<path d="M570,900 L570,350 Q570,160 720,160 Q870,160 870,350 L870,900" fill="#0e0818" stroke="#7c3aed" stroke-width="1.5" opacity=".65"/>
+<path d="M620,900 L620,380 Q620,220 720,220 Q820,220 820,380 L820,900" fill="none" stroke="#7c3aed" stroke-width=".8" opacity=".35"/>
+<!-- Right arch -->
+<path d="M1040,900 L1040,400 Q1040,250 1190,250 Q1340,250 1340,400 L1340,900" fill="#0e0818" stroke="#7c3aed" stroke-width="1.2" opacity=".6"/>
+<path d="M1080,900 L1080,420 Q1080,300 1190,300 Q1300,300 1300,420 L1300,900" fill="none" stroke="#7c3aed" stroke-width=".6" opacity=".3"/>
+<!-- Floor level -->
+<line x1="0" y1="860" x2="1440" y2="860" stroke="#7c3aed" stroke-width="1" opacity=".25"/>
+<line x1="0" y1="870" x2="1440" y2="870" stroke="#7c3aed" stroke-width=".5" opacity=".15"/>
+<!-- Ambient floor glow under arches -->
+<ellipse cx="250" cy="900" rx="180" ry="30" fill="#7c3aed" opacity=".06"/>
+<ellipse cx="720" cy="900" rx="220" ry="40" fill="#7c3aed" opacity=".08"/>
+<ellipse cx="1190" cy="900" rx="180" ry="30" fill="#7c3aed" opacity=".06"/>
+<!-- Decorative ceiling lights in arches -->
+<circle cx="250" cy="275" r="6" fill="#a78bfa" opacity=".5"/>
+<circle cx="720" cy="185" r="8" fill="#a78bfa" opacity=".55"/>
+<circle cx="1190" cy="275" r="6" fill="#a78bfa" opacity=".5"/>
+<!-- Light cones from ceiling lights -->
+<polygon points="244,281 256,281 300,500 200,500" fill="#7c3aed" opacity=".04"/>
+<polygon points="712,193 728,193 820,500 620,500" fill="#7c3aed" opacity=".05"/>
+<polygon points="1184,281 1196,281 1240,500 1140,500" fill="#7c3aed" opacity=".04"/>
+<!-- Corner HUD -->
+<path d="M60,60 L60,30 L90,30" fill="none" stroke="#7c3aed" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,60 L1380,30 L1350,30" fill="none" stroke="#7c3aed" stroke-width="1.5" opacity=".5"/>
+</svg>

@@ -1,0 +1,92 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+    <stop offset="0%" stop-color="#051210"/>
+    <stop offset="100%" stop-color="#020506"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#14b8a6" stop-opacity=".18"/>
+    <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".75"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/><circle cx="1289" cy="118" r="1.3"/></g>
+<!-- Signal wave rings — expanding from center -->
+<g fill="none" stroke="#14b8a6">
+  <circle cx="720" cy="450" r="60"  stroke-width="1.5" opacity=".55"/>
+  <circle cx="720" cy="450" r="130" stroke-width="1.2" opacity=".40"/>
+  <circle cx="720" cy="450" r="210" stroke-width="1"   opacity=".28"/>
+  <circle cx="720" cy="450" r="310" stroke-width=".8"  opacity=".18"/>
+  <circle cx="720" cy="450" r="430" stroke-width=".6"  opacity=".12"/>
+  <circle cx="720" cy="450" r="570" stroke-width=".5"  opacity=".07"/>
+  <circle cx="720" cy="450" r="720" stroke-width=".4"  opacity=".05"/>
+</g>
+<!-- Central transmitter node -->
+<circle cx="720" cy="450" r="18" fill="#14b8a6" opacity=".7"/>
+<circle cx="720" cy="450" r="8"  fill="#99f6e4" opacity=".9"/>
+<!-- Directional signal beams -->
+<g stroke="#14b8a6" stroke-width=".6" opacity=".2">
+  <!-- Upper right -->
+  <line x1="720" y1="450" x2="1200" y2="100"/>
+  <!-- Lower right -->
+  <line x1="720" y1="450" x2="1380" y2="600"/>
+  <!-- Lower left -->
+  <line x1="720" y1="450" x2="200" y2="750"/>
+  <!-- Upper left -->
+  <line x1="720" y1="450" x2="120" y2="180"/>
+  <!-- Right -->
+  <line x1="720" y1="450" x2="1440" y2="420"/>
+  <!-- Left -->
+  <line x1="720" y1="450" x2="0" y2="480"/>
+</g>
+<!-- Relay nodes on beams -->
+<g fill="#5eead4" opacity=".5">
+  <circle cx="870" cy="345" r="6"/>
+  <circle cx="1020" cy="240" r="5"/>
+  <circle cx="1150" cy="150" r="4"/>
+  <circle cx="960" cy="500" r="5"/>
+  <circle cx="1180" cy="540" r="4"/>
+  <circle cx="530" cy="570" r="5"/>
+  <circle cx="350" cy="680" r="4"/>
+  <circle cx="480" cy="345" r="6"/>
+  <circle cx="330" cy="260" r="5"/>
+</g>
+<!-- Relay node halos -->
+<g fill="none" stroke="#14b8a6" opacity=".15">
+  <circle cx="870" cy="345" r="14"/>
+  <circle cx="480" cy="345" r="14"/>
+  <circle cx="960" cy="500" r="12"/>
+  <circle cx="530" cy="570" r="12"/>
+</g>
+<!-- Message bubble shapes — upper left -->
+<g fill="none" stroke="#14b8a6" stroke-width=".8" opacity=".3">
+  <rect x="60" y="200" width="220" height="60" rx="12"/>
+  <polygon points="80,260 80,280 100,260"/>
+  <rect x="60" y="280" width="160" height="50" rx="12"/>
+  <polygon points="200,330 200,350 180,330"/>
+  <rect x="60" y="360" width="200" height="60" rx="12"/>
+  <polygon points="80,420 80,440 100,420"/>
+</g>
+<!-- Message bubble shapes — lower right -->
+<g fill="none" stroke="#14b8a6" stroke-width=".8" opacity=".3">
+  <rect x="1160" y="500" width="220" height="60" rx="12"/>
+  <polygon points="1360,560 1360,580 1340,560"/>
+  <rect x="1160" y="580" width="160" height="50" rx="12"/>
+  <polygon points="1180,630 1180,650 1200,630"/>
+  <rect x="1200" y="650" width="200" height="60" rx="12"/>
+  <polygon points="1380,710 1380,730 1360,710"/>
+</g>
+<!-- Encryption hex pattern -->
+<g stroke="#14b8a6" stroke-width=".4" opacity=".1" fill="none">
+  <polygon points="720,350 762,375 762,425 720,450 678,425 678,375"/>
+  <polygon points="762,375 804,400 804,450 762,475 720,450 720,400"/>
+  <polygon points="678,375 720,350 720,300 678,275 636,300 636,350"/>
+</g>
+<!-- Corner HUD -->
+<path d="M60,60 L60,30 L90,30" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,60 L1380,30 L1350,30" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity=".5"/>
+<path d="M60,840 L60,870 L90,870" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,840 L1380,870 L1350,870" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity=".5"/>
+</svg>

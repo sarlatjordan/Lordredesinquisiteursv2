@@ -1,0 +1,118 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+    <stop offset="0%" stop-color="#0f0606"/>
+    <stop offset="100%" stop-color="#040202"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#dc2626" stop-opacity=".2"/>
+    <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".65"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/></g>
+<!-- Authority grid background -->
+<g stroke="#dc2626" stroke-width=".35" opacity=".12">
+  <line x1="0" y1="90"  x2="1440" y2="90"/> <line x1="0" y1="180" x2="1440" y2="180"/>
+  <line x1="0" y1="270" x2="1440" y2="270"/><line x1="0" y1="360" x2="1440" y2="360"/>
+  <line x1="0" y1="450" x2="1440" y2="450"/><line x1="0" y1="540" x2="1440" y2="540"/>
+  <line x1="0" y1="630" x2="1440" y2="630"/><line x1="0" y1="720" x2="1440" y2="720"/>
+  <line x1="0" y1="810" x2="1440" y2="810"/>
+  <line x1="160" y1="0" x2="160" y2="900"/><line x1="320" y1="0" x2="320" y2="900"/>
+  <line x1="480" y1="0" x2="480" y2="900"/><line x1="640" y1="0" x2="640" y2="900"/>
+  <line x1="800" y1="0" x2="800" y2="900"/><line x1="960" y1="0" x2="960" y2="900"/>
+  <line x1="1120" y1="0" x2="1120" y2="900"/><line x1="1280" y1="0" x2="1280" y2="900"/>
+</g>
+<!-- Central lock body -->
+<rect x="660" y="410" width="120" height="100" rx="8" fill="none" stroke="#dc2626" stroke-width="1.8" opacity=".55"/>
+<rect x="672" y="422" width="96" height="76" rx="5" fill="none" stroke="#dc2626" stroke-width=".6" opacity=".3"/>
+<!-- Lock shackle -->
+<path d="M690,410 L690,360 Q690,320 720,320 Q750,320 750,360 L750,410" fill="none" stroke="#dc2626" stroke-width="2" opacity=".55"/>
+<path d="M698,410 L698,368 Q698,335 720,335 Q742,335 742,368 L742,410" fill="none" stroke="#dc2626" stroke-width=".7" opacity=".3"/>
+<!-- Lock keyhole -->
+<circle cx="720" cy="460" r="14" fill="none" stroke="#dc2626" stroke-width="1.5" opacity=".6"/>
+<rect x="715" y="460" width="10" height="22" rx="2" fill="none" stroke="#dc2626" stroke-width="1.2" opacity=".5"/>
+<!-- Lock glow -->
+<circle cx="720" cy="460" r="30" fill="#dc2626" opacity=".05"/>
+<!-- Authority ring around lock -->
+<circle cx="720" cy="470" r="90"  fill="none" stroke="#dc2626" stroke-width="1"   opacity=".3"/>
+<circle cx="720" cy="470" r="130" fill="none" stroke="#dc2626" stroke-width=".7"  opacity=".2"/>
+<circle cx="720" cy="470" r="180" fill="none" stroke="#dc2626" stroke-width=".5"  opacity=".12"/>
+<!-- Eight-point authority mark ticks -->
+<g stroke="#dc2626" stroke-width="1.5" opacity=".4">
+  <line x1="720" y1="380" x2="720" y2="360"/>
+  <line x1="810" y1="470" x2="830" y2="470"/>
+  <line x1="720" y1="560" x2="720" y2="580"/>
+  <line x1="630" y1="470" x2="610" y2="470"/>
+  <line x1="784" y1="406" x2="798" y2="392"/>
+  <line x1="784" y1="534" x2="798" y2="548"/>
+  <line x1="656" y1="534" x2="642" y2="548"/>
+  <line x1="656" y1="406" x2="642" y2="392"/>
+</g>
+<!-- Side readout panels -->
+<rect x="30" y="220" width="200" height="160" fill="#1a0404" stroke="#dc2626" stroke-width=".8" opacity=".5" rx="3"/>
+<line x1="30" y1="245" x2="230" y2="245" stroke="#dc2626" stroke-width=".6" opacity=".35"/>
+<g fill="#dc2626" opacity=".25">
+  <rect x="42" y="258" width="120" height="5" rx="1"/>
+  <rect x="42" y="272" width="80" height="5"  rx="1"/>
+  <rect x="42" y="286" width="140" height="5" rx="1"/>
+  <rect x="42" y="300" width="60"  height="5" rx="1"/>
+  <rect x="42" y="314" width="110" height="5" rx="1"/>
+  <rect x="42" y="328" width="95"  height="5" rx="1"/>
+  <rect x="42" y="342" width="130" height="5" rx="1"/>
+  <rect x="42" y="356" width="70"  height="5" rx="1"/>
+</g>
+<rect x="1210" y="220" width="200" height="160" fill="#1a0404" stroke="#dc2626" stroke-width=".8" opacity=".5" rx="3"/>
+<line x1="1210" y1="245" x2="1410" y2="245" stroke="#dc2626" stroke-width=".6" opacity=".35"/>
+<g fill="#dc2626" opacity=".25">
+  <rect x="1222" y="258" width="100" height="5" rx="1"/>
+  <rect x="1222" y="272" width="150" height="5" rx="1"/>
+  <rect x="1222" y="286" width="70"  height="5" rx="1"/>
+  <rect x="1222" y="300" width="120" height="5" rx="1"/>
+  <rect x="1222" y="314" width="90"  height="5" rx="1"/>
+  <rect x="1222" y="328" width="140" height="5" rx="1"/>
+  <rect x="1222" y="342" width="80"  height="5" rx="1"/>
+  <rect x="1222" y="356" width="110" height="5" rx="1"/>
+</g>
+<!-- Warning stripe bottom -->
+<rect x="0" y="872" width="1440" height="28" fill="#1a0404" opacity=".9"/>
+<g stroke="#dc2626" stroke-width=".8" opacity=".45">
+  <line x1="0" y1="872" x2="1440" y2="872"/>
+</g>
+<!-- Hazard stripes in warning bar -->
+<g opacity=".15" fill="#dc2626">
+  <polygon points="0,872 28,872 0,900"/>
+  <polygon points="56,872 84,872 56,900 28,900"/>
+  <polygon points="112,872 140,872 112,900 84,900"/>
+  <polygon points="168,872 196,872 168,900 140,900"/>
+  <polygon points="224,872 252,872 224,900 196,900"/>
+  <polygon points="280,872 308,872 280,900 252,900"/>
+  <polygon points="336,872 364,872 336,900 308,900"/>
+  <polygon points="392,872 420,872 392,900 364,900"/>
+  <polygon points="448,872 476,872 448,900 420,900"/>
+  <polygon points="504,872 532,872 504,900 476,900"/>
+  <polygon points="560,872 588,872 560,900 532,900"/>
+  <polygon points="616,872 644,872 616,900 588,900"/>
+  <polygon points="672,872 700,872 672,900 644,900"/>
+  <polygon points="728,872 756,872 728,900 700,900"/>
+  <polygon points="784,872 812,872 784,900 756,900"/>
+  <polygon points="840,872 868,872 840,900 812,900"/>
+  <polygon points="896,872 924,872 896,900 868,900"/>
+  <polygon points="952,872 980,872 952,900 924,900"/>
+  <polygon points="1008,872 1036,872 1008,900 980,900"/>
+  <polygon points="1064,872 1092,872 1064,900 1036,900"/>
+  <polygon points="1120,872 1148,872 1120,900 1092,900"/>
+  <polygon points="1176,872 1204,872 1176,900 1148,900"/>
+  <polygon points="1232,872 1260,872 1232,900 1204,900"/>
+  <polygon points="1288,872 1316,872 1288,900 1260,900"/>
+  <polygon points="1344,872 1372,872 1344,900 1316,900"/>
+  <polygon points="1400,872 1428,872 1400,900 1372,900"/>
+</g>
+<!-- Corner HUD — heavy authority style -->
+<path d="M60,60 L60,25 L100,25" fill="none" stroke="#dc2626" stroke-width="2" opacity=".6"/>
+<path d="M1380,60 L1380,25 L1340,25" fill="none" stroke="#dc2626" stroke-width="2" opacity=".6"/>
+<path d="M60,840 L60,872 L100,872" fill="none" stroke="#dc2626" stroke-width="2" opacity=".6"/>
+<path d="M1380,840 L1380,872 L1340,872" fill="none" stroke="#dc2626" stroke-width="2" opacity=".6"/>
+</svg>

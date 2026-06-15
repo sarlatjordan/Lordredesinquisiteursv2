@@ -1,17 +1,14 @@
-// Map route prefixes → image paths in /public/bg/
-// Drop your images in public/bg/ with the filenames listed below.
-// Exact route match wins; longest prefix wins for nested routes.
 export const PAGE_BACKGROUNDS: Record<string, string> = {
-  '/dashboard':    '/bg/dashboard.jpg',
-  '/logistique':   '/bg/logistique.jpg',
-  '/flotte':       '/bg/flotte.jpg',
-  '/operations':   '/bg/operations.jpg',
-  '/evenements':   '/bg/evenements.jpg',
-  '/membres':      '/bg/membres.jpg',
-  '/carte':        '/bg/carte.jpg',
-  '/ressources':   '/bg/ressources.jpg',
-  '/messages':     '/bg/messages.jpg',
-  '/partenariats': '/bg/partenariats.jpg',
-  '/profil':       '/bg/profil.jpg',
-  '/admin':        '/bg/admin.jpg',
+  '/dashboard':    '/bg/dashboard.svg',
+  '/logistique':   '/bg/logistique.svg',
+  '/flotte':       '/bg/flotte.svg',
+  '/operations':   '/bg/operations.svg',
+  '/evenements':   '/bg/evenements.svg',
+  '/membres':      '/bg/membres.svg',
+  '/carte':        '/bg/carte.svg',
+  '/ressources':   '/bg/ressources.svg',
+  '/messages':     '/bg/messages.svg',
+  '/partenariats': '/bg/partenariats.svg',
+  '/profil':       '/bg/profil.svg',
+  '/admin':        '/bg/admin.svg',
 }

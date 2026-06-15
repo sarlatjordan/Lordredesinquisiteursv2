@@ -1,0 +1,86 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+    <stop offset="0%" stop-color="#060b14"/>
+    <stop offset="100%" stop-color="#020408"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#3b82f6" stop-opacity=".17"/>
+    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".7"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/></g>
+<!-- Large ID card frame — center -->
+<rect x="520" y="220" width="400" height="500" rx="10" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity=".4"/>
+<rect x="535" y="235" width="370" height="465" rx="8" fill="none" stroke="#3b82f6" stroke-width=".6" opacity=".2"/>
+<!-- ID card inner header bar -->
+<rect x="520" y="220" width="400" height="60" rx="10" fill="#0d1929" opacity=".7"/>
+<line x1="520" y1="280" x2="920" y2="280" stroke="#3b82f6" stroke-width=".8" opacity=".4"/>
+<!-- ID card avatar placeholder -->
+<rect x="555" y="300" width="110" height="130" rx="4" fill="none" stroke="#3b82f6" stroke-width=".8" opacity=".35"/>
+<circle cx="610" cy="345" r="28" fill="none" stroke="#3b82f6" stroke-width=".6" opacity=".3"/>
+<path d="M575,430 Q610,395 645,430" fill="none" stroke="#3b82f6" stroke-width=".6" opacity=".3"/>
+<!-- ID card data lines -->
+<g stroke="#3b82f6" stroke-width=".6" opacity=".25">
+  <line x1="685" y1="315" x2="890" y2="315"/>
+  <line x1="685" y1="335" x2="870" y2="335"/>
+  <line x1="685" y1="355" x2="880" y2="355"/>
+  <line x1="685" y1="375" x2="860" y2="375"/>
+  <line x1="685" y1="395" x2="875" y2="395"/>
+  <line x1="685" y1="415" x2="850" y2="415"/>
+</g>
+<!-- ID card lower data block -->
+<g stroke="#3b82f6" stroke-width=".5" opacity=".2">
+  <line x1="555" y1="455" x2="890" y2="455"/>
+  <line x1="555" y1="475" x2="890" y2="475"/>
+  <line x1="555" y1="495" x2="830" y2="495"/>
+  <line x1="555" y1="515" x2="860" y2="515"/>
+  <line x1="555" y1="535" x2="810" y2="535"/>
+  <line x1="555" y1="555" x2="880" y2="555"/>
+  <line x1="555" y1="575" x2="840" y2="575"/>
+  <line x1="555" y1="595" x2="870" y2="595"/>
+</g>
+<!-- Scan line sweep -->
+<rect x="520" y="440" width="400" height="2" fill="#3b82f6" opacity=".12"/>
+<rect x="520" y="442" width="400" height="60" fill="url(#glow)" opacity=".05"/>
+<!-- Corner scan brackets on ID card -->
+<path d="M530,230 L530,250 L550,250" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity=".6"/>
+<path d="M910,230 L910,250 L890,250" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity=".6"/>
+<path d="M530,710 L530,690 L550,690" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity=".6"/>
+<path d="M910,710 L910,690 L890,690" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity=".6"/>
+<!-- Side scan line panels -->
+<g stroke="#3b82f6" stroke-width=".4" opacity=".12">
+  <line x1="100" y1="200" x2="500" y2="200"/><line x1="100" y1="225" x2="500" y2="225"/>
+  <line x1="100" y1="250" x2="500" y2="250"/><line x1="100" y1="275" x2="500" y2="275"/>
+  <line x1="100" y1="300" x2="500" y2="300"/><line x1="100" y1="325" x2="500" y2="325"/>
+  <line x1="100" y1="350" x2="500" y2="350"/><line x1="100" y1="375" x2="500" y2="375"/>
+  <line x1="100" y1="400" x2="500" y2="400"/><line x1="100" y1="425" x2="500" y2="425"/>
+  <line x1="100" y1="450" x2="500" y2="450"/><line x1="100" y1="475" x2="500" y2="475"/>
+  <line x1="100" y1="500" x2="500" y2="500"/><line x1="100" y1="525" x2="500" y2="525"/>
+  <line x1="100" y1="550" x2="500" y2="550"/><line x1="100" y1="575" x2="500" y2="575"/>
+  <line x1="100" y1="600" x2="500" y2="600"/><line x1="100" y1="625" x2="500" y2="625"/>
+  <line x1="100" y1="650" x2="500" y2="650"/><line x1="100" y1="675" x2="500" y2="675"/>
+  <line x1="100" y1="700" x2="500" y2="700"/>
+  <line x1="940" y1="200" x2="1340" y2="200"/><line x1="940" y1="225" x2="1340" y2="225"/>
+  <line x1="940" y1="250" x2="1340" y2="250"/><line x1="940" y1="275" x2="1340" y2="275"/>
+  <line x1="940" y1="300" x2="1340" y2="300"/><line x1="940" y1="325" x2="1340" y2="325"/>
+  <line x1="940" y1="350" x2="1340" y2="350"/><line x1="940" y1="375" x2="1340" y2="375"/>
+  <line x1="940" y1="400" x2="1340" y2="400"/><line x1="940" y1="425" x2="1340" y2="425"/>
+  <line x1="940" y1="450" x2="1340" y2="450"/><line x1="940" y1="475" x2="1340" y2="475"/>
+  <line x1="940" y1="500" x2="1340" y2="500"/><line x1="940" y1="525" x2="1340" y2="525"/>
+  <line x1="940" y1="550" x2="1340" y2="550"/><line x1="940" y1="575" x2="1340" y2="575"/>
+  <line x1="940" y1="600" x2="1340" y2="600"/><line x1="940" y1="625" x2="1340" y2="625"/>
+  <line x1="940" y1="650" x2="1340" y2="650"/><line x1="940" y1="675" x2="1340" y2="675"/>
+  <line x1="940" y1="700" x2="1340" y2="700"/>
+</g>
+<!-- Glow behind card -->
+<ellipse cx="720" cy="470" rx="240" ry="300" fill="#3b82f6" opacity=".05"/>
+<!-- Corner HUD -->
+<path d="M60,60 L60,30 L90,30" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,60 L1380,30 L1350,30" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity=".5"/>
+<path d="M60,840 L60,870 L90,870" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,840 L1380,870 L1350,870" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity=".5"/>
+</svg>

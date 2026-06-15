@@ -17,7 +17,7 @@ export function PageBackground() {
       aria-hidden="true"
       className="absolute inset-0 z-0 pointer-events-none"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.82) 100%), url(${bgPath})`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.70) 100%), url(${bgPath})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

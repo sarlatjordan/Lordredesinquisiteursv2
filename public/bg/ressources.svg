@@ -1,0 +1,90 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+    <stop offset="0%" stop-color="#08071a"/>
+    <stop offset="100%" stop-color="#030208"/>
+  </radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+    <stop offset="0%" stop-color="#6366f1" stop-opacity=".18"/>
+    <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1440" height="900" fill="url(#bg)"/>
+<rect width="1440" height="900" fill="url(#glow)"/>
+<!-- Stars -->
+<g fill="white" opacity=".75"><circle cx="72" cy="43" r="1.2"/><circle cx="498" cy="67" r="1.5"/><circle cx="923" cy="55" r="1.3"/><circle cx="1372" cy="48" r="1.1"/><circle cx="177" cy="145" r="1.4"/><circle cx="612" cy="138" r="1.2"/><circle cx="215" cy="28" r=".8"/><circle cx="701" cy="19" r="1"/><circle cx="1148" cy="33" r=".9"/><circle cx="387" cy="88" r="1.3"/><circle cx="842" cy="91" r="1.5"/></g>
+<!-- Archive shelving structure — left -->
+<g stroke="#6366f1" stroke-width=".6" opacity=".3" fill="none">
+  <rect x="20" y="80" width="180" height="760"/>
+  <line x1="20" y1="190" x2="200" y2="190"/><line x1="20" y1="300" x2="200" y2="300"/>
+  <line x1="20" y1="410" x2="200" y2="410"/><line x1="20" y1="520" x2="200" y2="520"/>
+  <line x1="20" y1="630" x2="200" y2="630"/><line x1="20" y1="740" x2="200" y2="740"/>
+</g>
+<!-- Data blocks on shelves left -->
+<g fill="#6366f1" opacity=".18">
+  <rect x="30" y="100" width="50" height="80"/><rect x="90" y="110" width="40" height="70"/><rect x="140" y="95" width="50" height="85"/>
+  <rect x="30" y="210" width="60" height="80"/><rect x="100" y="220" width="45" height="70"/><rect x="155" y="205" width="35" height="85"/>
+  <rect x="30" y="320" width="40" height="80"/><rect x="80" y="310" width="60" height="90"/><rect x="150" y="325" width="40" height="75"/>
+  <rect x="30" y="430" width="55" height="80"/><rect x="95" y="420" width="35" height="90"/><rect x="140" y="435" width="50" height="75"/>
+  <rect x="30" y="540" width="45" height="80"/><rect x="85" y="530" width="60" height="90"/><rect x="155" y="545" width="35" height="75"/>
+  <rect x="30" y="650" width="60" height="80"/><rect x="100" y="640" width="40" height="90"/><rect x="150" y="655" width="40" height="75"/>
+</g>
+<!-- Archive shelving structure — right -->
+<g stroke="#6366f1" stroke-width=".6" opacity=".3" fill="none">
+  <rect x="1240" y="80" width="180" height="760"/>
+  <line x1="1240" y1="190" x2="1420" y2="190"/><line x1="1240" y1="300" x2="1420" y2="300"/>
+  <line x1="1240" y1="410" x2="1420" y2="410"/><line x1="1240" y1="520" x2="1420" y2="520"/>
+  <line x1="1240" y1="630" x2="1420" y2="630"/><line x1="1240" y1="740" x2="1420" y2="740"/>
+</g>
+<g fill="#6366f1" opacity=".18">
+  <rect x="1250" y="100" width="50" height="80"/><rect x="1310" y="110" width="40" height="70"/><rect x="1360" y="95" width="50" height="85"/>
+  <rect x="1250" y="210" width="60" height="80"/><rect x="1320" y="220" width="45" height="70"/><rect x="1375" y="205" width="35" height="85"/>
+  <rect x="1250" y="320" width="40" height="80"/><rect x="1300" y="310" width="60" height="90"/><rect x="1370" y="325" width="40" height="75"/>
+  <rect x="1250" y="430" width="55" height="80"/><rect x="1315" y="420" width="35" height="90"/><rect x="1360" y="435" width="50" height="75"/>
+  <rect x="1250" y="540" width="45" height="80"/><rect x="1305" y="530" width="60" height="90"/><rect x="1375" y="545" width="35" height="75"/>
+  <rect x="1250" y="650" width="60" height="80"/><rect x="1320" y="640" width="40" height="90"/><rect x="1370" y="655" width="40" height="75"/>
+</g>
+<!-- Central data stream lines -->
+<g stroke="#6366f1" stroke-width="1" opacity=".2">
+  <line x1="220" y1="100" x2="1220" y2="100"/><line x1="220" y1="200" x2="1220" y2="200"/>
+  <line x1="220" y1="300" x2="1220" y2="300"/><line x1="220" y1="400" x2="1220" y2="400"/>
+  <line x1="220" y1="500" x2="1220" y2="500"/><line x1="220" y1="600" x2="1220" y2="600"/>
+  <line x1="220" y1="700" x2="1220" y2="700"/><line x1="220" y1="800" x2="1220" y2="800"/>
+</g>
+<!-- Flowing data particles on streams -->
+<g fill="#818cf8">
+  <rect x="260" y="97" width="40" height="6" rx="3" opacity=".5"/>
+  <rect x="480" y="197" width="60" height="6" rx="3" opacity=".4"/>
+  <rect x="700" y="297" width="50" height="6" rx="3" opacity=".5"/>
+  <rect x="920" y="397" width="70" height="6" rx="3" opacity=".4"/>
+  <rect x="400" y="497" width="45" height="6" rx="3" opacity=".5"/>
+  <rect x="640" y="597" width="55" height="6" rx="3" opacity=".4"/>
+  <rect x="860" y="697" width="40" height="6" rx="3" opacity=".5"/>
+  <rect x="300" y="797" width="65" height="6" rx="3" opacity=".4"/>
+  <rect x="1100" y="97" width="40" height="6" rx="3" opacity=".5"/>
+  <rect x="880" y="197" width="55" height="6" rx="3" opacity=".4"/>
+  <rect x="660" y="297" width="45" height="6" rx="3" opacity=".5"/>
+  <rect x="440" y="497" width="60" height="6" rx="3" opacity=".4"/>
+</g>
+<!-- Central holographic book -->
+<rect x="640" y="360" width="160" height="180" rx="4" fill="none" stroke="#6366f1" stroke-width="1.5" opacity=".4"/>
+<line x1="720" y1="360" x2="720" y2="540" stroke="#6366f1" stroke-width="1" opacity=".35"/>
+<!-- Book lines suggesting text -->
+<g stroke="#6366f1" stroke-width=".6" opacity=".25">
+  <line x1="658" y1="390" x2="710" y2="390"/><line x1="658" y1="405" x2="710" y2="405"/>
+  <line x1="658" y1="420" x2="710" y2="420"/><line x1="658" y1="435" x2="710" y2="435"/>
+  <line x1="658" y1="450" x2="710" y2="450"/><line x1="658" y1="465" x2="710" y2="465"/>
+  <line x1="658" y1="480" x2="710" y2="480"/><line x1="658" y1="495" x2="710" y2="495"/>
+  <line x1="730" y1="390" x2="782" y2="390"/><line x1="730" y1="405" x2="782" y2="405"/>
+  <line x1="730" y1="420" x2="782" y2="420"/><line x1="730" y1="435" x2="782" y2="435"/>
+  <line x1="730" y1="450" x2="782" y2="450"/><line x1="730" y1="465" x2="782" y2="465"/>
+  <line x1="730" y1="480" x2="782" y2="480"/><line x1="730" y1="495" x2="782" y2="495"/>
+</g>
+<!-- Glow under book -->
+<ellipse cx="720" cy="550" rx="100" ry="15" fill="#6366f1" opacity=".08"/>
+<!-- Corner HUD -->
+<path d="M60,60 L60,30 L90,30" fill="none" stroke="#6366f1" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,60 L1380,30 L1350,30" fill="none" stroke="#6366f1" stroke-width="1.5" opacity=".5"/>
+<path d="M60,840 L60,870 L90,870" fill="none" stroke="#6366f1" stroke-width="1.5" opacity=".5"/>
+<path d="M1380,840 L1380,870 L1350,870" fill="none" stroke="#6366f1" stroke-width="1.5" opacity=".5"/>
+</svg>
