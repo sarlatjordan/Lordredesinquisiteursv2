@@ -14,9 +14,7 @@ export async function markRead(notificationId: string): Promise<ActionResult> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  // adminClient pour bypasser RLS — ownership vérifié explicitement via .eq('profile_id', user.id)
-  const admin = createAdminClient()
-  const { error } = await admin
+  const { error } = await supabase
     .from('notifications')
     .update({ is_read: true })
     .eq('id', parsed.data)

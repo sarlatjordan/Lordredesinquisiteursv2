@@ -17,6 +17,8 @@ const DURATION_OPTIONS: { value: DeviceTrustDuration; label: string }[] = [
   { value: '1y',  label: '1 an' },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default function MFAPage() {
   const router = useRouter()
   const [factorId, setFactorId]   = useState('')

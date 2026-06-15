@@ -29,16 +29,17 @@ export default async function AdminPointsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(me?.role ?? '') < 1000) redirect('/dashboard')
+  const [meResult, rawResult] = await Promise.all([
+    supabase.from('profiles').select('role').eq('id', user.id).single(),
+    supabase.from('member_points')
+      .select('*, member:profiles!profile_id(id, username, display_name, avatar_url, role), awarder:profiles!awarded_by(id, username, display_name)')
+      .order('created_at', { ascending: false })
+      .limit(200),
+  ])
 
-  const { data: raw } = await supabase
-    .from('member_points')
-    .select('*, member:profiles!profile_id(id, username, display_name, avatar_url, role), awarder:profiles!awarded_by(id, username, display_name)')
-    .order('created_at', { ascending: false })
-    .limit(200)
+  if (getRolePrivilege(meResult.data?.role ?? '') < 1000) redirect('/dashboard')
 
-  const rows = (raw as unknown as PointRow[]) ?? []
+  const rows = (rawResult.data as unknown as PointRow[]) ?? []
 
   const totalPositive = rows.filter(r => r.points > 0).reduce((s, r) => s + r.points, 0)
   const totalNegative = rows.filter(r => r.points < 0).reduce((s, r) => s + r.points, 0)

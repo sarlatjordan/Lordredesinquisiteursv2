@@ -13,17 +13,19 @@ export default async function EvenementsPage() {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Récupérer le privilège de l'utilisateur connecté
   let userPrivilege = 0
-  let canCreate = false   // Aspirant+ : peut créer un événement (FEAT-09)
-  let canManage = false   // Gardien+ : peut modifier/gérer les participants
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-    userPrivilege = getRolePrivilege(profile?.role ?? '')
+  let canCreate = false
+  let canManage = false
+
+  // Profil + inscriptions + comptage en parallèle — les requêtes événements dépendent de userPrivilege
+  const [profileResult, userAttendeesRes, countRes] = await Promise.all([
+    user ? supabase.from('profiles').select('role').eq('id', user.id).single() : Promise.resolve({ data: null }),
+    user ? supabase.from('event_attendees').select('*').eq('profile_id', user.id) : Promise.resolve({ data: [] }),
+    supabase.from('event_attendees').select('event_id').eq('status', 'confirme'),
+  ])
+
+  if (profileResult.data) {
+    userPrivilege = getRolePrivilege(profileResult.data.role ?? '')
     canCreate = userPrivilege >= PRIVILEGE.CREATE_EVENTS
     canManage = userPrivilege >= PRIVILEGE.MANAGE_EVENTS
   }
@@ -31,12 +33,9 @@ export default async function EvenementsPage() {
   const discordConfigured = isDiscordConfigured()
   const canCreateOp = userPrivilege >= PRIVILEGE.CREATE_OPS
 
-  // Un événement est "à venir" si son statut est actif ET sa date est dans le futur.
-  // S'il est planifié/en_cours mais que la date est dépassée, il va dans "passés"
-  // même si l'organisateur a oublié de le clôturer.
   const now = new Date().toISOString()
 
-  const [upcomingRes, terminatedRes, overdueRes, userAttendeesRes, countRes] = await Promise.all([
+  const [upcomingRes, terminatedRes, overdueRes] = await Promise.all([
     // À venir : statut actif + date future
     supabase
       .from('events')
@@ -62,12 +61,6 @@ export default async function EvenementsPage() {
       .lte('min_privilege', userPrivilege)
       .order('start_at', { ascending: false })
       .limit(10),
-    // Participations de l'utilisateur courant
-    user
-      ? supabase.from('event_attendees').select('*').eq('profile_id', user.id)
-      : Promise.resolve({ data: [] }),
-    // Comptage participants confirmés par event
-    supabase.from('event_attendees').select('event_id').eq('status', 'confirme'),
   ])
 
   const upcomingRaw = upcomingRes.data

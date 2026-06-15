@@ -14,23 +14,16 @@ export default async function AdminAvatarsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  const [profileResult, pendingResult] = await Promise.all([
+    supabase.from('profiles').select('role').eq('id', user.id).single(),
+    supabase.from('profiles').select('id, username, display_name, avatar_url, avatar_pending_url').not('avatar_pending_url', 'is', null).order('username', { ascending: true }),
+  ])
 
-  if (!profile || getRolePrivilege(profile.role) < 1000) {
+  if (!profileResult.data || getRolePrivilege(profileResult.data.role) < 1000) {
     redirect('/dashboard')
   }
 
-  const { data: pending } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_url, avatar_pending_url')
-    .not('avatar_pending_url', 'is', null)
-    .order('username', { ascending: true })
-
-  const profiles = (pending ?? []) as ProfileWithPendingAvatar[]
+  const profiles = (pendingResult.data ?? []) as ProfileWithPendingAvatar[]
 
   return (
     <div className="space-y-6">

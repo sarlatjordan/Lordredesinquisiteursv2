@@ -1,5 +1,6 @@
 'use server'
 
+import { z } from 'zod'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
@@ -12,6 +13,9 @@ export async function getOrgSettings(): Promise<OrgSettings | null> {
 }
 
 export async function setRecruitmentOpen(open: boolean): Promise<ActionResult> {
+  const parsed = z.boolean().safeParse(open)
+  if (!parsed.success) return { success: false, error: 'Paramètre invalide' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
@@ -22,7 +26,7 @@ export async function setRecruitmentOpen(open: boolean): Promise<ActionResult> {
 
   const { error } = await supabase
     .from('org_settings')
-    .update({ recruitment_open: open, updated_at: new Date().toISOString(), updated_by: user.id })
+    .update({ recruitment_open: parsed.data, updated_at: new Date().toISOString(), updated_by: user.id })
     .eq('id', true)
 
   if (error) return { success: false, error: error.message }

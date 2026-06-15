@@ -35,18 +35,25 @@ export async function createShip(input: ShipCreateInput): Promise<ActionResult<S
   return { success: true, data: data as Ship }
 }
 
+const ShipStatusSchema = z.enum(['disponible', 'en_mission', 'maintenance', 'indisponible'])
+
 export async function updateShipStatus(
   shipId: string,
   status: 'disponible' | 'en_mission' | 'maintenance' | 'indisponible'
 ): Promise<ActionResult> {
+  const idParsed = z.string().uuid().safeParse(shipId)
+  if (!idParsed.success) return { success: false, error: 'Identifiant vaisseau invalide' }
+  const statusParsed = ShipStatusSchema.safeParse(status)
+  if (!statusParsed.success) return { success: false, error: 'Statut invalide' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
   const { error } = await supabase
     .from('ships')
-    .update({ status })
-    .eq('id', shipId)
+    .update({ status: statusParsed.data })
+    .eq('id', idParsed.data)
 
   if (error) return { success: false, error: error.message }
 
@@ -56,6 +63,9 @@ export async function updateShipStatus(
 }
 
 export async function deleteShip(shipId: string): Promise<ActionResult> {
+  const parsed = z.string().uuid().safeParse(shipId)
+  if (!parsed.success) return { success: false, error: 'Identifiant vaisseau invalide' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
@@ -63,7 +73,7 @@ export async function deleteShip(shipId: string): Promise<ActionResult> {
   const { error } = await supabase
     .from('ships')
     .delete()
-    .eq('id', shipId)
+    .eq('id', parsed.data)
 
   if (error) return { success: false, error: error.message }
 

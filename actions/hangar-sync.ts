@@ -416,7 +416,7 @@ export async function syncHangarFromRsiLogin(
         const bodyStart = text.indexOf('<body')
         if (bodyStart > 0 && process.env.NODE_ENV === 'development') console.log('[RSI pledges HTML] body snippet:', text.slice(bodyStart, bodyStart + 1000))
 
-        hangarData = { success: 1, data: { _html: text } as unknown as RsiHangarResponse['data'] }
+        hangarData = { success: 1, data: { _html: text } }
         break
       }
 
@@ -440,7 +440,7 @@ export async function syncHangarFromRsiLogin(
       if (process.env.NODE_ENV === 'development') {
         console.log('[RSI hangar] data keys:', Object.keys(hangarData.data ?? {}))
       }
-      return { success: false, error: 'Aucun vaisseau trouvé. Log console pour debug structure.' }
+      return { success: false, error: 'Aucun vaisseau trouvé dans la réponse RSI.' }
     }
 
     shipNames = entries

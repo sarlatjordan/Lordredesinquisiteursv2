@@ -19,25 +19,17 @@ export default async function AdminActivitePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile || getRolePrivilege(profile.role) < 1000) redirect('/dashboard')
-
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-
   const admin = createAdminClient()
-  const { data: raw } = await admin
-    .from('profiles')
-    .select('*')
-    .eq('is_active', true)
-    .lt('last_seen_at', thirtyDaysAgo)
-    .order('last_seen_at', { ascending: true })
 
-  const members = (raw as Profile[]) ?? []
+  const [profileResult, rawResult] = await Promise.all([
+    supabase.from('profiles').select('role').eq('id', user.id).single(),
+    admin.from('profiles').select('*').eq('is_active', true).lt('last_seen_at', thirtyDaysAgo).order('last_seen_at', { ascending: true }),
+  ])
+
+  if (!profileResult.data || getRolePrivilege(profileResult.data.role) < 1000) redirect('/dashboard')
+
+  const members = (rawResult.data as Profile[]) ?? []
 
   return (
     <div className="space-y-6">

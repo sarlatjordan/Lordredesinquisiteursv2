@@ -1,5 +1,6 @@
 ﻿'use server'
 
+import { z } from 'zod'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -131,10 +132,17 @@ export async function rejectAvatar(profileId: string): Promise<ActionResult> {
 
 // ─── Gestion des rôles ────────────────────────────────────────────────────────
 
+const MemberRoleSchema = z.enum(['visiteur', 'aspirant', 'consacre', 'gardien', 'inquisiteur', 'maitre_inquisiteur', 'sage'])
+
 export async function updateMemberRole(
   memberId: string,
   role: 'visiteur' | 'aspirant' | 'consacre' | 'gardien' | 'inquisiteur' | 'maitre_inquisiteur' | 'sage'
 ): Promise<ActionResult> {
+  const idParsed = z.string().uuid().safeParse(memberId)
+  if (!idParsed.success) return { success: false, error: 'Identifiant membre invalide' }
+  const roleParsed = MemberRoleSchema.safeParse(role)
+  if (!roleParsed.success) return { success: false, error: 'Rang invalide' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
@@ -143,29 +151,31 @@ export async function updateMemberRole(
   if (me?.role !== 'sage') return { success: false, error: 'Droits insuffisants — Sage requis' }
 
   // Rôle actuel du membre (pour l'historique)
-  const { data: target } = await supabase.from('profiles').select('role, username').eq('id', memberId).single()
+  const { data: target } = await supabase.from('profiles').select('role, username').eq('id', idParsed.data).single()
   if (!target) return { success: false, error: 'Membre introuvable' }
 
-  const { error } = await supabase.from('profiles').update({ role }).eq('id', memberId)
+  // Mise à jour du rôle + points totaux en parallèle
+  const [{ error }, { data: pts }] = await Promise.all([
+    supabase.from('profiles').update({ role: roleParsed.data }).eq('id', idParsed.data),
+    supabase.from('member_points').select('points').eq('profile_id', idParsed.data),
+  ])
   if (error) return { success: false, error: error.message }
 
-  // Points totaux au moment de la promotion
-  const { data: pts } = await supabase.from('member_points').select('points').eq('profile_id', memberId)
   const totalPoints = (pts ?? []).reduce((sum, r) => sum + r.points, 0)
 
   // Historique promotion
   await supabase.from('member_promotions').insert({
-    profile_id:          memberId,
+    profile_id:          idParsed.data,
     from_role:           target.role,
-    to_role:             role,
+    to_role:             roleParsed.data,
     promoted_by:         user.id,
     points_at_promotion: totalPoints,
   })
 
   const fromLabel = ROLES[target.role as keyof typeof ROLES] ?? target.role
-  const toLabel   = ROLES[role as keyof typeof ROLES] ?? role
+  const toLabel   = ROLES[roleParsed.data as keyof typeof ROLES] ?? roleParsed.data
   await createNotification(supabase, {
-    profile_id: memberId,
+    profile_id: idParsed.data,
     type: 'promotion',
     title: `Promotion : ${fromLabel} → ${toLabel}`,
     message: 'Le Haut Conseil a statué sur votre progression.',
