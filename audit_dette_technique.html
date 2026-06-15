@@ -99,6 +99,7 @@ button.active-faible{background:var(--faible-bg);color:var(--faible-text);border
 .issue-title{font-size:.85rem;font-weight:500;flex:1;min-width:0}
 .issue-file{font-size:.75rem;color:var(--text-muted);font-family:'SF Mono','Fira Code',Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;flex-shrink:0}
 .issue-chevron{color:var(--text-muted);font-size:1rem;flex-shrink:0;transition:transform .2s;line-height:1}
+.issue-id{flex-shrink:0;font-size:.66rem;font-weight:700;font-family:'SF Mono','Fira Code',Consolas,monospace;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-muted);padding:.15rem .45rem;border-radius:4px;letter-spacing:.02em}
 
 .issue-body{display:none;border-top:1px solid var(--border);padding:.85rem 1rem;font-size:.82rem;line-height:1.65}
 .issue.open .issue-body{display:block}
@@ -184,84 +185,84 @@ const CAT_COLORS = {
 };
 
 const ISSUES = [
-  {cat:'TypeScript', file:'app/(app)/layout.tsx:41', impact:'moyen',
+  {id:'TS-01', cat:'TypeScript', file:'app/(app)/layout.tsx:41', impact:'moyen',
    title:'Cast Profile partiel trompeur',
    problem:'`data as unknown as Profile | null` — SELECT de 5 colonnes casté vers `Profile` complet. Les champs absents seront undefined à l\'exécution mais déclarés présents.',
    fix:'Définir un type ProfileSummary pour les 5 colonnes sélectionnées, ou étendre le SELECT.'},
-  {cat:'TypeScript', file:'components/chat/chat-layout.tsx:110', impact:'moyen',
+  {id:'TS-02', cat:'TypeScript', file:'components/chat/chat-layout.tsx:110', impact:'moyen',
    title:'Cast Realtime payload incorrect',
    problem:'`data as unknown as ChatMessageWithAuthor` dans un listener Realtime. Le payload brut n\'a pas de champ `author` (absent dans les payloads Realtime, uniquement présent dans les JOINs).',
    fix:'Reconstruire ChatMessageWithAuthor depuis le payload brut ou refetch le message après réception.'},
-  {cat:'TypeScript', file:'actions/hangar-sync.ts:419', impact:'faible',
+  {id:'TS-03', cat:'TypeScript', file:'actions/hangar-sync.ts:419', impact:'faible',
    title:'Hack type RsiHangarResponse',
    problem:'`{ _html: text } as unknown as RsiHangarResponse[\'data\']` — objet non-conforme casté vers le type de réponse structurée. Résidu de debug.',
    fix:'Créer un type discriminé HangarRawHtml séparé de RsiHangarResponse[\'data\'].'},
-  {cat:'TypeScript', file:'components/ui/calendar.tsx:91', impact:'faible',
+  {id:'TS-04', cat:'TypeScript', file:'components/ui/calendar.tsx:91', impact:'faible',
    title:'`as any` isolé',
    problem:'Seul `as any` du codebase dans le composant Calendar shadcn.',
    fix:'Typer correctement avec Record<string, string> ou le type DayPicker approprié.'},
 
-  {cat:'Server Actions', file:'actions/notifications.ts', impact:'moyen',
+  {id:'SA-01', cat:'Server Actions', file:'actions/notifications.ts', impact:'moyen',
    title:'markRead / markAllRead sans Zod',
    problem:'Mutations sans validation Zod. `notificationId` n\'est pas validé comme UUID — n\'importe quelle string peut être passée.',
    fix:'`z.string().uuid().safeParse(notificationId)` avant la mutation.'},
-  {cat:'Server Actions', file:'actions/onboarding.ts', impact:'moyen',
+  {id:'SA-02', cat:'Server Actions', file:'actions/onboarding.ts', impact:'moyen',
    title:'claimOnboardingStep sans Zod',
    problem:'`step: ExtendedOnboardingStep` reçu sans .safeParse(). Un step arbitraire peut être inséré en DB si le type TypeScript est contourné côté appelant.',
    fix:'`z.enum([...VALID_STEPS]).safeParse(step)` en début de fonction.'},
-  {cat:'Server Actions', file:'actions/org-settings.ts', impact:'faible',
+  {id:'SA-03', cat:'Server Actions', file:'actions/org-settings.ts', impact:'faible',
    title:'setRecruitmentOpen sans Zod',
    problem:'`open: boolean` passé directement sans .safeParse().',
    fix:'`z.boolean().safeParse(open)`.'},
-  {cat:'Server Actions', file:'actions/ships.ts', impact:'faible',
+  {id:'SA-04', cat:'Server Actions', file:'actions/ships.ts', impact:'faible',
    title:'updateShipStatus / deleteShip sans Zod',
    problem:'`status` (union de strings) et `shipId` (UUID) passés sans validation Zod.',
    fix:'`z.string().uuid()` sur shipId, `z.enum([...])` sur status.'},
-  {cat:'Server Actions', file:'actions/members.ts', impact:'faible',
+  {id:'SA-05', cat:'Server Actions', file:'actions/members.ts', impact:'faible',
    title:'updateMemberRole sans Zod UUID',
    problem:'`role` validé par TypeScript uniquement. `memberId` n\'est pas validé comme UUID.',
    fix:'`z.string().uuid()` sur memberId, `z.enum([...ROLES])` sur role.'},
-  {cat:'Server Actions', file:'actions/notifications.ts', impact:'faible',
+  {id:'SA-06', cat:'Server Actions', file:'actions/notifications.ts', impact:'faible',
    title:'createAdminClient inutile dans markRead',
    problem:'Admin client bypass RLS pour des mutations user-scoped déjà couvertes par la policy `notifs_update`.',
    fix:'Utiliser `supabase` (client utilisateur) — laisser RLS gérer.'},
 
-  {cat:'RLS', file:'supabase/migrations/006_gallery.sql:22-33', impact:'faible',
+  {id:'RLS-01', cat:'RLS', file:'supabase/migrations/006_gallery.sql:22-33', impact:'faible',
    title:'Policy Storage compare role = \'sage\' en dur',
    problem:'Les policies Storage utilisent `role = \'sage\'` au lieu de `get_my_privilege() >= 1000`. Incohérent avec le reste, cassera si la hiérarchie évolue.',
    fix:'Migration 037 — remplacer par `get_my_privilege() >= 1000`.'},
-  {cat:'RLS', file:'supabase/migrations/001_initial.sql', impact:'faible',
+  {id:'RLS-02', cat:'RLS', file:'supabase/migrations/001_initial.sql', impact:'faible',
    title:'Policies legacy admin/officer mortes',
    problem:'events_update, events_delete, ships_delete, resources_* référencent des rôles inexistants. Inopérantes mais source de confusion à la lecture.',
    fix:'Migration qui drop les policies obsolètes et recrée avec get_my_privilege().'},
 
-  {cat:'Performance', file:'app/(app)/membres/page.tsx:22-34', impact:'moyen',
+  {id:'PERF-01', cat:'Performance', file:'app/(app)/membres/page.tsx:22-34', impact:'moyen',
    title:'3 requêtes Supabase séquentielles',
    problem:'`profiles.select(\'role\')` + `rpc(\'get_member_points_totals\')` + query membres exécutés séquentiellement après getUser(). Latence cumulée inutile.',
    fix:'Paralléliser les 3 dans un Promise.all après getUser.'},
-  {cat:'Performance', file:'app/(app)/admin/activite · avatars · points', impact:'faible',
+  {id:'PERF-02', cat:'Performance', file:'app/(app)/admin/activite · avatars · points', impact:'faible',
    title:'getUser → profiles séquentiel (3 pages admin)',
    problem:'Pattern getUser() → profiles.select(\'role\') séquentiel répété dans les 3 pages admin.',
    fix:'Paralléliser avec le pattern établi dans membres/[username]/page.tsx.'},
-  {cat:'Performance', file:'app/(app)/evenements/page.tsx:14-29', impact:'faible',
+  {id:'PERF-03', cat:'Performance', file:'app/(app)/evenements/page.tsx:14-29', impact:'faible',
    title:'profiles.select hors du Promise.all',
    problem:'getUser() + profiles.select(\'role\') séquentiels avant le Promise.all des 5 requêtes événements.',
    fix:'Inclure profiles.select(\'role\') dans le Promise.all.'},
 
-  {cat:'Patterns', file:'actions/applications.ts:83', impact:'moyen',
+  {id:'PAT-01', cat:'Patterns', file:'actions/applications.ts:83', impact:'moyen',
    title:'console.error sans guard NODE_ENV',
    problem:'`console.error(\'[submitApplication] Supabase error:\', ...)` s\'exécute en production et expose des détails d\'erreur DB dans les logs Vercel.',
    fix:'Supprimer ou encadrer par `if (process.env.NODE_ENV === \'development\')`.'},
-  {cat:'Patterns', file:'app/(app)/mfa/page.tsx', impact:'faible',
+  {id:'PAT-02', cat:'Patterns', file:'app/(app)/mfa/page.tsx', impact:'faible',
    title:'export const dynamic manquant',
    problem:'Seule page app/(app)/ sans `export const dynamic = \'force-dynamic\'`. Les 29 autres pages l\'ont toutes.',
    fix:'Ajouter `export const dynamic = \'force-dynamic\'`.'},
-  {cat:'Patterns', file:'actions/members.ts — updateMemberRole', impact:'faible',
+  {id:'PAT-03', cat:'Patterns', file:'actions/members.ts — updateMemberRole', impact:'faible',
    title:'Fetch séquentiels dans une même action',
    problem:'profiles.select(target) et member_points.select exécutés séquentiellement alors qu\'ils sont indépendants.',
    fix:'Promise.all([...]) pour les deux requêtes.'},
 
-  {cat:'Qualité', file:'actions/hangar-sync.ts:443', impact:'faible',
+  {id:'QUAL-01', cat:'Qualité', file:'actions/hangar-sync.ts:443', impact:'faible',
    title:'Message d\'erreur trompeur',
    problem:'`\'Aucun vaisseau trouvé. Log console pour debug structure.\'` fait référence à des logs console absents en production (guardés par NODE_ENV).',
    fix:'`\'Aucun vaisseau trouvé dans la réponse RSI.\'`'},
@@ -293,6 +294,7 @@ function renderIssues() {
     return `
     <div class="issue" onclick="toggleIssue(this)">
       <div class="issue-header">
+        <span class="issue-id">${issue.id}</span>
         <span class="impact-badge badge-${issue.impact}">${issue.impact}</span>
         <span class="cat-dot" style="background:${color}" title="${issue.cat}"></span>
         <span class="issue-title">${escHtml(issue.title)}</span>
