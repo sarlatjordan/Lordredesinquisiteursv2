@@ -2,6 +2,7 @@
 
 > Audit du 2026-06-15 — 21 problèmes recensés, aucun critique ni élevé.
 > Résolu au 2026-06-15 : TS-01, TS-02, SA-01, SA-02 (commit d9c6c21)
+> Résolu au 2026-06-15 : PERF-01, PAT-01 (commit 70f4f47)
 
 ## Résumé
 
@@ -10,10 +11,10 @@
 | TypeScript (TS) | 2 | 2 | **4** | 2 |
 | Server Actions (SA) | 2 | 4 | **6** | 2 |
 | Sécurité RLS (RLS) | 0 | 2 | **2** | — |
-| Performance (PERF) | 1 | 3 | **4** | — |
-| Cohérence patterns (PAT) | 1 | 2 | **3** | — |
+| Performance (PERF) | 1 | 3 | **4** | 1 |
+| Cohérence patterns (PAT) | 1 | 2 | **3** | 1 |
 | Code mort / qualité (QUAL) | 0 | 1 | **1** | — |
-| **Total** | **6** | **14** | **21** | **4** |
+| **Total** | **6** | **14** | **21** | **6** |
 
 ---
 
@@ -79,9 +80,9 @@ Guard `data?.author` ajouté avant le cast.
 
 ## Performance
 
-### [PERF-01 · MOYEN] `app/(app)/membres/page.tsx:22-34`
-**Problème :** 3 requêtes Supabase séquentielles après `getUser()` — `profiles.select('role')`, `rpc('get_member_points_totals')`, query membres complète.
-**Fix :** Paralléliser les 3 dans un `Promise.all` après `getUser`.
+### ~~[PERF-01 · MOYEN] `app/(app)/membres/page.tsx:22-34`~~ ✅ résolu — 70f4f47
+~~**Problème :** 3 requêtes Supabase séquentielles après `getUser()`.~~
+`Promise.all([profiles+role, rpc points, membres query])` — query membres construite avant le `Promise.all`.
 
 ### [PERF-02 · FAIBLE] `app/(app)/admin/activite/page.tsx`, `admin/avatars/page.tsx`, `admin/points/page.tsx`
 **Problème :** Pattern `getUser()` → `profiles.select('role')` séquentiel dans ces 3 pages admin.
@@ -95,9 +96,9 @@ Guard `data?.author` ajouté avant le cast.
 
 ## Cohérence patterns
 
-### [PAT-01 · MOYEN] `actions/applications.ts:83` — `console.error` sans guard `NODE_ENV`
-**Problème :** `console.error('[submitApplication] Supabase error:', ...)` expose des détails d'erreur DB dans les logs Vercel en production.
-**Fix :** Supprimer ou encadrer par `if (process.env.NODE_ENV === 'development')`.
+### ~~[PAT-01 · MOYEN] `actions/applications.ts:83` — `console.error` sans guard `NODE_ENV`~~ ✅ résolu — 70f4f47
+~~**Problème :** `console.error` expose des détails d'erreur DB en production.~~
+Encadré par `if (process.env.NODE_ENV === 'development')`.
 
 ### [PAT-02 · FAIBLE] `app/(app)/mfa/page.tsx` — `export const dynamic` manquant
 **Problème :** Seule page `app/(app)/` sans `export const dynamic = 'force-dynamic'` (les 29 autres l'ont).
