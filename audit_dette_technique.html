@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Dette Technique — INQFR</title>
+<style>
+:root {
+  --bg: #f4f3f0;
+  --bg-card: #ffffff;
+  --bg-secondary: #f0efeb;
+  --text: #1a1918;
+  --text-muted: #6b6965;
+  --border: rgba(0,0,0,0.1);
+  --border-strong: rgba(0,0,0,0.18);
+  --moyen-bg: #fff8ed;
+  --moyen-text: #7c4b00;
+  --moyen-border: #f4a93a;
+  --faible-bg: #edfaf4;
+  --faible-text: #1a5c3a;
+  --faible-border: #3cb87a;
+  --accent: #4f46e5;
+  --cat-ts: #7c3aed;
+  --cat-sa: #dc6b0e;
+  --cat-rls: #c0392b;
+  --cat-perf: #0e7a66;
+  --cat-pat: #1d6fb5;
+  --cat-qual: #6b6965;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181a;
+    --bg-card: #222226;
+    --bg-secondary: #2a2a2e;
+    --text: #e6e4df;
+    --text-muted: #9a9893;
+    --border: rgba(255,255,255,0.09);
+    --border-strong: rgba(255,255,255,0.16);
+    --moyen-bg: #2a1f06;
+    --moyen-text: #fbbf24;
+    --moyen-border: #92400e;
+    --faible-bg: #061e12;
+    --faible-text: #34d399;
+    --faible-border: #065f46;
+    --accent: #818cf8;
+    --cat-ts: #a78bfa;
+    --cat-sa: #fb923c;
+    --cat-rls: #f87171;
+    --cat-perf: #34d399;
+    --cat-pat: #60a5fa;
+    --cat-qual: #9a9893;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem 1.5rem}
+a{color:inherit}
+
+.header{margin-bottom:2rem}
+.header h1{font-size:1.4rem;font-weight:600;letter-spacing:-0.01em;margin-bottom:.25rem}
+.header p{font-size:.85rem;color:var(--text-muted)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:2rem}
+.metric{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem}
+.metric-label{font-size:.72rem;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.metric-val{font-size:1.9rem;font-weight:700;letter-spacing:-0.02em;line-height:1}
+.metric-sub{font-size:.72rem;color:var(--text-muted);margin-top:.3rem}
+.val-total{color:var(--text)}
+.val-moyen{color:#d97706}
+.val-faible{color:#059669}
+.val-ok{color:#4f46e5}
+
+.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem}
+.chart-title{font-size:.8rem;font-weight:500;color:var(--text-muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em}
+.chart-inner{position:relative;height:200px}
+.chart-legend{display:flex;gap:1.25rem;margin-top:.75rem}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.filter-group{display:flex;flex-wrap:wrap;gap:.4rem}
+.filter-sep{width:1px;background:var(--border-strong);margin:0 .2rem}
+button{font-family:inherit;font-size:.78rem;font-weight:500;cursor:pointer;border:1px solid var(--border-strong);background:var(--bg-card);color:var(--text-muted);padding:.35rem .75rem;border-radius:6px;transition:all .15s}
+button:hover{background:var(--bg-secondary);color:var(--text)}
+button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.active-moyen{background:var(--moyen-bg);color:var(--moyen-text);border-color:var(--moyen-border)}
+button.active-faible{background:var(--faible-bg);color:var(--faible-text);border-color:var(--faible-border)}
+
+.issue-count{font-size:.8rem;color:var(--text-muted);margin-bottom:1rem}
+.issue-count span{font-weight:600;color:var(--text)}
+
+.issues{display:flex;flex-direction:column;gap:.5rem}
+.issue{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.issue:hover{border-color:var(--border-strong)}
+.issue-header{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem}
+.impact-badge{flex-shrink:0;font-size:.68rem;font-weight:600;padding:.2rem .55rem;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.badge-moyen{background:var(--moyen-bg);color:var(--moyen-text);border:1px solid var(--moyen-border)}
+.badge-faible{background:var(--faible-bg);color:var(--faible-text);border:1px solid var(--faible-border)}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.issue-title{font-size:.85rem;font-weight:500;flex:1;min-width:0}
+.issue-file{font-size:.75rem;color:var(--text-muted);font-family:'SF Mono','Fira Code',Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;flex-shrink:0}
+.issue-chevron{color:var(--text-muted);font-size:1rem;flex-shrink:0;transition:transform .2s;line-height:1}
+
+.issue-body{display:none;border-top:1px solid var(--border);padding:.85rem 1rem;font-size:.82rem;line-height:1.65}
+.issue.open .issue-body{display:block}
+.issue.open .issue-chevron{transform:rotate(180deg)}
+.issue-body p{color:var(--text-muted);margin-bottom:.65rem}
+.issue-body strong{color:var(--text);font-weight:500}
+.fix-box{background:var(--bg-secondary);border-radius:6px;padding:.55rem .75rem;font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.75rem;color:var(--text);border-left:2px solid var(--accent)}
+
+.empty{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Audit dette technique — INQFR</h1>
+  <p>2026-06-15 &nbsp;·&nbsp; 21 problèmes recensés &nbsp;·&nbsp; aucun critique ni élevé</p>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">Total</div>
+    <div class="metric-val val-total">21</div>
+    <div class="metric-sub">problèmes</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Impact moyen</div>
+    <div class="metric-val val-moyen">6</div>
+    <div class="metric-sub">à traiter en priorité</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Impact faible</div>
+    <div class="metric-val val-faible">15</div>
+    <div class="metric-sub">dette acceptable</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Critique / élevé</div>
+    <div class="metric-val val-ok">0</div>
+    <div class="metric-sub">aucun bloquant</div>
+  </div>
+</div>
+
+<div class="chart-wrap">
+  <div class="chart-title">Répartition par catégorie</div>
+  <div class="chart-inner">
+    <canvas id="chart" role="img" aria-label="Nombre de problèmes par catégorie"></canvas>
+  </div>
+  <div class="chart-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div>Impact moyen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Impact faible</div>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="filter-group" id="cat-filters">
+    <button class="active" data-cat="all">Tout</button>
+    <button data-cat="TypeScript">TypeScript</button>
+    <button data-cat="Server Actions">Server Actions</button>
+    <button data-cat="RLS">Sécurité RLS</button>
+    <button data-cat="Performance">Performance</button>
+    <button data-cat="Patterns">Patterns</button>
+    <button data-cat="Qualité">Qualité</button>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group" id="impact-filters">
+    <button class="active" data-impact="all">Tout</button>
+    <button data-impact="moyen">Moyen</button>
+    <button data-impact="faible">Faible</button>
+  </div>
+</div>
+
+<div class="issue-count" id="count"></div>
+<div class="issues" id="issues"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const CAT_COLORS = {
+  'TypeScript': '#7c3aed',
+  'Server Actions': '#dc6b0e',
+  'RLS': '#c0392b',
+  'Performance': '#0e7a66',
+  'Patterns': '#1d6fb5',
+  'Qualité': '#6b6965'
+};
+
+const ISSUES = [
+  {cat:'TypeScript', file:'app/(app)/layout.tsx:41', impact:'moyen',
+   title:'Cast Profile partiel trompeur',
+   problem:'`data as unknown as Profile | null` — SELECT de 5 colonnes casté vers `Profile` complet. Les champs absents seront undefined à l\'exécution mais déclarés présents.',
+   fix:'Définir un type ProfileSummary pour les 5 colonnes sélectionnées, ou étendre le SELECT.'},
+  {cat:'TypeScript', file:'components/chat/chat-layout.tsx:110', impact:'moyen',
+   title:'Cast Realtime payload incorrect',
+   problem:'`data as unknown as ChatMessageWithAuthor` dans un listener Realtime. Le payload brut n\'a pas de champ `author` (absent dans les payloads Realtime, uniquement présent dans les JOINs).',
+   fix:'Reconstruire ChatMessageWithAuthor depuis le payload brut ou refetch le message après réception.'},
+  {cat:'TypeScript', file:'actions/hangar-sync.ts:419', impact:'faible',
+   title:'Hack type RsiHangarResponse',
+   problem:'`{ _html: text } as unknown as RsiHangarResponse[\'data\']` — objet non-conforme casté vers le type de réponse structurée. Résidu de debug.',
+   fix:'Créer un type discriminé HangarRawHtml séparé de RsiHangarResponse[\'data\'].'},
+  {cat:'TypeScript', file:'components/ui/calendar.tsx:91', impact:'faible',
+   title:'`as any` isolé',
+   problem:'Seul `as any` du codebase dans le composant Calendar shadcn.',
+   fix:'Typer correctement avec Record<string, string> ou le type DayPicker approprié.'},
+
+  {cat:'Server Actions', file:'actions/notifications.ts', impact:'moyen',
+   title:'markRead / markAllRead sans Zod',
+   problem:'Mutations sans validation Zod. `notificationId` n\'est pas validé comme UUID — n\'importe quelle string peut être passée.',
+   fix:'`z.string().uuid().safeParse(notificationId)` avant la mutation.'},
+  {cat:'Server Actions', file:'actions/onboarding.ts', impact:'moyen',
+   title:'claimOnboardingStep sans Zod',
+   problem:'`step: ExtendedOnboardingStep` reçu sans .safeParse(). Un step arbitraire peut être inséré en DB si le type TypeScript est contourné côté appelant.',
+   fix:'`z.enum([...VALID_STEPS]).safeParse(step)` en début de fonction.'},
+  {cat:'Server Actions', file:'actions/org-settings.ts', impact:'faible',
+   title:'setRecruitmentOpen sans Zod',
+   problem:'`open: boolean` passé directement sans .safeParse().',
+   fix:'`z.boolean().safeParse(open)`.'},
+  {cat:'Server Actions', file:'actions/ships.ts', impact:'faible',
+   title:'updateShipStatus / deleteShip sans Zod',
+   problem:'`status` (union de strings) et `shipId` (UUID) passés sans validation Zod.',
+   fix:'`z.string().uuid()` sur shipId, `z.enum([...])` sur status.'},
+  {cat:'Server Actions', file:'actions/members.ts', impact:'faible',
+   title:'updateMemberRole sans Zod UUID',
+   problem:'`role` validé par TypeScript uniquement. `memberId` n\'est pas validé comme UUID.',
+   fix:'`z.string().uuid()` sur memberId, `z.enum([...ROLES])` sur role.'},
+  {cat:'Server Actions', file:'actions/notifications.ts', impact:'faible',
+   title:'createAdminClient inutile dans markRead',
+   problem:'Admin client bypass RLS pour des mutations user-scoped déjà couvertes par la policy `notifs_update`.',
+   fix:'Utiliser `supabase` (client utilisateur) — laisser RLS gérer.'},
+
+  {cat:'RLS', file:'supabase/migrations/006_gallery.sql:22-33', impact:'faible',
+   title:'Policy Storage compare role = \'sage\' en dur',
+   problem:'Les policies Storage utilisent `role = \'sage\'` au lieu de `get_my_privilege() >= 1000`. Incohérent avec le reste, cassera si la hiérarchie évolue.',
+   fix:'Migration 037 — remplacer par `get_my_privilege() >= 1000`.'},
+  {cat:'RLS', file:'supabase/migrations/001_initial.sql', impact:'faible',
+   title:'Policies legacy admin/officer mortes',
+   problem:'events_update, events_delete, ships_delete, resources_* référencent des rôles inexistants. Inopérantes mais source de confusion à la lecture.',
+   fix:'Migration qui drop les policies obsolètes et recrée avec get_my_privilege().'},
+
+  {cat:'Performance', file:'app/(app)/membres/page.tsx:22-34', impact:'moyen',
+   title:'3 requêtes Supabase séquentielles',
+   problem:'`profiles.select(\'role\')` + `rpc(\'get_member_points_totals\')` + query membres exécutés séquentiellement après getUser(). Latence cumulée inutile.',
+   fix:'Paralléliser les 3 dans un Promise.all après getUser.'},
+  {cat:'Performance', file:'app/(app)/admin/activite · avatars · points', impact:'faible',
+   title:'getUser → profiles séquentiel (3 pages admin)',
+   problem:'Pattern getUser() → profiles.select(\'role\') séquentiel répété dans les 3 pages admin.',
+   fix:'Paralléliser avec le pattern établi dans membres/[username]/page.tsx.'},
+  {cat:'Performance', file:'app/(app)/evenements/page.tsx:14-29', impact:'faible',
+   title:'profiles.select hors du Promise.all',
+   problem:'getUser() + profiles.select(\'role\') séquentiels avant le Promise.all des 5 requêtes événements.',
+   fix:'Inclure profiles.select(\'role\') dans le Promise.all.'},
+
+  {cat:'Patterns', file:'actions/applications.ts:83', impact:'moyen',
+   title:'console.error sans guard NODE_ENV',
+   problem:'`console.error(\'[submitApplication] Supabase error:\', ...)` s\'exécute en production et expose des détails d\'erreur DB dans les logs Vercel.',
+   fix:'Supprimer ou encadrer par `if (process.env.NODE_ENV === \'development\')`.'},
+  {cat:'Patterns', file:'app/(app)/mfa/page.tsx', impact:'faible',
+   title:'export const dynamic manquant',
+   problem:'Seule page app/(app)/ sans `export const dynamic = \'force-dynamic\'`. Les 29 autres pages l\'ont toutes.',
+   fix:'Ajouter `export const dynamic = \'force-dynamic\'`.'},
+  {cat:'Patterns', file:'actions/members.ts — updateMemberRole', impact:'faible',
+   title:'Fetch séquentiels dans une même action',
+   problem:'profiles.select(target) et member_points.select exécutés séquentiellement alors qu\'ils sont indépendants.',
+   fix:'Promise.all([...]) pour les deux requêtes.'},
+
+  {cat:'Qualité', file:'actions/hangar-sync.ts:443', impact:'faible',
+   title:'Message d\'erreur trompeur',
+   problem:'`\'Aucun vaisseau trouvé. Log console pour debug structure.\'` fait référence à des logs console absents en production (guardés par NODE_ENV).',
+   fix:'`\'Aucun vaisseau trouvé dans la réponse RSI.\'`'},
+];
+
+let currentCat = 'all';
+let currentImpact = 'all';
+
+function getFiltered() {
+  return ISSUES.filter(i =>
+    (currentCat === 'all' || i.cat === currentCat) &&
+    (currentImpact === 'all' || i.impact === currentImpact)
+  );
+}
+
+function renderIssues() {
+  const filtered = getFiltered();
+  const container = document.getElementById('issues');
+  const count = document.getElementById('count');
+  count.innerHTML = `<span>${filtered.length}</span> problème${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">Aucun problème pour ces filtres.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map((issue, idx) => {
+    const color = CAT_COLORS[issue.cat] || '#6b6965';
+    return `
+    <div class="issue" onclick="toggleIssue(this)">
+      <div class="issue-header">
+        <span class="impact-badge badge-${issue.impact}">${issue.impact}</span>
+        <span class="cat-dot" style="background:${color}" title="${issue.cat}"></span>
+        <span class="issue-title">${escHtml(issue.title)}</span>
+        <span class="issue-file">${escHtml(issue.file)}</span>
+        <span class="issue-chevron">&#8964;</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>Problème :</strong> ${escHtml(issue.problem)}</p>
+        <div class="fix-box">${escHtml(issue.fix)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleIssue(el) {
+  el.classList.toggle('open');
+}
+
+document.getElementById('cat-filters').addEventListener('click', e => {
+  if (e.target.dataset.cat) {
+    currentCat = e.target.dataset.cat;
+    document.querySelectorAll('#cat-filters button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    renderIssues();
+  }
+});
+
+document.getElementById('impact-filters').addEventListener('click', e => {
+  if (e.target.dataset.impact) {
+    currentImpact = e.target.dataset.impact;
+    document.querySelectorAll('#impact-filters button').forEach(b => {
+      b.classList.remove('active','active-moyen','active-faible');
+    });
+    if (e.target.dataset.impact === 'moyen') e.target.classList.add('active-moyen');
+    else if (e.target.dataset.impact === 'faible') e.target.classList.add('active-faible');
+    else e.target.classList.add('active');
+    renderIssues();
+  }
+});
+
+const cats = ['TypeScript','Server Actions','RLS','Performance','Patterns','Qualité'];
+const moyenCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'moyen').length);
+const faibleCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'faible').length);
+const labels = cats.map(c => c === 'Server Actions' ? 'Server Actions' : c);
+
+new Chart(document.getElementById('chart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Moyen', data: moyenCounts, backgroundColor: '#d97706', borderRadius: 4, borderSkipped: false },
+      { label: 'Faible', data: faibleCounts, backgroundColor: '#059669', borderRadius: 4, borderSkipped: false }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { display: false },
+        ticks: { font: { size: 11 }, color: '#9a9893' }
+      },
+      y: {
+        stacked: true,
+        grid: { color: 'rgba(128,128,128,0.12)' },
+        ticks: { stepSize: 1, font: { size: 11 }, color: '#9a9893' },
+        max: 8
+      }
+    }
+  }
+});
+
+renderIssues();
+</script>
+</body>
+</html>
