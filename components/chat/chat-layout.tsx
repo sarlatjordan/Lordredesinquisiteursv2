@@ -106,7 +106,7 @@ export function ChatLayout({
             .eq('id', (payload.new as { id: string }).id)
             .single()
 
-          if (data && intentRef.current === activeChannelId) {
+          if (data?.author && intentRef.current === activeChannelId) {
             setMessages((prev) => [...prev, data as unknown as ChatMessageWithAuthor])
           }
         }

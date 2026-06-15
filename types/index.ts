@@ -31,6 +31,8 @@ export type ChatMemberSeen = Database['public']['Tables']['chat_member_seen']['R
 export type RankEvaluation = Database['public']['Tables']['rank_evaluations']['Row']
 
 // ─── Types enrichis (avec jointures) ─────────────────────────────────────────
+export type ProfileSummary = Pick<Profile, 'id' | 'role' | 'display_name' | 'username' | 'avatar_url'>
+
 export type ProfileWithStats = Profile & {
   ship_count?: number
   event_count?: number

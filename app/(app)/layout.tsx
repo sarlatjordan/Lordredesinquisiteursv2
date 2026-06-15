@@ -8,7 +8,7 @@ import { RedactedContent } from '@/components/layout/redacted-content'
 import { PageTransition } from '@/components/layout/page-transition'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
-import type { Notification, Profile } from '@/types'
+import type { Notification, ProfileSummary } from '@/types'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const headersList = await headers()
@@ -31,14 +31,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  let profile: Profile | null = null
+  let profile: ProfileSummary | null = null
   if (user) {
     const { data } = await supabase
       .from('profiles')
       .select('id, role, display_name, username, avatar_url')
       .eq('id', user.id)
       .single()
-    profile = data as unknown as Profile | null
+    profile = data as unknown as ProfileSummary | null
   }
 
   // Notifications non lues + liste des 15 dernières

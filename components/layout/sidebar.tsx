@@ -10,12 +10,12 @@ import { NAV_LINKS } from './nav-links'
 import { APP_ABBREVIATION, APP_NAME } from '@/lib/constants'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
-import type { Profile } from '@/types'
+import type { ProfileSummary } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 interface SidebarProps {
-  profile: Profile | null
+  profile: ProfileSummary | null
   badges?: Partial<Record<string, number>>
 }
 

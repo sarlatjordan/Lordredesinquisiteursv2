@@ -1,11 +1,15 @@
 'use server'
 
+import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult, Notification } from '@/types'
 
 export async function markRead(notificationId: string): Promise<ActionResult> {
+  const parsed = z.string().uuid().safeParse(notificationId)
+  if (!parsed.success) return { success: false, error: 'Identifiant invalide' }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
@@ -15,7 +19,7 @@ export async function markRead(notificationId: string): Promise<ActionResult> {
   const { error } = await admin
     .from('notifications')
     .update({ is_read: true })
-    .eq('id', notificationId)
+    .eq('id', parsed.data)
     .eq('profile_id', user.id)
 
   if (error) return { success: false, error: error.message }

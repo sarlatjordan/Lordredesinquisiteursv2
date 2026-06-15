@@ -1,5 +1,6 @@
 'use server'
 
+import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -8,7 +9,19 @@ import { ONBOARDING_CONFIGS } from '@/lib/constants'
 import type { ExtendedOnboardingStep } from '@/types'
 import type { Role } from '@/lib/constants'
 
+const OnboardingStepSchema = z.enum([
+  'profile', 'ship', 'operation',
+  'operation_important', 'first_event', 'bonus',
+  'discord_joined', 'consacre_bonus',
+  'consacre_events_5', 'consacre_op_5', 'consacre_logistics', 'consacre_resource', 'consacre_recruitment',
+  'gardien_op_lead', 'gardien_events_10', 'gardien_logistics', 'gardien_resource', 'gardien_recruitment', 'gardien_bonus',
+  'inquisiteur_op_lead_3', 'inquisiteur_event_organize', 'inquisiteur_training', 'inquisiteur_events_25', 'inquisiteur_partnership', 'inquisiteur_bonus',
+])
+
 export async function claimOnboardingStep(step: ExtendedOnboardingStep): Promise<void> {
+  const parsed = OnboardingStepSchema.safeParse(step)
+  if (!parsed.success) return
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
