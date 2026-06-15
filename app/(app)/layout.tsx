@@ -6,6 +6,7 @@ import { MobileNav } from '@/components/layout/mobile-nav'
 import { TopBar } from '@/components/layout/top-bar'
 import { RedactedContent } from '@/components/layout/redacted-content'
 import { PageTransition } from '@/components/layout/page-transition'
+import { PageBackground } from '@/components/layout/page-background'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
 import type { Notification, ProfileSummary } from '@/types'
@@ -77,10 +78,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       {/* Contenu principal */}
       <div className="lg:pl-64 flex flex-col min-h-screen">
         <TopBar unreadCount={unreadCount} notifications={notifications} />
-        <main className="flex-1 p-4 lg:p-6 pb-20 lg:pb-6">
-          {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile
-            ? <RedactedContent />
-            : <PageTransition>{children}</PageTransition>}
+        <main className="flex-1 relative">
+          <PageBackground />
+          <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">
+            {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile
+              ? <RedactedContent />
+              : <PageTransition>{children}</PageTransition>}
+          </div>
         </main>
       </div>
 

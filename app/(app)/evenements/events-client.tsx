@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, CalendarDays } from 'lucide-react'
+import { Plus, CalendarDays, LayoutGrid, Rows3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -10,9 +10,13 @@ import { EventCard } from '@/components/evenements/event-card'
 import { EventForm } from '@/components/evenements/event-form'
 import { EventDetailDialog } from '@/components/evenements/event-detail-dialog'
 import { EventViewDialog } from '@/components/evenements/event-view-dialog'
+import { CalendarMonthView } from '@/components/evenements/calendar-month-view'
+import { CalendarWeekView } from '@/components/evenements/calendar-week-view'
 import { createEvent, registerForEvent, unregisterFromEvent } from '@/actions/events'
 import type { EventWithDetails } from '@/types'
 import { useRouter } from 'next/navigation'
+
+type ViewMode = 'mois' | 'semaine' | 'liste'
 
 interface EventsClientProps {
   upcomingEvents: EventWithDetails[]
@@ -25,6 +29,7 @@ interface EventsClientProps {
 }
 
 export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false, canDiscordSync = false, canCreateOp = false }: EventsClientProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('mois')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [managedEvent, setManagedEvent] = useState<EventWithDetails | null>(null)
   const [viewedEvent, setViewedEvent] = useState<EventWithDetails | null>(null)
@@ -32,6 +37,10 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
   const [registerError, setRegisterError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+
+  const allEvents = [...upcomingEvents, ...pastEvents].sort(
+    (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+  )
 
   function handleCreateEvent(data: import('@/components/evenements/event-form').EventFormData) {
     setCreateError(null)
@@ -67,38 +76,84 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Événements</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {upcomingEvents.length} événement{upcomingEvents.length > 1 ? 's' : ''} à venir
+            {upcomingEvents.length} à venir · {allEvents.length} total
           </p>
         </div>
 
-        {canCreate && (
-          <Dialog open={isCreateOpen} onOpenChange={(v) => { setIsCreateOpen(v); if (!v) setCreateError(null) }}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5">
-                <Plus className="h-4 w-4" />
-                Nouvel événement
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Créer un événement</DialogTitle>
-                <DialogDescription>Planifiez une opération, réunion ou activité pour l&apos;Ordre.</DialogDescription>
-              </DialogHeader>
-              <EventForm
-                onSubmit={handleCreateEvent}
-                isPending={isPending}
-                onCancel={() => setIsCreateOpen(false)}
-                serverError={createError}
-                canDiscordSync={canDiscordSync}
-                canCreateOp={canCreateOp}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex items-center rounded-md border border-border bg-card/60 p-0.5 gap-0.5">
+            <button
+              onClick={() => setViewMode('mois')}
+              title="Vue mensuelle"
+              className={[
+                'flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
+                viewMode === 'mois'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+              ].join(' ')}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              Mois
+            </button>
+            <button
+              onClick={() => setViewMode('semaine')}
+              title="Vue hebdomadaire"
+              className={[
+                'flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
+                viewMode === 'semaine'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+              ].join(' ')}
+            >
+              <Rows3 className="h-3.5 w-3.5" />
+              Semaine
+            </button>
+            <button
+              onClick={() => setViewMode('liste')}
+              title="Vue liste"
+              className={[
+                'flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
+                viewMode === 'liste'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+              ].join(' ')}
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              Liste
+            </button>
+          </div>
+
+          {canCreate && (
+            <Dialog open={isCreateOpen} onOpenChange={(v) => { setIsCreateOpen(v); if (!v) setCreateError(null) }}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  Nouvel événement
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Créer un événement</DialogTitle>
+                  <DialogDescription>Planifiez une opération, réunion ou activité pour l&apos;Ordre.</DialogDescription>
+                </DialogHeader>
+                <EventForm
+                  onSubmit={handleCreateEvent}
+                  isPending={isPending}
+                  onCancel={() => setIsCreateOpen(false)}
+                  serverError={createError}
+                  canDiscordSync={canDiscordSync}
+                  canCreateOp={canCreateOp}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       </div>
 
       {registerError && (
@@ -107,58 +162,79 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
         </div>
       )}
 
-      <Tabs defaultValue="upcoming">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="upcoming">
-            À venir ({upcomingEvents.length})
-          </TabsTrigger>
-          <TabsTrigger value="past">
-            Passés ({pastEvents.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Views */}
+      {viewMode === 'mois' && (
+        <CalendarMonthView
+          events={allEvents}
+          canManage={canManage}
+          onViewEvent={setViewedEvent}
+          onManageEvent={setManagedEvent}
+        />
+      )}
 
-        <TabsContent value="upcoming" className="mt-4">
-          {upcomingEvents.length === 0 ? (
-            <EmptyState message="Aucun événement planifié" />
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {upcomingEvents.map((event, i) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  currentUserId={currentUserId}
-                  isOrganizer={canManage}
-                  onRegister={handleRegister}
-                  onUnregister={handleUnregister}
-                  onManage={canManage ? setManagedEvent : undefined}
-                  onView={setViewedEvent}
-                  index={i}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
+      {viewMode === 'semaine' && (
+        <CalendarWeekView
+          events={allEvents}
+          canManage={canManage}
+          onViewEvent={setViewedEvent}
+          onManageEvent={setManagedEvent}
+        />
+      )}
 
-        <TabsContent value="past" className="mt-4">
-          {pastEvents.length === 0 ? (
-            <EmptyState message="Aucun événement passé" />
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {pastEvents.map((event, i) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  currentUserId={currentUserId}
-                  isOrganizer={canManage}
-                  onManage={canManage ? setManagedEvent : undefined}
-                  onView={setViewedEvent}
-                  index={i}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+      {viewMode === 'liste' && (
+        <Tabs defaultValue="upcoming">
+          <TabsList className="bg-muted/50">
+            <TabsTrigger value="upcoming">
+              À venir ({upcomingEvents.length})
+            </TabsTrigger>
+            <TabsTrigger value="past">
+              Passés ({pastEvents.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upcoming" className="mt-4">
+            {upcomingEvents.length === 0 ? (
+              <EmptyState message="Aucun événement planifié" />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {upcomingEvents.map((event, i) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    currentUserId={currentUserId}
+                    isOrganizer={canManage}
+                    onRegister={handleRegister}
+                    onUnregister={handleUnregister}
+                    onManage={canManage ? setManagedEvent : undefined}
+                    onView={setViewedEvent}
+                    index={i}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="past" className="mt-4">
+            {pastEvents.length === 0 ? (
+              <EmptyState message="Aucun événement passé" />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {pastEvents.map((event, i) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    currentUserId={currentUserId}
+                    isOrganizer={canManage}
+                    onManage={canManage ? setManagedEvent : undefined}
+                    onView={setViewedEvent}
+                    index={i}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
 
       <EventDetailDialog
         event={managedEvent}
