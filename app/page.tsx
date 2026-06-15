@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getPublicStats } from '@/lib/public-stats'
 import { PublicNav } from '@/components/landing/public-nav'
+import { StarfieldCanvas } from '@/components/landing/starfield-canvas'
 import { Hero } from '@/components/landing/hero'
 import { StatsBar } from '@/components/landing/stats-bar'
 import { HistorySection } from '@/components/landing/history-section'
@@ -61,6 +62,8 @@ export default async function RootPage({ searchParams }: RootPageProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <StarfieldCanvas />
+      <div className="relative" style={{ zIndex: 1 }}>
       <PublicNav isLoggedIn={isLoggedIn} />
 
       <main>
@@ -87,6 +90,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
       </main>
 
       <LandingFooter />
+      </div>
     </div>
   )
 }
