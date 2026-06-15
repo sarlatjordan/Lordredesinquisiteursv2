@@ -109,13 +109,17 @@ button.active-faible{background:var(--faible-bg);color:var(--faible-text);border
 .fix-box{background:var(--bg-secondary);border-radius:6px;padding:.55rem .75rem;font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.75rem;color:var(--text);border-left:2px solid var(--accent)}
 
 .empty{text-align:center;padding:3rem 1rem;color:var(--text-muted);font-size:.85rem}
+.issue.resolved{opacity:.55}
+.issue.resolved .issue-title{text-decoration:line-through;color:var(--text-muted)}
+.badge-resolved{background:#e8f5e9;color:#2e7d32;border:1px solid #81c784;font-size:.68rem;font-weight:600;padding:.2rem .55rem;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+@media (prefers-color-scheme: dark){.badge-resolved{background:#1b3a1e;color:#81c784;border-color:#2e7d32}}
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>Audit dette technique — INQFR</h1>
-  <p>2026-06-15 &nbsp;·&nbsp; 21 problèmes recensés &nbsp;·&nbsp; aucun critique ni élevé</p>
+  <p>2026-06-15 &nbsp;·&nbsp; 21 problèmes recensés &nbsp;·&nbsp; <strong>4 résolus</strong> &nbsp;·&nbsp; aucun critique ni élevé</p>
 </div>
 
 <div class="metrics">
@@ -126,8 +130,8 @@ button.active-faible{background:var(--faible-bg);color:var(--faible-text);border
   </div>
   <div class="metric">
     <div class="metric-label">Impact moyen</div>
-    <div class="metric-val val-moyen">6</div>
-    <div class="metric-sub">à traiter en priorité</div>
+    <div class="metric-val val-moyen">2</div>
+    <div class="metric-sub">restants (6 initiaux)</div>
   </div>
   <div class="metric">
     <div class="metric-label">Impact faible</div>
@@ -135,9 +139,9 @@ button.active-faible{background:var(--faible-bg);color:var(--faible-text);border
     <div class="metric-sub">dette acceptable</div>
   </div>
   <div class="metric">
-    <div class="metric-label">Critique / élevé</div>
-    <div class="metric-val val-ok">0</div>
-    <div class="metric-sub">aucun bloquant</div>
+    <div class="metric-label">Résolus</div>
+    <div class="metric-val val-ok">4</div>
+    <div class="metric-sub">commit d9c6c21</div>
   </div>
 </div>
 
@@ -167,6 +171,7 @@ button.active-faible{background:var(--faible-bg);color:var(--faible-text);border
     <button class="active" data-impact="all">Tout</button>
     <button data-impact="moyen">Moyen</button>
     <button data-impact="faible">Faible</button>
+    <button data-impact="resolved">Résolus</button>
   </div>
 </div>
 
@@ -185,14 +190,14 @@ const CAT_COLORS = {
 };
 
 const ISSUES = [
-  {id:'TS-01', cat:'TypeScript', file:'app/(app)/layout.tsx:41', impact:'moyen',
+  {id:'TS-01', cat:'TypeScript', file:'app/(app)/layout.tsx:41', impact:'moyen', resolved:true,
    title:'Cast Profile partiel trompeur',
    problem:'`data as unknown as Profile | null` — SELECT de 5 colonnes casté vers `Profile` complet. Les champs absents seront undefined à l\'exécution mais déclarés présents.',
-   fix:'Définir un type ProfileSummary pour les 5 colonnes sélectionnées, ou étendre le SELECT.'},
-  {id:'TS-02', cat:'TypeScript', file:'components/chat/chat-layout.tsx:110', impact:'moyen',
+   fix:'ProfileSummary = Pick<Profile, id|role|display_name|username|avatar_url> défini dans types/index.ts. Cast et prop Sidebar mis à jour. (d9c6c21)'},
+  {id:'TS-02', cat:'TypeScript', file:'components/chat/chat-layout.tsx:110', impact:'moyen', resolved:true,
    title:'Cast Realtime payload incorrect',
    problem:'`data as unknown as ChatMessageWithAuthor` dans un listener Realtime. Le payload brut n\'a pas de champ `author` (absent dans les payloads Realtime, uniquement présent dans les JOINs).',
-   fix:'Reconstruire ChatMessageWithAuthor depuis le payload brut ou refetch le message après réception.'},
+   fix:'Guard data?.author ajouté avant le cast — bloque les messages sans auteur. (d9c6c21)'},
   {id:'TS-03', cat:'TypeScript', file:'actions/hangar-sync.ts:419', impact:'faible',
    title:'Hack type RsiHangarResponse',
    problem:'`{ _html: text } as unknown as RsiHangarResponse[\'data\']` — objet non-conforme casté vers le type de réponse structurée. Résidu de debug.',
@@ -202,14 +207,14 @@ const ISSUES = [
    problem:'Seul `as any` du codebase dans le composant Calendar shadcn.',
    fix:'Typer correctement avec Record<string, string> ou le type DayPicker approprié.'},
 
-  {id:'SA-01', cat:'Server Actions', file:'actions/notifications.ts', impact:'moyen',
-   title:'markRead / markAllRead sans Zod',
+  {id:'SA-01', cat:'Server Actions', file:'actions/notifications.ts', impact:'moyen', resolved:true,
+   title:'markRead sans Zod',
    problem:'Mutations sans validation Zod. `notificationId` n\'est pas validé comme UUID — n\'importe quelle string peut être passée.',
-   fix:'`z.string().uuid().safeParse(notificationId)` avant la mutation.'},
-  {id:'SA-02', cat:'Server Actions', file:'actions/onboarding.ts', impact:'moyen',
+   fix:'z.string().uuid().safeParse() ajouté, parsed.data utilisé dans la requête. (d9c6c21)'},
+  {id:'SA-02', cat:'Server Actions', file:'actions/onboarding.ts', impact:'moyen', resolved:true,
    title:'claimOnboardingStep sans Zod',
    problem:'`step: ExtendedOnboardingStep` reçu sans .safeParse(). Un step arbitraire peut être inséré en DB si le type TypeScript est contourné côté appelant.',
-   fix:'`z.enum([...VALID_STEPS]).safeParse(step)` en début de fonction.'},
+   fix:'OnboardingStepSchema = z.enum([...]) valide le step avant tout accès DB. (d9c6c21)'},
   {id:'SA-03', cat:'Server Actions', file:'actions/org-settings.ts', impact:'faible',
    title:'setRecruitmentOpen sans Zod',
    problem:'`open: boolean` passé directement sans .safeParse().',
@@ -272,10 +277,11 @@ let currentCat = 'all';
 let currentImpact = 'all';
 
 function getFiltered() {
-  return ISSUES.filter(i =>
-    (currentCat === 'all' || i.cat === currentCat) &&
-    (currentImpact === 'all' || i.impact === currentImpact)
-  );
+  return ISSUES.filter(i => {
+    if (currentImpact === 'resolved') return !!i.resolved && (currentCat === 'all' || i.cat === currentCat);
+    return (currentCat === 'all' || i.cat === currentCat) &&
+           (currentImpact === 'all' || i.impact === currentImpact);
+  });
 }
 
 function renderIssues() {
@@ -289,13 +295,15 @@ function renderIssues() {
     return;
   }
 
-  container.innerHTML = filtered.map((issue, idx) => {
+  container.innerHTML = filtered.map((issue) => {
     const color = CAT_COLORS[issue.cat] || '#6b6965';
     return `
-    <div class="issue" onclick="toggleIssue(this)">
+    <div class="issue${issue.resolved ? ' resolved' : ''}" onclick="toggleIssue(this)">
       <div class="issue-header">
         <span class="issue-id">${issue.id}</span>
-        <span class="impact-badge badge-${issue.impact}">${issue.impact}</span>
+        ${issue.resolved
+          ? '<span class="badge-resolved">✓ résolu</span>'
+          : `<span class="impact-badge badge-${issue.impact}">${issue.impact}</span>`}
         <span class="cat-dot" style="background:${color}" title="${issue.cat}"></span>
         <span class="issue-title">${escHtml(issue.title)}</span>
         <span class="issue-file">${escHtml(issue.file)}</span>
@@ -340,8 +348,8 @@ document.getElementById('impact-filters').addEventListener('click', e => {
 });
 
 const cats = ['TypeScript','Server Actions','RLS','Performance','Patterns','Qualité'];
-const moyenCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'moyen').length);
-const faibleCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'faible').length);
+const moyenCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'moyen' && !i.resolved).length);
+const faibleCounts = cats.map(c => ISSUES.filter(i => i.cat === c && i.impact === 'faible' && !i.resolved).length);
 const labels = cats.map(c => c === 'Server Actions' ? 'Server Actions' : c);
 
 new Chart(document.getElementById('chart'), {
