@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import type { EventWithDetails } from '@/types'
 
 const DAY_NAMES = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM']
+const SHORT_MONTHS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
 const EVENT_COLORS: Record<string, string> = {
   operation: 'border-l-red-500 bg-red-500/10 text-foreground',
@@ -21,6 +22,10 @@ function getWeekStart(date: Date): Date {
   d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
   d.setHours(0, 0, 0, 0)
   return d
+}
+
+function fmtDate(d: Date) {
+  return `${String(d.getDate()).padStart(2, '0')} ${SHORT_MONTHS[d.getMonth()]}`
 }
 
 interface Props {
@@ -41,10 +46,7 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
   })
 
   const weekEnd = days[6]
-  const formatDate = (d: Date) =>
-    `${String(d.getDate()).padStart(2, '0')} ${['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'][d.getMonth()]}`
-
-  const weekLabel = `${formatDate(weekStart)} — ${formatDate(weekEnd)} ${weekEnd.getFullYear()}`
+  const weekLabel = `${fmtDate(weekStart)} — ${fmtDate(weekEnd)} ${weekEnd.getFullYear()}`
 
   const isToday = (d: Date) =>
     d.getDate() === today.getDate() &&
@@ -64,9 +66,9 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-2 lg:h-[calc(100dvh-220px)] lg:min-h-[360px]">
       {/* Navigation */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 shrink-0">
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={prevWeek}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -78,8 +80,8 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
         </Button>
       </div>
 
-      {/* 7 columns */}
-      <div className="grid grid-cols-7 gap-1.5">
+      {/* 7 columns — flex-1 fills remaining height */}
+      <div className="flex-1 min-h-0 grid grid-cols-7 gap-1.5">
         {days.map((day, i) => {
           const dayEvents = events
             .filter(e => {
@@ -90,39 +92,37 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
             })
             .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 
-          const today_ = isToday(day)
+          const tod = isToday(day)
 
           return (
             <div
               key={i}
               className={[
-                'relative rounded-sm border overflow-hidden',
-                today_
-                  ? 'border-primary/50 bg-primary/5'
-                  : 'border-border/40 bg-card/40',
+                'relative flex flex-col rounded-sm border overflow-hidden',
+                tod ? 'border-primary/50 bg-primary/5' : 'border-border/40 bg-card/40',
               ].join(' ')}
             >
-              {/* Day header */}
+              {/* Day header — fixed */}
               <div className={[
-                'px-1 py-2 border-b text-center',
-                today_ ? 'border-primary/30 bg-primary/10' : 'border-border/30',
+                'shrink-0 px-1 py-2 border-b text-center',
+                tod ? 'border-primary/30 bg-primary/10' : 'border-border/30',
               ].join(' ')}>
                 <p className={[
                   'text-[8px] font-bold uppercase tracking-[0.12em]',
-                  today_ ? 'text-primary' : 'text-muted-foreground/60',
+                  tod ? 'text-primary' : 'text-muted-foreground/60',
                 ].join(' ')}>
                   {DAY_NAMES[i]}
                 </p>
                 <p className={[
                   'text-sm font-bold font-mono leading-none mt-0.5',
-                  today_ ? 'text-primary' : 'text-foreground',
+                  tod ? 'text-primary' : 'text-foreground',
                 ].join(' ')}>
                   {String(day.getDate()).padStart(2, '0')}
                 </p>
               </div>
 
-              {/* Events */}
-              <div className="p-1 space-y-1 min-h-[100px]">
+              {/* Events — scrollable, fills remaining column height */}
+              <div className="flex-1 overflow-y-auto p-1 space-y-1 min-h-0">
                 {dayEvents.length === 0 ? (
                   <p className="text-[9px] text-muted-foreground/25 font-mono text-center mt-4 select-none">—</p>
                 ) : (
@@ -145,9 +145,7 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
                 )}
               </div>
 
-              {/* SC corner top-left */}
               <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-border/50 pointer-events-none" />
-              {/* SC corner bottom-right */}
               <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-border/50 pointer-events-none" />
             </div>
           )

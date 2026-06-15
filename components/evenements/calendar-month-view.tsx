@@ -19,14 +19,6 @@ const EVENT_COLORS: Record<string, string> = {
   autre:     'bg-zinc-500/75 text-white',
 }
 
-const EVENT_BORDER_COLORS: Record<string, string> = {
-  operation: 'border-l-red-500',
-  reunion:   'border-l-blue-500',
-  formation: 'border-l-violet-500',
-  social:    'border-l-emerald-500',
-  autre:     'border-l-zinc-500',
-}
-
 interface Props {
   events: EventWithDetails[]
   canManage: boolean
@@ -43,18 +35,20 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
 
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const firstDow = new Date(year, month, 1).getDay()
-  const startOffset = firstDow === 0 ? 6 : firstDow - 1  // Monday-first
-
-  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7
+  const startOffset = firstDow === 0 ? 6 : firstDow - 1
+  const numWeeks = Math.ceil((startOffset + daysInMonth) / 7)
+  const totalCells = numWeeks * 7
 
   const cells = Array.from({ length: totalCells }, (_, i) => {
     const dayNum = i - startOffset + 1
     if (dayNum < 1 || dayNum > daysInMonth) return { date: null, events: [] as EventWithDetails[] }
     const date = new Date(year, month, dayNum)
-    const dayEvents = events.filter(e => {
-      const d = new Date(e.start_at)
-      return d.getFullYear() === year && d.getMonth() === month && d.getDate() === dayNum
-    }).sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
+    const dayEvents = events
+      .filter(e => {
+        const d = new Date(e.start_at)
+        return d.getFullYear() === year && d.getMonth() === month && d.getDate() === dayNum
+      })
+      .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
     return { date, events: dayEvents }
   })
 
@@ -70,9 +64,9 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-2 lg:h-[calc(100dvh-220px)] lg:min-h-[360px]">
       {/* Navigation */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 shrink-0">
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setAnchor(new Date(year, month - 1, 1))}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -85,21 +79,24 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 shrink-0">
         {DAY_HEADERS.map(d => (
-          <div key={d} className="text-center text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground py-1">
+          <div key={d} className="text-center text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground py-0.5">
             {d}
           </div>
         ))}
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-7 gap-1">
+      {/* Grid — flex-1 fills remaining height, rows split equally */}
+      <div
+        className="flex-1 min-h-0 grid grid-cols-7 gap-1"
+        style={{ gridTemplateRows: `repeat(${numWeeks}, 1fr)` }}
+      >
         {cells.map((cell, idx) => (
           <div
             key={idx}
             className={[
-              'relative min-h-[88px] rounded-sm border p-1 transition-colors',
+              'relative rounded-sm border p-1 overflow-hidden transition-colors',
               cell.date
                 ? isToday(cell.date)
                   ? 'border-primary/50 bg-primary/5'
@@ -109,9 +106,7 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
           >
             {cell.date && (
               <>
-                {/* Corner accent top-left */}
                 <span className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border-t border-l border-border/60 pointer-events-none" />
-                {/* Corner accent bottom-right */}
                 <span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-b border-r border-border/60 pointer-events-none" />
 
                 <p className={[
@@ -148,7 +143,7 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 pt-1">
+      <div className="flex flex-wrap gap-3 shrink-0">
         {Object.entries({ operation: 'Opération', reunion: 'Réunion', formation: 'Formation', social: 'Social', autre: 'Autre' }).map(([type, label]) => (
           <div key={type} className="flex items-center gap-1.5">
             <span className={`inline-block h-2 w-2 rounded-[1px] ${EVENT_COLORS[type]}`} />
