@@ -1,30 +1,31 @@
 # Backlog — Dette technique INQFR
 
 > Audit du 2026-06-15 — 21 problèmes recensés, aucun critique ni élevé.
+> Résolu au 2026-06-15 : TS-01, TS-02, SA-01, SA-02 (commit d9c6c21)
 
 ## Résumé
 
-| Catégorie | Moyen | Faible | Total |
-|---|:---:|:---:|:---:|
-| TypeScript (TS) | 2 | 2 | **4** |
-| Server Actions (SA) | 2 | 4 | **6** |
-| Sécurité RLS (RLS) | 0 | 2 | **2** |
-| Performance (PERF) | 1 | 3 | **4** |
-| Cohérence patterns (PAT) | 1 | 2 | **3** |
-| Code mort / qualité (QUAL) | 0 | 1 | **1** |
-| **Total** | **6** | **14** | **21** |
+| Catégorie | Moyen | Faible | Total | Résolu |
+|---|:---:|:---:|:---:|:---:|
+| TypeScript (TS) | 2 | 2 | **4** | 2 |
+| Server Actions (SA) | 2 | 4 | **6** | 2 |
+| Sécurité RLS (RLS) | 0 | 2 | **2** | — |
+| Performance (PERF) | 1 | 3 | **4** | — |
+| Cohérence patterns (PAT) | 1 | 2 | **3** | — |
+| Code mort / qualité (QUAL) | 0 | 1 | **1** | — |
+| **Total** | **6** | **14** | **21** | **4** |
 
 ---
 
 ## TypeScript
 
-### [TS-01 · MOYEN] `app/(app)/layout.tsx:41`
-**Problème :** `data as unknown as Profile | null` — SELECT de 5 colonnes casté vers `Profile` complet. Les champs absents seront `undefined` à l'exécution mais déclarés présents.
-**Fix :** Définir un type `ProfileSummary` pour les 5 colonnes sélectionnées, ou étendre le SELECT.
+### ~~[TS-01 · MOYEN] `app/(app)/layout.tsx:41`~~ ✅ résolu — d9c6c21
+~~**Problème :** `data as unknown as Profile | null` — SELECT de 5 colonnes casté vers `Profile` complet.~~
+`ProfileSummary = Pick<Profile, 'id'|'role'|'display_name'|'username'|'avatar_url'>` défini dans `types/index.ts`.
 
-### [TS-02 · MOYEN] `components/chat/chat-layout.tsx:110`
-**Problème :** `data as unknown as ChatMessageWithAuthor` dans un listener Realtime. Le payload brut n'a pas la même structure qu'un JOIN — le champ `author` est absent.
-**Fix :** Reconstruire `ChatMessageWithAuthor` depuis le payload brut ou refetch le message après réception.
+### ~~[TS-02 · MOYEN] `components/chat/chat-layout.tsx:110`~~ ✅ résolu — d9c6c21
+~~**Problème :** `data as unknown as ChatMessageWithAuthor` sans guard sur `author`.~~
+Guard `data?.author` ajouté avant le cast.
 
 ### [TS-03 · FAIBLE] `actions/hangar-sync.ts:419`
 **Problème :** `{ _html: text } as unknown as RsiHangarResponse['data']` — objet non-conforme casté vers le type de réponse structurée. Hack de debug.
@@ -38,13 +39,13 @@
 
 ## Server Actions
 
-### [SA-01 · MOYEN] `actions/notifications.ts` — `markRead`, `markAllRead`
-**Problème :** Mutations sans validation Zod. `notificationId` n'est pas validé comme UUID.
-**Fix :** `z.string().uuid().safeParse(notificationId)` avant la mutation.
+### ~~[SA-01 · MOYEN] `actions/notifications.ts` — `markRead`~~ ✅ résolu — d9c6c21
+~~**Problème :** `notificationId` non validé comme UUID.~~
+`z.string().uuid().safeParse()` ajouté, `parsed.data` utilisé dans la requête.
 
-### [SA-02 · MOYEN] `actions/onboarding.ts` — `claimOnboardingStep`
-**Problème :** `step: ExtendedOnboardingStep` reçu sans validation Zod. Un step arbitraire peut être inséré en DB si le type est contourné côté appelant.
-**Fix :** `z.enum([...VALID_STEPS]).safeParse(step)` en début de fonction.
+### ~~[SA-02 · MOYEN] `actions/onboarding.ts` — `claimOnboardingStep`~~ ✅ résolu — d9c6c21
+~~**Problème :** `step` reçu sans validation Zod.~~
+`OnboardingStepSchema = z.enum([...])` valide le step avant tout accès DB.
 
 ### [SA-03 · FAIBLE] `actions/org-settings.ts` — `setRecruitmentOpen`
 **Problème :** `open: boolean` passé sans `.safeParse`.
