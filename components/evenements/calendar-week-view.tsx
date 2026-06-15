@@ -132,12 +132,12 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
                       onClick={() => handleEvent(ev)}
                       title={ev.title}
                       className={[
-                        'w-full text-left border-l-2 rounded-[2px] px-1 py-0.5 transition-opacity hover:opacity-80',
+                        'w-full text-left border-l-2 rounded-sm px-1.5 py-1 transition-opacity hover:opacity-80',
                         EVENT_COLORS[ev.type] ?? 'border-l-primary bg-primary/10 text-foreground',
                       ].join(' ')}
                     >
-                      <p className="text-[8px] font-medium truncate leading-tight">{ev.title}</p>
-                      <p className="text-[8px] font-mono text-muted-foreground leading-tight">
+                      <p className="text-[11px] font-semibold truncate leading-tight">{ev.title}</p>
+                      <p className="text-[10px] font-mono text-muted-foreground leading-tight">
                         {new Date(ev.start_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </button>
