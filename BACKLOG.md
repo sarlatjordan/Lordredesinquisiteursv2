@@ -17,7 +17,27 @@
 
 ## ⏳ Items actifs
 
-Aucun item ouvert. 🎉
+### 🚀 Features planifiées
+
+#### P1 — Prochainement
+
+| ID | Item | Description |
+|---|---|---|
+| FEAT-31 | Pipeline Kanban candidatures | Vue Kanban (Reçu → En discussion → Accepté/Refusé) pour le Conseil, remplace la liste plate `/admin/candidatures`. |
+| FEAT-33 | Recherche globale | Barre de recherche unifiée sur membres, ressources, opérations et événements. |
+
+#### P2 — Planifié
+
+| ID | Item | Description |
+|---|---|---|
+| FEAT-25 | Planificateur composition de flotte | Avant une op, assigner les vaisseaux de la flotte aux slots de rôle (tank/support/DPS). Vue drag-and-drop sauvegardée sur l'opération. |
+| FEAT-26 | Tracker de disponibilité | Chaque membre indique ses créneaux dispo de la semaine. Page opérations affiche combien de membres sont dispo pour un slot donné. |
+| FEAT-27 | Système de loot / butin | Distribuer équitablement les gains d'une opération entre participants (points ou crédits internes tracés en DB). |
+| FEAT-28 | Journal de guerre | Après une op terminée, créer un "highlight" avec texte + screenshots. Consultable sur la landing publique. |
+| FEAT-29 | Badges / achievements | Achievements débloqués automatiquement (1ère op, 5 events, 1er rapport…). Affichés sur la fiche membre. |
+| FEAT-30 | Widget "Qui est en vocal" | Appel au bot Discord déjà connecté pour afficher les membres actuellement dans un canal vocal. |
+| FEAT-32 | Notifications push web | Alertes navigateur (Web Push API) quand une op commence, un event approche ou un message est reçu. |
+| FEAT-34 | Mode "en opération" | Statut activable "Je suis en jeu" visible sur le dashboard avec horodatage. |
 
 ---
 
