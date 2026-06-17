@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -23,6 +23,12 @@ import {
   Copy,
   Check as CheckIcon,
   Link2,
+  Upload,
+  Bold,
+  Italic,
+  Underline,
+  Heading1,
+  Heading2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { updateProfile, submitAvatarForApproval } from "@/actions/members";
+import { updateProfile, submitAvatarForApproval, uploadAvatarFile } from "@/actions/members";
 import { requestDataExport } from "@/actions/rgpd";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES, ROLE_COLORS, type Role } from "@/lib/constants";
@@ -103,6 +109,98 @@ function Feedback({ status, error }: { status: SaveStatus; error?: string }) {
   );
 }
 
+// ─── Bio editor avec toolbar markdown ────────────────────────────────────────
+
+function BioEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  function wrap(before: string, after: string) {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = value.slice(start, end);
+    const next = value.slice(0, start) + before + selected + after + value.slice(end);
+    onChange(next);
+    requestAnimationFrame(() => {
+      ta.focus();
+      ta.setSelectionRange(start + before.length, end + before.length);
+    });
+  }
+
+  function insertHeading(level: number) {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const prefix = "#".repeat(level) + " ";
+    onChange(value.slice(0, lineStart) + prefix + value.slice(lineStart));
+    requestAnimationFrame(() => {
+      ta.focus();
+      ta.setSelectionRange(start + prefix.length, start + prefix.length);
+    });
+  }
+
+  function ToolBtn({
+    onClick,
+    title,
+    children,
+  }: {
+    onClick: () => void;
+    title: string;
+    children: React.ReactNode;
+  }) {
+    return (
+      <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        className="flex items-center justify-center h-7 w-7 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      >
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <div className="space-y-0">
+      <div className="flex items-center gap-0.5 px-2 py-1 rounded-t-md border border-b-0 border-input bg-muted/40">
+        <ToolBtn onClick={() => insertHeading(1)} title="Titre H1">
+          <Heading1 className="h-3.5 w-3.5" />
+        </ToolBtn>
+        <ToolBtn onClick={() => insertHeading(2)} title="Sous-titre H2">
+          <Heading2 className="h-3.5 w-3.5" />
+        </ToolBtn>
+        <div className="w-px h-4 bg-border mx-1" />
+        <ToolBtn onClick={() => wrap("**", "**")} title="Gras">
+          <Bold className="h-3.5 w-3.5" />
+        </ToolBtn>
+        <ToolBtn onClick={() => wrap("*", "*")} title="Italique">
+          <Italic className="h-3.5 w-3.5" />
+        </ToolBtn>
+        <ToolBtn onClick={() => wrap("<u>", "</u>")} title="Souligné">
+          <Underline className="h-3.5 w-3.5" />
+        </ToolBtn>
+      </div>
+      <Textarea
+        ref={ref}
+        id="bio"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Quelques mots sur toi… (markdown supporté)"
+        rows={4}
+        className="rounded-t-none font-mono text-sm"
+      />
+    </div>
+  );
+}
+
 // ─── Section identité ─────────────────────────────────────────────────────────
 
 function SectionIdentite({
@@ -120,13 +218,16 @@ function SectionIdentite({
   const [avatarStatus, setAvatarStatus] = useState<SaveStatus>("idle");
   const [avatarError, setAvatarError] = useState("");
   const [isPendingAvatar, startAvatarTransition] = useTransition();
+  const [avatarTab, setAvatarTab] = useState<"file" | "url">("file");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit } = useForm({
+  const { handleSubmit, watch, setValue, register } = useForm({
     defaultValues: {
       display_name: profile?.display_name ?? "",
       bio: profile?.bio ?? "",
     },
   });
+  const bioValue = watch("bio");
 
   function onSubmit(data: { display_name: string; bio: string }) {
     setStatus("saving");
@@ -141,6 +242,25 @@ function SectionIdentite({
       } else {
         setStatus("error");
         setError(res.error);
+      }
+    });
+  }
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarStatus("saving");
+    setAvatarError("");
+    startAvatarTransition(async () => {
+      const fd = new FormData();
+      fd.append("avatar", file);
+      const res = await uploadAvatarFile(fd);
+      if (res.success) {
+        setAvatarStatus("success");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      } else {
+        setAvatarStatus("error");
+        setAvatarError(res.error);
       }
     });
   }
@@ -211,11 +331,9 @@ function SectionIdentite({
 
         <div className="space-y-1.5">
           <Label htmlFor="bio">Bio</Label>
-          <Textarea
-            id="bio"
-            placeholder="Quelques mots sur toi…"
-            rows={3}
-            {...register("bio")}
+          <BioEditor
+            value={bioValue}
+            onChange={(v) => setValue("bio", v)}
           />
         </div>
 
@@ -248,34 +366,87 @@ function SectionIdentite({
             </div>
           </div>
         ) : (
-          <form onSubmit={handleAvatarSubmit} className="space-y-2">
-            <p className="text-[11px] text-muted-foreground">
-              Soumettez une URL d&apos;image pour validation par le Conseil
-              (formats : JPG, PNG, WebP).
-            </p>
-            <div className="flex gap-2">
-              <Input
-                placeholder="https://..."
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                disabled={isPendingAvatar}
-              />
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isPendingAvatar || !avatarUrl.trim()}
-                className="shrink-0"
-              >
-                {isPendingAvatar && (
-                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                )}
-                Soumettre
-              </Button>
+          <div className="space-y-3">
+            {/* Tabs */}
+            <div className="flex gap-1 p-0.5 rounded-md bg-muted w-fit">
+              {(["file", "url"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => { setAvatarTab(tab); setAvatarStatus("idle"); setAvatarError(""); }}
+                  className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                    avatarTab === tab
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab === "file" ? "Depuis mon PC" : "Depuis une URL"}
+                </button>
+              ))}
             </div>
+
+            {avatarTab === "file" ? (
+              <div className="space-y-2">
+                <p className="text-[11px] text-muted-foreground">
+                  JPG, PNG ou WebP — 2 Mo max. La photo sera soumise au Conseil pour validation.
+                </p>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    disabled={isPendingAvatar}
+                    onChange={handleFileUpload}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={isPendingAvatar}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="gap-1.5"
+                  >
+                    {isPendingAvatar ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="h-3.5 w-3.5" />
+                    )}
+                    Choisir un fichier
+                  </Button>
+                </label>
+              </div>
+            ) : (
+              <form onSubmit={handleAvatarSubmit} className="space-y-2">
+                <p className="text-[11px] text-muted-foreground">
+                  Soumettez une URL d&apos;image pour validation par le Conseil
+                  (formats : JPG, PNG, WebP).
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="https://..."
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    disabled={isPendingAvatar}
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isPendingAvatar || !avatarUrl.trim()}
+                    className="shrink-0"
+                  >
+                    {isPendingAvatar && (
+                      <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                    )}
+                    Soumettre
+                  </Button>
+                </div>
+              </form>
+            )}
+
             {avatarStatus === "success" && (
               <p className="flex items-center gap-1.5 text-xs text-green-400">
-                <CheckCircle className="h-3.5 w-3.5" /> Photo soumise — en
-                attente de validation
+                <CheckCircle className="h-3.5 w-3.5" /> Photo soumise — en attente de validation
               </p>
             )}
             {avatarStatus === "error" && (
@@ -283,7 +454,7 @@ function SectionIdentite({
                 <AlertCircle className="h-3.5 w-3.5" /> {avatarError}
               </p>
             )}
-          </form>
+          </div>
         )}
       </div>
     </Section>

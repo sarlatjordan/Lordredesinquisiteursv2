@@ -34,6 +34,37 @@ export async function updateProfile(input: ProfileUpdateInput): Promise<ActionRe
   return { success: true, data: data as Profile }
 }
 
+// ─── Upload avatar depuis le PC → Storage → pending approval ─────────────────
+
+export async function uploadAvatarFile(formData: FormData): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const file = formData.get('avatar') as File | null
+  if (!file || !file.size) return { success: false, error: 'Fichier requis' }
+  if (file.size > 2 * 1024 * 1024) return { success: false, error: 'Fichier trop lourd (max 2 Mo)' }
+
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+  if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return { success: false, error: 'Format non supporté (JPG, PNG, WebP)' }
+
+  const path = `pending/${user.id}.${ext}`
+  const arrayBuffer = await file.arrayBuffer()
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, arrayBuffer, { contentType: file.type, upsert: true })
+  if (uploadError) return { success: false, error: uploadError.message }
+
+  const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+
+  const { error } = await supabase.from('profiles').update({ avatar_pending_url: publicUrl }).eq('id', user.id)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/profil')
+  return { success: true, data: undefined }
+}
+
 // ─── FEAT-20 : Workflow validation photo de profil ───────────────────────────
 
 export async function submitAvatarForApproval(input: AvatarSubmitInput): Promise<ActionResult> {
