@@ -1,400 +1,974 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INQFR — Historique & Backlog</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0d0d10;
-  color: #e8e6e0;
-  padding: 2rem 1.25rem 4rem;
-  max-width: 780px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INQFR — Historique & Backlog</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0d0d10;
+        color: #e8e6e0;
+        padding: 2rem 1.25rem 4rem;
+        max-width: 780px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
 
-/* ── Radio tab switches (hidden) ──────────── */
-input[name="tab"] { display: none; }
+      /* ── Radio tab switches (hidden) ──────────── */
+      input[name="tab"] {
+        display: none;
+      }
 
-/* ── Header ───────────────────────────────── */
-.site-header {
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.25rem;
-  border-bottom: .5px solid #2a2a32;
-}
-.site-header h1 { font-size: 18px; font-weight: 500; color: #e8e6e0; margin-bottom: .3rem; }
-.site-header p  { font-size: 13px; color: #555560; }
+      /* ── Header ───────────────────────────────── */
+      .site-header {
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 0.5px solid #2a2a32;
+      }
+      .site-header h1 {
+        font-size: 18px;
+        font-weight: 500;
+        color: #e8e6e0;
+        margin-bottom: 0.3rem;
+      }
+      .site-header p {
+        font-size: 13px;
+        color: #555560;
+      }
 
-/* ── Nav tabs ─────────────────────────────── */
-.tabs { display: flex; gap: .35rem; margin-bottom: 2.5rem; }
-.tab {
-  font-size: 13px; font-weight: 500; padding: .35rem .9rem;
-  border-radius: 8px; border: .5px solid #2a2a32; cursor: pointer;
-  background: #18181e; color: #555560; transition: all .15s; user-select: none;
-}
-.tab:hover { color: #9898a0; border-color: #2a2a32; }
+      /* ── Nav tabs ─────────────────────────────── */
+      .tabs {
+        display: flex;
+        gap: 0.35rem;
+        margin-bottom: 2.5rem;
+      }
+      .tab {
+        font-size: 13px;
+        font-weight: 500;
+        padding: 0.35rem 0.9rem;
+        border-radius: 8px;
+        border: 0.5px solid #2a2a32;
+        cursor: pointer;
+        background: #18181e;
+        color: #555560;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .tab:hover {
+        color: #9898a0;
+        border-color: #2a2a32;
+      }
 
-/* Active tab — driven by :checked sibling selector */
-#tab-c:checked ~ .tabs label[for="tab-c"],
-#tab-b:checked ~ .tabs label[for="tab-b"] {
-  background: #1e1e2e; color: #e8e6e0; border-color: #3a3a44;
-}
+      /* Active tab — driven by :checked sibling selector */
+      #tab-c:checked ~ .tabs label[for="tab-c"],
+      #tab-b:checked ~ .tabs label[for="tab-b"] {
+        background: #1e1e2e;
+        color: #e8e6e0;
+        border-color: #3a3a44;
+      }
 
-/* ── Sections ─────────────────────────────── */
-.section { display: none; }
-#tab-c:checked ~ #changelog { display: block; }
-#tab-b:checked ~ #backlog   { display: block; }
+      /* ── Sections ─────────────────────────────── */
+      .section {
+        display: none;
+      }
+      #tab-c:checked ~ #changelog {
+        display: block;
+      }
+      #tab-b:checked ~ #backlog {
+        display: block;
+      }
 
-/* ── Backlog pills ────────────────────────── */
-.pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; }
-.pill {
-  font-size: 12px; font-weight: 500; padding: .25rem .75rem;
-  border-radius: 99px; border: .5px solid; display: inline-flex; align-items: center; gap: .3rem;
-}
-.pill-g { background: #0a2318; color: #4ade80; border-color: #14532d; }
-.pill-a { background: #231a05; color: #fbbf24; border-color: #78350f; }
-.pill-b { background: #0a1628; color: #60a5fa; border-color: #1e3a5f; }
+      /* ── Backlog pills ────────────────────────── */
+      .pills {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+      .pill {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 99px;
+        border: 0.5px solid;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .pill-g {
+        background: #0a2318;
+        color: #4ade80;
+        border-color: #14532d;
+      }
+      .pill-a {
+        background: #231a05;
+        color: #fbbf24;
+        border-color: #78350f;
+      }
+      .pill-b {
+        background: #0a1628;
+        color: #60a5fa;
+        border-color: #1e3a5f;
+      }
 
-/* ── Backlog cards ────────────────────────── */
-.bl-section { margin-bottom: 1.75rem; }
-.bl-label {
-  font-size: 11px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: .09em; color: #444450; margin-bottom: .75rem;
-  display: flex; align-items: center; gap: .5rem;
-}
-.bl-label::after { content: ''; flex: 1; height: .5px; background: #222228; }
-.bl-cards { display: flex; flex-direction: column; gap: .4rem; }
-.bl-card {
-  background: #18181e; border: .5px solid #2a2a32; border-radius: 12px;
-  padding: .85rem 1rem; display: flex; align-items: flex-start; gap: .85rem;
-  border-left-width: 2px; border-left-style: solid; transition: background .15s;
-}
-.bl-card:hover { background: #1c1c24; border-color: #3a3a44; }
-.card-p1 { border-left-color: #f59e0b; }
-.card-p2 { border-left-color: #3b82f6; }
-.bl-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; line-height: 1; }
-.bl-body { flex: 1; min-width: 0; }
-.bl-name { font-size: 14px; font-weight: 500; color: #d4d2cc; margin-bottom: 3px; }
-.bl-desc { font-size: 12.5px; color: #555560; line-height: 1.55; }
-.bl-id {
-  flex-shrink: 0; font-size: 11px; font-weight: 500;
-  font-family: 'SF Mono', Consolas, monospace;
-  color: #444450; background: #1e1e26; border: .5px solid #2a2a32;
-  padding: .15rem .45rem; border-radius: 4px; margin-top: 2px; white-space: nowrap;
-}
-.done-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .4rem; }
-.done-item {
-  background: #18181e; border: .5px solid #2a2a32; border-radius: 10px;
-  padding: .65rem .85rem; border-left: 2px solid #14532d;
-}
-.done-cat { font-size: 13px; font-weight: 500; color: #888890; margin-bottom: .2rem; }
-.done-desc { font-size: 11.5px; color: #3e3e48; line-height: 1.5; }
+      /* ── Backlog cards ────────────────────────── */
+      .bl-section {
+        margin-bottom: 1.75rem;
+      }
+      .bl-label {
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: #444450;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .bl-label::after {
+        content: "";
+        flex: 1;
+        height: 0.5px;
+        background: #222228;
+      }
+      .bl-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .bl-card {
+        background: #18181e;
+        border: 0.5px solid #2a2a32;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        border-left-width: 2px;
+        border-left-style: solid;
+        transition: background 0.15s;
+      }
+      .bl-card:hover {
+        background: #1c1c24;
+        border-color: #3a3a44;
+      }
+      .card-p1 {
+        border-left-color: #f59e0b;
+      }
+      .card-p2 {
+        border-left-color: #3b82f6;
+      }
+      .bl-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        line-height: 1;
+      }
+      .bl-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .bl-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #d4d2cc;
+        margin-bottom: 3px;
+      }
+      .bl-desc {
+        font-size: 12.5px;
+        color: #555560;
+        line-height: 1.55;
+      }
+      .bl-id {
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: "SF Mono", Consolas, monospace;
+        color: #444450;
+        background: #1e1e26;
+        border: 0.5px solid #2a2a32;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        margin-top: 2px;
+        white-space: nowrap;
+      }
+      .done-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.4rem;
+      }
+      .done-item {
+        background: #18181e;
+        border: 0.5px solid #2a2a32;
+        border-radius: 10px;
+        padding: 0.65rem 0.85rem;
+        border-left: 2px solid #14532d;
+      }
+      .done-cat {
+        font-size: 13px;
+        font-weight: 500;
+        color: #888890;
+        margin-bottom: 0.2rem;
+      }
+      .done-desc {
+        font-size: 11.5px;
+        color: #3e3e48;
+        line-height: 1.5;
+      }
 
-/* ── Changelog timeline ───────────────────── */
-.release { margin-bottom: 2.75rem; position: relative; padding-left: 1.5rem; }
-.release::before {
-  content: '';
-  position: absolute; left: 0; top: .5rem; bottom: -2.75rem;
-  width: .5px; background: #222228;
-}
-.release:last-child::before { display: none; }
-.release-dot {
-  position: absolute; left: -5px; top: .45rem;
-  width: 11px; height: 11px; border-radius: 50%;
-  background: #1a1a22; border: 2px solid #444450;
-}
-.release-dot.dot-launch { border-color: #4ade80; }
-.release-dot.dot-sprint  { border-color: #60a5fa; }
-.release-dot.dot-recent  { border-color: #a78bfa; }
+      /* ── Changelog timeline ───────────────────── */
+      .release {
+        margin-bottom: 2.75rem;
+        position: relative;
+        padding-left: 1.5rem;
+      }
+      .release::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+        bottom: -2.75rem;
+        width: 0.5px;
+        background: #222228;
+      }
+      .release:last-child::before {
+        display: none;
+      }
+      .release-dot {
+        position: absolute;
+        left: -5px;
+        top: 0.45rem;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #1a1a22;
+        border: 2px solid #444450;
+      }
+      .release-dot.dot-launch {
+        border-color: #4ade80;
+      }
+      .release-dot.dot-sprint {
+        border-color: #60a5fa;
+      }
+      .release-dot.dot-recent {
+        border-color: #a78bfa;
+      }
 
-.release-header { margin-bottom: .85rem; }
-.release-version { font-size: 15px; font-weight: 500; color: #d4d2cc; margin-bottom: .15rem; }
-.release-date { font-size: 12px; color: #444450; }
+      .release-header {
+        margin-bottom: 0.85rem;
+      }
+      .release-version {
+        font-size: 15px;
+        font-weight: 500;
+        color: #d4d2cc;
+        margin-bottom: 0.15rem;
+      }
+      .release-date {
+        font-size: 12px;
+        color: #444450;
+      }
 
-.entries { display: flex; flex-direction: column; gap: .35rem; }
-.entry {
-  display: flex; align-items: flex-start; gap: .65rem;
-  background: #18181e; border: .5px solid #2a2a32; border-radius: 10px;
-  padding: .65rem .85rem;
-}
-.entry:hover { background: #1c1c24; }
-.tag {
-  flex-shrink: 0; font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .05em;
-  padding: .2rem .45rem; border-radius: 4px; border: .5px solid;
-  margin-top: 1px;
-}
-.tag-feat  { background: #0a1628; color: #60a5fa; border-color: #1e3a5f; }
-.tag-fix   { background: #231a05; color: #fbbf24; border-color: #78350f; }
-.tag-sec   { background: #200a0a; color: #f87171; border-color: #7f1d1d; }
-.tag-perf  { background: #0a1f0e; color: #4ade80; border-color: #14532d; }
-.tag-ux    { background: #1a0a28; color: #c084fc; border-color: #581c87; }
-.entry-text { font-size: 13px; color: #888890; line-height: 1.5; flex: 1; }
-.entry-text strong { color: #d4d2cc; font-weight: 500; }
-</style>
-</head>
-<body>
+      .entries {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .entry {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        background: #18181e;
+        border: 0.5px solid #2a2a32;
+        border-radius: 10px;
+        padding: 0.65rem 0.85rem;
+      }
+      .entry:hover {
+        background: #1c1c24;
+      }
+      .tag {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.2rem 0.45rem;
+        border-radius: 4px;
+        border: 0.5px solid;
+        margin-top: 1px;
+      }
+      .tag-feat {
+        background: #0a1628;
+        color: #60a5fa;
+        border-color: #1e3a5f;
+      }
+      .tag-fix {
+        background: #231a05;
+        color: #fbbf24;
+        border-color: #78350f;
+      }
+      .tag-sec {
+        background: #200a0a;
+        color: #f87171;
+        border-color: #7f1d1d;
+      }
+      .tag-perf {
+        background: #0a1f0e;
+        color: #4ade80;
+        border-color: #14532d;
+      }
+      .tag-ux {
+        background: #1a0a28;
+        color: #c084fc;
+        border-color: #581c87;
+      }
+      .entry-text {
+        font-size: 13px;
+        color: #888890;
+        line-height: 1.5;
+        flex: 1;
+      }
+      .entry-text strong {
+        color: #d4d2cc;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Radio inputs MUST be siblings of .tabs and sections for :checked ~ to work -->
+    <input type="radio" id="tab-c" name="tab" checked />
+    <input type="radio" id="tab-b" name="tab" />
 
-<!-- Radio inputs MUST be siblings of .tabs and sections for :checked ~ to work -->
-<input type="radio" id="tab-c" name="tab" checked>
-<input type="radio" id="tab-b" name="tab">
-
-<div class="site-header">
-  <h1>INQFR — Historique & Backlog</h1>
-  <p>Suivi de toutes les évolutions depuis le lancement · Mis à jour le 17 juin 2026</p>
-</div>
-
-<div class="tabs">
-  <label for="tab-c" class="tab">📋 Historique</label>
-  <label for="tab-b" class="tab">🚀 Backlog</label>
-</div>
-
-<!-- ══════════════ CHANGELOG ══════════════ -->
-<div id="changelog" class="section">
-
-  <!-- v1.0 -->
-  <div class="release">
-    <div class="release-dot dot-launch"></div>
-    <div class="release-header">
-      <div class="release-version">v1.0 — Lancement initial</div>
-      <div class="release-date">Mai 2026</div>
+    <div class="site-header">
+      <h1>INQFR — Historique & Backlog</h1>
+      <p>
+        Suivi de toutes les évolutions depuis le lancement · Mis à jour le 17
+        juin 2026
+      </p>
     </div>
-    <div class="entries">
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Application complète</strong> — Dashboard, membres, événements, flotte, opérations, logistique, ressources, messagerie, partenariats, carte stratégique, profil, admin, landing publique, recrutement, galerie, stats</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Authentification</strong> — Email + mot de passe, magic link, système de rangs (Visiteur → Sage), RLS Supabase sur toutes les tables</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Carte stratégique</strong> — 22 systèmes Star Citizen en SVG interactif</div></div>
-    </div>
-  </div>
 
-  <!-- Sprint 1 - 4 juin -->
-  <div class="release">
-    <div class="release-dot dot-sprint"></div>
-    <div class="release-header">
-      <div class="release-version">Sprint 1 — Sécurité, performance & contenu</div>
-      <div class="release-date">4 juin 2026</div>
+    <div class="tabs">
+      <label for="tab-b" class="tab">🚀 Backlog</label>
+      <label for="tab-c" class="tab">📋 Historique</label>
     </div>
-    <div class="entries">
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Messagerie instantanée</strong> — Chat temps réel par canal avec Supabase Realtime</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Centre de notifications</strong> — Cloche en sidebar, marquage lu, notifications push in-app</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Onboarding aspirant</strong> — Checklist de progression avec étapes claimables et récompenses en points</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Membres inactifs</strong> — Indicateur de membres sans activité récente, visible par les Sages</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Export calendrier .ics</strong> — Abonnement aux événements dans Google Agenda, Apple Calendar, etc.</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Épreuves de rang</strong> — Système de défis assignés par les Maîtres Inquisiteurs pour progresser</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Redirect post-login</strong> — Retour automatique à la page demandée après connexion</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Message d'accès refusé</strong> — Les visiteurs voient une explication claire au lieu d'une page blanche</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Skeletons de chargement</strong> — Animations grises pendant le chargement des pages</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Page 404 personnalisée</strong> — Page d'erreur aux couleurs du site</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Progression profil</strong> — Barre de progression vers le rang suivant visible sur le profil</div></div>
-      <div class="entry"><span class="tag tag-sec">Sécurité</span><div class="entry-text"><strong>Anti auto-promotion</strong> — Un membre ne peut plus changer son propre rang via l'API</div></div>
-      <div class="entry"><span class="tag tag-sec">Sécurité</span><div class="entry-text"><strong>RLS renforcé</strong> — Correction des politiques d'accès sur les inscriptions aux événements, les notifications et les vaisseaux</div></div>
-      <div class="entry"><span class="tag tag-sec">Sécurité</span><div class="entry-text"><strong>Réservation inventaire atomique</strong> — Impossibilité de réserver deux fois le même item simultanément (vulnérabilité TOCTOU corrigée)</div></div>
-      <div class="entry"><span class="tag tag-sec">Sécurité</span><div class="entry-text"><strong>Route ICS sécurisée</strong> — Vérification des droits d'accès aux événements privés dans le flux calendrier</div></div>
-      <div class="entry"><span class="tag tag-perf">Perf</span><div class="entry-text"><strong>Requêtes parallèles</strong> — Les chargements de page n'attendent plus chaque requête les unes après les autres (dashboard, membres, opérations)</div></div>
-      <div class="entry"><span class="tag tag-perf">Perf</span><div class="entry-text"><strong>Cache paramètres org</strong> — Les réglages globaux ne sont plus rechargés à chaque requête</div></div>
-      <div class="entry"><span class="tag tag-perf">Perf</span><div class="entry-text"><strong>Calcul des points en SQL</strong> — Remplace un traitement JS lent côté serveur par une requête optimisée en base</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Page Flotte blanche</strong> — Crash intermittent corrigé sur la page de gestion des vaisseaux</div></div>
-    </div>
-  </div>
 
-  <!-- Sprint 2 - 5 juin -->
-  <div class="release">
-    <div class="release-dot dot-sprint"></div>
-    <div class="release-header">
-      <div class="release-version">Sprint 2 — Contenu & administration</div>
-      <div class="release-date">5 juin 2026</div>
-    </div>
-    <div class="entries">
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Fiches membres publiques</strong> — Les visiteurs non connectés peuvent voir les profils des membres</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Événements cliquables</strong> — Cliquer sur un événement ouvre une fiche de détail complète sans quitter la page</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Audit des points</strong> — Page d'administration listant toutes les attributions de points avec date et raison</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Seuil commandement ops relevé</strong> — Seuls les Maîtres Inquisiteurs (et plus) peuvent désormais créer des opérations</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Changement de mot de passe sécurisé</strong> — Le mot de passe actuel est maintenant demandé avant de pouvoir en définir un nouveau</div></div>
-      <div class="entry"><span class="tag tag-ux">UX</span><div class="entry-text"><strong>Background thème SC sur /login</strong> — Page de connexion avec décor spatial (étoiles, planète, hangar)</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Recrutement</strong> — Formulaire de candidature accepte maintenant les membres déjà inscrits + champ nom rendu optionnel</div></div>
-    </div>
-  </div>
-
-  <!-- Sprint 3 - 6 juin -->
-  <div class="release">
-    <div class="release-dot dot-sprint"></div>
-    <div class="release-header">
-      <div class="release-version">Sprint 3 — Auth, Discord & onboarding étendu</div>
-      <div class="release-date">6 juin 2026</div>
-    </div>
-    <div class="entries">
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Google OAuth</strong> — Connexion en un clic avec un compte Google</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Discord OAuth</strong> — Connexion en un clic avec un compte Discord</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>MFA TOTP</strong> — Double authentification via Google Authenticator ou Authy, activable sur le profil</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Appareils de confiance</strong> — Option "Se souvenir de moi" après validation MFA (1h à 1 an)</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Captcha Turnstile</strong> — Protection anti-bot sur le formulaire de connexion (Cloudflare)</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Synchronisation Discord bidirectionnelle</strong> — Les événements créés sur le site apparaissent dans Discord, et vice-versa via Make.com</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Calendrier ICS global</strong> — Abonnement personnel synchronisé avec Google Agenda, token HMAC sécurisé</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Onboarding 4 rangs</strong> — Parcours initiatique complet : Aspirant, Consacré, Gardien, Inquisiteur — 5 étapes chacun avec bonus de complétion</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Flotte fusionnée</strong> — Vaisseaux personnels et de l'org sur la même grille, tri A→Z, filtre par pilote et par corp</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Export RGPD</strong> — Téléchargement de toutes ses données personnelles depuis le profil</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Liaison comptes OAuth</strong> — Connecter Google/Discord à un compte existant email+mdp</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Chat temps réel</strong> — Crash corrigé lors de la réception de messages sans données jointes</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Notifications</strong> — Marquage "lu" instantané sans rechargement de page</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>MFA + OAuth</strong> — Le challenge MFA s'applique correctement aux connexions Google et Discord</div></div>
-    </div>
-  </div>
-
-  <!-- Sprint 4 - 17 juin -->
-  <div class="release">
-    <div class="release-dot dot-recent"></div>
-    <div class="release-header">
-      <div class="release-version">Sprint 4 — Calendrier, UI & profil</div>
-      <div class="release-date">15–17 juin 2026</div>
-    </div>
-    <div class="entries">
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Vues calendrier</strong> — Page Événements avec toggle Mois / Semaine / Liste, vue mois par défaut, adaptatif à la taille d'écran</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Backgrounds SC thématiques</strong> — Chaque page du QG a son propre décor spatial (hangar, entrepôt, carte stellaire, réticule tactique…)</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Landing page immersive</strong> — Champ d'étoiles animé visible sur toute la page d'accueil en scrollant</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Upload photo de profil</strong> — Envoi direct depuis l'ordinateur (JPG/PNG/WebP, 2 Mo max) sans URL externe, stocké dans Supabase Storage</div></div>
-      <div class="entry"><span class="tag tag-feat">Feature</span><div class="entry-text"><strong>Éditeur de bio markdown</strong> — Barre d'outils sur la bio (titres H1/H2, gras, italique, souligné), rendu formaté sur la fiche membre</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Événements trop petits</strong> — Les fiches d'événements dans le calendrier sont désormais lisibles avec texte agrandi</div></div>
-      <div class="entry"><span class="tag tag-fix">Fix</span><div class="entry-text"><strong>Flotte filtre corpo</strong> — Le filtre "Corpo" basé sur le bon indicateur (is_org_ship)</div></div>
-      <div class="entry"><span class="tag tag-sec">Sécurité</span><div class="entry-text"><strong>Bucket avatars sécurisé</strong> — Les photos uploadées sont isolées par utilisateur avec politiques RLS dédiées</div></div>
-    </div>
-  </div>
-
-</div><!-- /changelog -->
-
-<!-- ══════════════ BACKLOG ══════════════ -->
-<div id="backlog" class="section">
-
-  <div class="pills">
-    <span class="pill pill-g">✓ 38 terminés</span>
-    <span class="pill pill-a">↑ 2 priorité haute</span>
-    <span class="pill pill-b">· 8 planifiés</span>
-  </div>
-
-  <div class="bl-section">
-    <div class="bl-label">Prochainement — priorité haute</div>
-    <div class="bl-cards">
-      <div class="bl-card card-p1">
-        <div class="bl-icon">🗂</div>
-        <div class="bl-body">
-          <div class="bl-name">Pipeline Kanban des candidatures</div>
-          <div class="bl-desc">Vue Kanban pour le Conseil : Reçu → En discussion → Accepté / Refusé. Remplace la liste plate actuelle.</div>
+    <!-- ══════════════ CHANGELOG ══════════════ -->
+    <div id="changelog" class="section">
+      <!-- v1.0 -->
+      <div class="release">
+        <div class="release-dot dot-launch"></div>
+        <div class="release-header">
+          <div class="release-version">v1.0 — Lancement initial</div>
+          <div class="release-date">Mai 2026</div>
         </div>
-        <div class="bl-id">FEAT-31</div>
-      </div>
-      <div class="bl-card card-p1">
-        <div class="bl-icon">🔍</div>
-        <div class="bl-body">
-          <div class="bl-name">Recherche globale</div>
-          <div class="bl-desc">Une barre de recherche qui cherche partout à la fois : membres, ressources, opérations, événements.</div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Application complète</strong> — Dashboard, membres,
+              événements, flotte, opérations, logistique, ressources,
+              messagerie, partenariats, carte stratégique, profil, admin,
+              landing publique, recrutement, galerie, stats
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Authentification</strong> — Email + mot de passe, magic
+              link, système de rangs (Visiteur → Sage), RLS Supabase sur toutes
+              les tables
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Carte stratégique</strong> — 22 systèmes Star Citizen en
+              SVG interactif
+            </div>
+          </div>
         </div>
-        <div class="bl-id">FEAT-33</div>
+      </div>
+
+      <!-- Sprint 1 - 4 juin -->
+      <div class="release">
+        <div class="release-dot dot-sprint"></div>
+        <div class="release-header">
+          <div class="release-version">
+            Sprint 1 — Sécurité, performance & contenu
+          </div>
+          <div class="release-date">4 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Messagerie instantanée</strong> — Chat temps réel par
+              canal avec Supabase Realtime
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Centre de notifications</strong> — Cloche en sidebar,
+              marquage lu, notifications push in-app
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Onboarding aspirant</strong> — Checklist de progression
+              avec étapes claimables et récompenses en points
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Membres inactifs</strong> — Indicateur de membres sans
+              activité récente, visible par les Sages
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Export calendrier .ics</strong> — Abonnement aux
+              événements dans Google Agenda, Apple Calendar, etc.
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Épreuves de rang</strong> — Système de défis assignés par
+              les Maîtres Inquisiteurs pour progresser
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Redirect post-login</strong> — Retour automatique à la
+              page demandée après connexion
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Message d'accès refusé</strong> — Les visiteurs voient une
+              explication claire au lieu d'une page blanche
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Skeletons de chargement</strong> — Animations grises
+              pendant le chargement des pages
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Page 404 personnalisée</strong> — Page d'erreur aux
+              couleurs du site
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Progression profil</strong> — Barre de progression vers le
+              rang suivant visible sur le profil
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-sec">Sécurité</span>
+            <div class="entry-text">
+              <strong>Anti auto-promotion</strong> — Un membre ne peut plus
+              changer son propre rang via l'API
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-sec">Sécurité</span>
+            <div class="entry-text">
+              <strong>RLS renforcé</strong> — Correction des politiques d'accès
+              sur les inscriptions aux événements, les notifications et les
+              vaisseaux
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-sec">Sécurité</span>
+            <div class="entry-text">
+              <strong>Réservation inventaire atomique</strong> — Impossibilité
+              de réserver deux fois le même item simultanément (vulnérabilité
+              TOCTOU corrigée)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-sec">Sécurité</span>
+            <div class="entry-text">
+              <strong>Route ICS sécurisée</strong> — Vérification des droits
+              d'accès aux événements privés dans le flux calendrier
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-perf">Perf</span>
+            <div class="entry-text">
+              <strong>Requêtes parallèles</strong> — Les chargements de page
+              n'attendent plus chaque requête les unes après les autres
+              (dashboard, membres, opérations)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-perf">Perf</span>
+            <div class="entry-text">
+              <strong>Cache paramètres org</strong> — Les réglages globaux ne
+              sont plus rechargés à chaque requête
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-perf">Perf</span>
+            <div class="entry-text">
+              <strong>Calcul des points en SQL</strong> — Remplace un traitement
+              JS lent côté serveur par une requête optimisée en base
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Page Flotte blanche</strong> — Crash intermittent corrigé
+              sur la page de gestion des vaisseaux
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sprint 2 - 5 juin -->
+      <div class="release">
+        <div class="release-dot dot-sprint"></div>
+        <div class="release-header">
+          <div class="release-version">Sprint 2 — Contenu & administration</div>
+          <div class="release-date">5 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Fiches membres publiques</strong> — Les visiteurs non
+              connectés peuvent voir les profils des membres
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Événements cliquables</strong> — Cliquer sur un événement
+              ouvre une fiche de détail complète sans quitter la page
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Audit des points</strong> — Page d'administration listant
+              toutes les attributions de points avec date et raison
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Seuil commandement ops relevé</strong> — Seuls les Maîtres
+              Inquisiteurs (et plus) peuvent désormais créer des opérations
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Changement de mot de passe sécurisé</strong> — Le mot de
+              passe actuel est maintenant demandé avant de pouvoir en définir un
+              nouveau
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-ux">UX</span>
+            <div class="entry-text">
+              <strong>Background thème SC sur /login</strong> — Page de
+              connexion avec décor spatial (étoiles, planète, hangar)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Recrutement</strong> — Formulaire de candidature accepte
+              maintenant les membres déjà inscrits + champ nom rendu optionnel
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sprint 3 - 6 juin -->
+      <div class="release">
+        <div class="release-dot dot-sprint"></div>
+        <div class="release-header">
+          <div class="release-version">
+            Sprint 3 — Auth, Discord & onboarding étendu
+          </div>
+          <div class="release-date">6 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Google OAuth</strong> — Connexion en un clic avec un
+              compte Google
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Discord OAuth</strong> — Connexion en un clic avec un
+              compte Discord
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>MFA TOTP</strong> — Double authentification via Google
+              Authenticator ou Authy, activable sur le profil
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Appareils de confiance</strong> — Option "Se souvenir de
+              moi" après validation MFA (1h à 1 an)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Captcha Turnstile</strong> — Protection anti-bot sur le
+              formulaire de connexion (Cloudflare)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Synchronisation Discord bidirectionnelle</strong> — Les
+              événements créés sur le site apparaissent dans Discord, et
+              vice-versa via Make.com
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Calendrier ICS global</strong> — Abonnement personnel
+              synchronisé avec Google Agenda, token HMAC sécurisé
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Onboarding 4 rangs</strong> — Parcours initiatique complet
+              : Aspirant, Consacré, Gardien, Inquisiteur — 5 étapes chacun avec
+              bonus de complétion
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Flotte fusionnée</strong> — Vaisseaux personnels et de
+              l'org sur la même grille, tri A→Z, filtre par pilote et par corp
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Export RGPD</strong> — Téléchargement de toutes ses
+              données personnelles depuis le profil
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Liaison comptes OAuth</strong> — Connecter Google/Discord
+              à un compte existant email+mdp
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Chat temps réel</strong> — Crash corrigé lors de la
+              réception de messages sans données jointes
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Notifications</strong> — Marquage "lu" instantané sans
+              rechargement de page
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>MFA + OAuth</strong> — Le challenge MFA s'applique
+              correctement aux connexions Google et Discord
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sprint 4 - 17 juin -->
+      <div class="release">
+        <div class="release-dot dot-recent"></div>
+        <div class="release-header">
+          <div class="release-version">Sprint 4 — Calendrier, UI & profil</div>
+          <div class="release-date">15–17 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Vues calendrier</strong> — Page Événements avec toggle
+              Mois / Semaine / Liste, vue mois par défaut, adaptatif à la taille
+              d'écran
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Backgrounds SC thématiques</strong> — Chaque page du QG a
+              son propre décor spatial (hangar, entrepôt, carte stellaire,
+              réticule tactique…)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Landing page immersive</strong> — Champ d'étoiles animé
+              visible sur toute la page d'accueil en scrollant
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Upload photo de profil</strong> — Envoi direct depuis
+              l'ordinateur (JPG/PNG/WebP, 2 Mo max) sans URL externe, stocké
+              dans Supabase Storage
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Éditeur de bio markdown</strong> — Barre d'outils sur la
+              bio (titres H1/H2, gras, italique, souligné), rendu formaté sur la
+              fiche membre
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Événements trop petits</strong> — Les fiches d'événements
+              dans le calendrier sont désormais lisibles avec texte agrandi
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Flotte filtre corpo</strong> — Le filtre "Corpo" basé sur
+              le bon indicateur (is_org_ship)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-sec">Sécurité</span>
+            <div class="entry-text">
+              <strong>Bucket avatars sécurisé</strong> — Les photos uploadées
+              sont isolées par utilisateur avec politiques RLS dédiées
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+    <!-- /changelog -->
 
-  <div class="bl-section">
-    <div class="bl-label">Planifié — idées validées</div>
-    <div class="bl-cards">
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🚀</div>
-        <div class="bl-body">
-          <div class="bl-name">Planificateur de composition de flotte</div>
-          <div class="bl-desc">Avant une opération, assigner les vaisseaux aux rôles (tank, support, DPS). Sauvegardé sur l'opération.</div>
-        </div>
-        <div class="bl-id">FEAT-25</div>
+    <!-- ══════════════ BACKLOG ══════════════ -->
+    <div id="backlog" class="section">
+      <div class="pills">
+        <span class="pill pill-g">✓ 38 terminés</span>
+        <span class="pill pill-a">↑ 2 priorité haute</span>
+        <span class="pill pill-b">· 8 planifiés</span>
       </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🗓</div>
-        <div class="bl-body">
-          <div class="bl-name">Tracker de disponibilité</div>
-          <div class="bl-desc">Chaque membre indique ses créneaux dispo dans la semaine. La page opérations affiche qui est disponible.</div>
+
+      <div class="bl-section">
+        <div class="bl-label">Prochainement — priorité haute</div>
+        <div class="bl-cards">
+          <div class="bl-card card-p1">
+            <div class="bl-icon">🗂</div>
+            <div class="bl-body">
+              <div class="bl-name">Pipeline Kanban des candidatures</div>
+              <div class="bl-desc">
+                Vue Kanban pour le Conseil : Reçu → En discussion → Accepté /
+                Refusé. Remplace la liste plate actuelle.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-31</div>
+          </div>
+          <div class="bl-card card-p1">
+            <div class="bl-icon">🔍</div>
+            <div class="bl-body">
+              <div class="bl-name">Recherche globale</div>
+              <div class="bl-desc">
+                Une barre de recherche qui cherche partout à la fois : membres,
+                ressources, opérations, événements.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-33</div>
+          </div>
         </div>
-        <div class="bl-id">FEAT-26</div>
       </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">💰</div>
-        <div class="bl-body">
-          <div class="bl-name">Système de loot / partage du butin</div>
-          <div class="bl-desc">Distribuer les gains d'une opération entre les participants. Historique visible sur la fiche membre.</div>
+
+      <div class="bl-section">
+        <div class="bl-label">Planifié — idées validées</div>
+        <div class="bl-cards">
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🚀</div>
+            <div class="bl-body">
+              <div class="bl-name">Planificateur de composition de flotte</div>
+              <div class="bl-desc">
+                Avant une opération, assigner les vaisseaux aux rôles (tank,
+                support, DPS). Sauvegardé sur l'opération.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-25</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🗓</div>
+            <div class="bl-body">
+              <div class="bl-name">Tracker de disponibilité</div>
+              <div class="bl-desc">
+                Chaque membre indique ses créneaux dispo dans la semaine. La
+                page opérations affiche qui est disponible.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-26</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">💰</div>
+            <div class="bl-body">
+              <div class="bl-name">Système de loot / partage du butin</div>
+              <div class="bl-desc">
+                Distribuer les gains d'une opération entre les participants.
+                Historique visible sur la fiche membre.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-27</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">📖</div>
+            <div class="bl-body">
+              <div class="bl-name">Journal de guerre</div>
+              <div class="bl-desc">
+                Après une opération, rédiger un compte-rendu avec texte et
+                captures. Visible sur la landing publique.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-28</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🏅</div>
+            <div class="bl-body">
+              <div class="bl-name">Badges & achievements</div>
+              <div class="bl-desc">
+                Badges débloqués automatiquement : première opération, 5
+                événements, premier rapport… Affichés sur la fiche membre.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-29</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🎙</div>
+            <div class="bl-body">
+              <div class="bl-name">Widget "Qui est en vocal"</div>
+              <div class="bl-desc">
+                Affiche les membres actuellement dans un canal vocal Discord.
+                Utilise le bot déjà connecté.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-30</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🔔</div>
+            <div class="bl-body">
+              <div class="bl-name">Notifications push navigateur</div>
+              <div class="bl-desc">
+                Alertes envoyées même si l'onglet est fermé : opération qui
+                commence, événement proche, message reçu.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-32</div>
+          </div>
+          <div class="bl-card card-p2">
+            <div class="bl-icon">🎮</div>
+            <div class="bl-body">
+              <div class="bl-name">Mode "en opération"</div>
+              <div class="bl-desc">
+                Statut "Je suis en jeu" activable depuis le tableau de bord,
+                visible par tous avec l'heure de début.
+              </div>
+            </div>
+            <div class="bl-id">FEAT-34</div>
+          </div>
         </div>
-        <div class="bl-id">FEAT-27</div>
       </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">📖</div>
-        <div class="bl-body">
-          <div class="bl-name">Journal de guerre</div>
-          <div class="bl-desc">Après une opération, rédiger un compte-rendu avec texte et captures. Visible sur la landing publique.</div>
+
+      <div class="bl-section">
+        <div class="bl-label">Terminé — résumé</div>
+        <div class="done-grid">
+          <div class="done-item">
+            <div class="done-cat">🔒 Sécurité & Auth</div>
+            <div class="done-desc">
+              RLS, MFA TOTP, trusted devices, Turnstile, CSP, ICS HMAC, OAuth
+              Google & Discord
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">⚡ Features core</div>
+            <div class="done-desc">
+              Messagerie temps réel, notifications, onboarding 4 rangs,
+              épreuves, calendrier ICS, RGPD
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🚀 Flotte & Opérations</div>
+            <div class="done-desc">
+              Grille flotte, filtres, édition inline, 250 modèles RSI, Discord
+              sync bidirectionnel
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🎨 UI & Expérience</div>
+            <div class="done-desc">
+              Calendrier mois/semaine/liste, backgrounds SC, upload photo PC,
+              toolbar bio markdown
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">📈 Performance</div>
+            <div class="done-desc">
+              Promise.all waterfall, RPC SQL points, colonnes Supabase, cache
+              settings
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🏗 Architecture</div>
+            <div class="done-desc">
+              Server Actions Zod, auth-helpers, React.cache metadata, erreurs
+              corrigées
+            </div>
+          </div>
         </div>
-        <div class="bl-id">FEAT-28</div>
-      </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🏅</div>
-        <div class="bl-body">
-          <div class="bl-name">Badges & achievements</div>
-          <div class="bl-desc">Badges débloqués automatiquement : première opération, 5 événements, premier rapport… Affichés sur la fiche membre.</div>
-        </div>
-        <div class="bl-id">FEAT-29</div>
-      </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🎙</div>
-        <div class="bl-body">
-          <div class="bl-name">Widget "Qui est en vocal"</div>
-          <div class="bl-desc">Affiche les membres actuellement dans un canal vocal Discord. Utilise le bot déjà connecté.</div>
-        </div>
-        <div class="bl-id">FEAT-30</div>
-      </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🔔</div>
-        <div class="bl-body">
-          <div class="bl-name">Notifications push navigateur</div>
-          <div class="bl-desc">Alertes envoyées même si l'onglet est fermé : opération qui commence, événement proche, message reçu.</div>
-        </div>
-        <div class="bl-id">FEAT-32</div>
-      </div>
-      <div class="bl-card card-p2">
-        <div class="bl-icon">🎮</div>
-        <div class="bl-body">
-          <div class="bl-name">Mode "en opération"</div>
-          <div class="bl-desc">Statut "Je suis en jeu" activable depuis le tableau de bord, visible par tous avec l'heure de début.</div>
-        </div>
-        <div class="bl-id">FEAT-34</div>
       </div>
     </div>
-  </div>
-
-  <div class="bl-section">
-    <div class="bl-label">Terminé — résumé</div>
-    <div class="done-grid">
-      <div class="done-item">
-        <div class="done-cat">🔒 Sécurité & Auth</div>
-        <div class="done-desc">RLS, MFA TOTP, trusted devices, Turnstile, CSP, ICS HMAC, OAuth Google & Discord</div>
-      </div>
-      <div class="done-item">
-        <div class="done-cat">⚡ Features core</div>
-        <div class="done-desc">Messagerie temps réel, notifications, onboarding 4 rangs, épreuves, calendrier ICS, RGPD</div>
-      </div>
-      <div class="done-item">
-        <div class="done-cat">🚀 Flotte & Opérations</div>
-        <div class="done-desc">Grille flotte, filtres, édition inline, 250 modèles RSI, Discord sync bidirectionnel</div>
-      </div>
-      <div class="done-item">
-        <div class="done-cat">🎨 UI & Expérience</div>
-        <div class="done-desc">Calendrier mois/semaine/liste, backgrounds SC, upload photo PC, toolbar bio markdown</div>
-      </div>
-      <div class="done-item">
-        <div class="done-cat">📈 Performance</div>
-        <div class="done-desc">Promise.all waterfall, RPC SQL points, colonnes Supabase, cache settings</div>
-      </div>
-      <div class="done-item">
-        <div class="done-cat">🏗 Architecture</div>
-        <div class="done-desc">Server Actions Zod, auth-helpers, React.cache metadata, erreurs corrigées</div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /backlog -->
-
-</body>
+    <!-- /backlog -->
+  </body>
 </html>
