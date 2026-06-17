@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { LogOut, Shield, Settings, ClipboardList, ImageIcon, Globe, Activity, TrendingUp, Zap } from 'lucide-react'
+import { LogOut, Shield, Settings, ClipboardList, ImageIcon, Globe, Activity, TrendingUp, Zap, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getRolePrivilege } from '@/lib/constants'
 import { NAV_LINKS } from './nav-links'
@@ -136,7 +136,7 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
               { href: '/admin/galerie',      label: 'Galerie',       Icon: ImageIcon },
               { href: '/admin/avatars',      label: 'Avatars',       Icon: ImageIcon },
               { href: '/admin/activite',     label: 'Activité',      Icon: Activity },
-              { href: '/admin/points',       label: 'Points',         Icon: Zap },
+              { href: '/admin/points',       label: 'Points',        Icon: Zap },
             ].map(({ href, label, Icon }) => (
               <Link key={href} href={href}>
                 <motion.div
@@ -161,6 +161,16 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
                 </motion.div>
               </Link>
             ))}
+            <a href="/backlog.html" target="_blank" rel="noopener noreferrer">
+              <motion.div
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.15 }}
+                className="group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors duration-150 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-sidebar-accent-foreground transition-colors" />
+                <span className="truncate">Backlog & Historique</span>
+              </motion.div>
+            </a>
           </div>
         </>
       )}
