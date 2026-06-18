@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import ReactMarkdown from 'react-markdown'
 import type { ChatMessageWithAuthor } from '@/types'
 
 interface ChatWindowProps {
@@ -77,7 +78,16 @@ export function ChatWindow({
                     : 'bg-muted text-foreground rounded-tl-none'
                 )}
               >
-                {msg.content}
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <span>{children}</span>,
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    u: ({ children }) => <u>{children}</u>,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
               </div>
             </div>
           </div>
