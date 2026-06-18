@@ -16,6 +16,7 @@ import {
   type PartnershipRelation, type PartnershipStatus, type PartnershipType,
 } from '@/lib/constants'
 import { deletePartnership } from '@/actions/partnerships'
+import { MarkdownContent } from '@/components/ui/markdown-content'
 import type { Partnership } from '@/types'
 
 interface PartnershipDetailProps {
@@ -133,7 +134,7 @@ export function PartnershipDetail({ partnership: p, canManage, canDelete }: Part
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Termes et conditions</h3>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 p-4">
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{p.terms}</p>
+                <div className="text-sm text-foreground leading-relaxed"><MarkdownContent>{p.terms}</MarkdownContent></div>
               </div>
             </motion.section>
           ) : (
@@ -151,7 +152,7 @@ export function PartnershipDetail({ partnership: p, canManage, canDelete }: Part
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Notes internes</h3>
               </div>
               <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-4">
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{p.notes}</p>
+                <div className="text-sm text-foreground leading-relaxed"><MarkdownContent>{p.notes}</MarkdownContent></div>
               </div>
             </motion.section>
           )}

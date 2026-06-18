@@ -9,6 +9,7 @@ import { SHIP_TYPES, SHIP_STATUS, SHIP_STATUS_COLORS, type ShipType, type ShipSt
 import { getInitials } from '@/lib/utils'
 import { deleteShip, updateShipName } from '@/actions/ships'
 import { useRouter } from 'next/navigation'
+import { MarkdownContent } from '@/components/ui/markdown-content'
 import type { ShipWithOwner } from '@/types'
 
 interface ShipCardProps {
@@ -233,9 +234,9 @@ export function ShipCard({ ship, index = 0, currentUserId, isAdmin, imageUrl }: 
         )}
 
         {ship.notes && (
-          <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border line-clamp-2">
-            {ship.notes}
-          </p>
+          <div className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border line-clamp-2">
+            <MarkdownContent inline>{ship.notes}</MarkdownContent>
+          </div>
         )}
 
         <AnimatePresence>

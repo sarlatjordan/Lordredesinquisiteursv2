@@ -26,6 +26,7 @@ import { deleteOperation, saveOperationDebrief, updateOperation } from '@/action
 import type { OperationWithDetails, Profile, InventoryItemWithStock } from '@/types'
 import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react'
 import { MarkdownEditor } from '@/components/ui/markdown-editor'
+import { MarkdownContent } from '@/components/ui/markdown-content'
 import { Label } from '@/components/ui/label'
 
 interface OperationDetailProps {
@@ -245,7 +246,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
             >
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Briefing</h3>
               <div className="rounded-lg border border-border bg-muted/20 p-4">
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{op.description}</p>
+                <div className="text-sm text-foreground leading-relaxed"><MarkdownContent>{op.description}</MarkdownContent></div>
               </div>
             </motion.section>
           ) : null}
@@ -401,7 +402,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
           ) : (
             op.debrief && (
               <div className="rounded-lg border border-border bg-muted/20 p-4">
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{op.debrief}</p>
+                <div className="text-sm text-foreground leading-relaxed"><MarkdownContent>{op.debrief}</MarkdownContent></div>
               </div>
             )
           )}

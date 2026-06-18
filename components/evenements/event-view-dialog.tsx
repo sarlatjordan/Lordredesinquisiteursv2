@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from '@/components/ui/badge'
 import { formatDateTime, formatRelativeTime, buildGoogleCalendarUrl } from '@/lib/utils'
 import { EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_STATUS, type EventType, type EventStatus } from '@/lib/constants'
+import { MarkdownContent } from '@/components/ui/markdown-content'
 import type { EventWithDetails } from '@/types'
 
 interface EventViewDialogProps {
@@ -93,7 +94,7 @@ export function EventViewDialog({ event, open, onClose }: EventViewDialogProps) 
 
           {event.description && (
             <div className="border-t border-border pt-4">
-              <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{event.description}</p>
+              <div className="text-sm text-foreground/90 leading-relaxed"><MarkdownContent>{event.description}</MarkdownContent></div>
             </div>
           )}
 
@@ -112,9 +113,7 @@ export function EventViewDialog({ event, open, onClose }: EventViewDialogProps) 
                 <FileText className="h-3.5 w-3.5" />
                 Rapport
               </p>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed italic">
-                {event.report}
-              </p>
+              <div className="text-sm text-muted-foreground leading-relaxed italic"><MarkdownContent>{event.report}</MarkdownContent></div>
             </div>
           )}
 
