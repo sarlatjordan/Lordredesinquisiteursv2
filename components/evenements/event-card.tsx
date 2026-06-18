@@ -36,14 +36,14 @@ export function EventCard({
   const isMaybeAttending = event.attendees?.some(
     (a) => a.profile_id === currentUserId && a.status === 'peut_etre'
   )
-  const isPast = event.status === 'termine' || event.status === 'annule'
-  const isCancelled = event.status === 'annule'
+  const isPast = event.status === 'completed' || event.status === 'cancelled'
+  const isCancelled = event.status === 'cancelled'
 
   const statusColor: Record<EventStatus, string> = {
-    planifie: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
-    en_cours: 'text-green-400 bg-green-400/10 border-green-400/30',
-    termine:  'text-muted-foreground bg-muted/50 border-border',
-    annule:   'text-destructive bg-destructive/10 border-destructive/30',
+    planned:   'text-blue-400 bg-blue-400/10 border-blue-400/30',
+    active:    'text-green-400 bg-green-400/10 border-green-400/30',
+    completed: 'text-muted-foreground bg-muted/50 border-border',
+    cancelled: 'text-destructive bg-destructive/10 border-destructive/30',
   }
 
   return (

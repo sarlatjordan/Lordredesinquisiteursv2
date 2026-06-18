@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache'
+﻿import { unstable_cache } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { MediaGallery, Event } from '@/types'
 
@@ -24,7 +24,7 @@ export const getPublicCalendarEvents = unstable_cache(
       .from('events')
       .select('id, title, type, status, start_at, end_at, location, description, min_privilege')
       .eq('min_privilege', 0)
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .gte('start_at', start)
       .lte('start_at', end)
       .order('start_at', { ascending: true })
@@ -33,3 +33,4 @@ export const getPublicCalendarEvents = unstable_cache(
   ['public-calendar'],
   { revalidate: 900, tags: ['public-calendar'] }
 )
+

@@ -111,7 +111,7 @@ export const EventCreateSchema = z.object({
 export type EventCreateInput = z.infer<typeof EventCreateSchema>
 
 export const EventUpdateSchema = EventCreateSchema.extend({
-  status: z.enum(['planifie', 'en_cours', 'termine', 'annule']).optional(),
+  status: z.enum(['planned', 'active', 'completed', 'cancelled']).optional(),
 })
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>
 
@@ -199,7 +199,7 @@ export const OperationCreateSchema = z.object({
   title: z.string().min(3, 'Titre requis (min. 3 car.)').max(100),
   system_name: z.string().min(1, 'Système requis').max(100),
   type: z.enum(['combat', 'salvage', 'mining', 'commerce', 'infiltration', 'rescue']),
-  status: z.enum(['planifie', 'en_cours', 'termine', 'annule']).default('planifie'),
+  status: z.enum(['planned', 'active', 'completed', 'cancelled']).default('planned'),
   departure_at: z.string().min(1, 'Date de départ requise'),
   estimated_duration_min: z.preprocess(
     (v) => (v === '' || v === null || v === undefined ? undefined : Number(v)),

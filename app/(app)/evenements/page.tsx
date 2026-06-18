@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { EventsClient } from './events-client'
 import type { EventWithDetails, EventAttendee } from '@/types'
@@ -40,7 +40,7 @@ export default async function EvenementsPage() {
     supabase
       .from('events')
       .select('*')
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .gte('start_at', now)
       .lte('min_privilege', userPrivilege)
       .order('start_at', { ascending: true }),
@@ -48,7 +48,7 @@ export default async function EvenementsPage() {
     supabase
       .from('events')
       .select('*')
-      .in('status', ['termine', 'annule'])
+      .in('status', ['completed', 'cancelled'])
       .lte('min_privilege', userPrivilege)
       .order('start_at', { ascending: false })
       .limit(20),
@@ -56,7 +56,7 @@ export default async function EvenementsPage() {
     supabase
       .from('events')
       .select('*')
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .lt('start_at', now)
       .lte('min_privilege', userPrivilege)
       .order('start_at', { ascending: false })
@@ -103,3 +103,4 @@ export default async function EvenementsPage() {
     />
   )
 }
+

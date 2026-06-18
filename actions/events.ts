@@ -64,7 +64,7 @@ export async function createEvent(
       description: parsed.data.description || null,
       system_name: parsed.data.location || 'À définir',
       type: 'combat',
-      status: 'planifie',
+      status: 'planned',
       departure_at: parsed.data.start_at,
       risk_level: 'medium',
       min_privilege: parsed.data.min_privilege ?? 100,
@@ -226,7 +226,7 @@ export async function unregisterFromEvent(eventId: string): Promise<ActionResult
 
 export async function updateEventStatus(
   eventId: string,
-  status: 'planifie' | 'en_cours' | 'termine' | 'annule'
+  status: 'planned' | 'active' | 'completed' | 'cancelled'
 ): Promise<ActionResult> {
   const { supabase, user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }

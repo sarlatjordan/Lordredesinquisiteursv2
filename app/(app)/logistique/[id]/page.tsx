@@ -95,7 +95,7 @@ export default async function ItemPage({
     ? await supabase
         .from('operations')
         .select('id, title')
-        .in('status', ['planifie', 'en_cours'])
+        .in('status', ['planned', 'active'])
         .order('departure_at')
     : { data: [] }
 

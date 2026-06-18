@@ -18,7 +18,7 @@ interface OpCardProps {
 }
 
 export function OpCard({ op, index = 0 }: OpCardProps) {
-  const isPast = op.status === 'termine' || op.status === 'annule'
+  const isPast = op.status === 'completed' || op.status === 'cancelled'
   const opType = op.type as OpType
   const opStatus = op.status as OpStatus
   const opRisk = op.risk_level as OpRisk

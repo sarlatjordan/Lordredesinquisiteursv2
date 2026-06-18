@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from 'next/server'
+﻿import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyIcsToken } from '@/lib/ics-token'
 import { isUUID } from '@/lib/utils'
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
   const { data: events } = await supabase
     .from('events')
     .select('*')
-    .in('status', ['planifie', 'en_cours'])
+    .in('status', ['planned', 'active'])
     .gte('start_at', new Date().toISOString())
     .lte('min_privilege', userPrivilege)
     .order('start_at', { ascending: true })
@@ -112,3 +112,4 @@ export async function GET(request: NextRequest) {
     },
   })
 }
+

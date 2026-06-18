@@ -44,12 +44,12 @@ export default async function DashboardPage() {
     { data: attendeeCounts },
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('events').select('*', { count: 'exact', head: true }).in('status', ['planifie', 'en_cours']),
+    supabase.from('events').select('*', { count: 'exact', head: true }).in('status', ['planned', 'active']),
     supabase.from('ships').select('*', { count: 'exact', head: true }),
     supabase
       .from('events')
       .select('*')
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .gte('start_at', new Date().toISOString())
       .order('start_at', { ascending: true })
       .limit(5),
@@ -222,4 +222,5 @@ export default async function DashboardPage() {
     </div>
   )
 }
+
 

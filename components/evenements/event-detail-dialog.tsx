@@ -80,7 +80,7 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
     startTransition(async () => {
       const result = await updateEvent(event!.id, {
         ...data,
-        status: data.status ?? event!.status as 'planifie' | 'en_cours' | 'termine' | 'annule',
+        status: data.status ?? event!.status as 'planned' | 'active' | 'completed' | 'cancelled',
       })
       if (result.success) {
         router.refresh()
@@ -154,7 +154,7 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
     title: event.title,
     description: event.description ?? '',
     type: event.type as 'operation' | 'reunion' | 'formation' | 'social' | 'autre',
-    status: event.status as 'planifie' | 'en_cours' | 'termine' | 'annule',
+    status: event.status as 'planned' | 'active' | 'completed' | 'cancelled',
     start_at: toDatetimeLocal(event.start_at),
     end_at: toDatetimeLocal(event.end_at),
     location: event.location ?? '',
@@ -170,7 +170,7 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
           <DialogDescription>Gestion de l&apos;événement — édition, participants et rapport</DialogDescription>
         </DialogHeader>
 
-        {event.status !== 'annule' && event.status !== 'termine' && (
+        {event.status !== 'cancelled' && event.status !== 'completed' && (
           <div className="flex flex-wrap gap-2 -mt-1">
             <a
               href={buildGoogleCalendarUrl(event)}

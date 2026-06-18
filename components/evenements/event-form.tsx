@@ -14,7 +14,7 @@ interface EventFormValues {
   title: string
   description?: string
   type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
-  status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+  status?: 'planned' | 'active' | 'completed' | 'cancelled'
   start_at: string
   end_at?: string
   location?: string
@@ -28,7 +28,7 @@ export interface EventFormData {
   title: string
   description?: string
   type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
-  status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+  status?: 'planned' | 'active' | 'completed' | 'cancelled'
   start_at: string
   end_at?: string
   location?: string
@@ -71,7 +71,7 @@ export function EventForm({
     defaultValues: {
       type: 'operation',
       min_privilege: '0',
-      status: 'planifie',
+      status: 'planned',
       sendToDiscord: false,
       createOperation: false,
       ...defaultValues,

@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+﻿import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -54,7 +54,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
     admin
       .from('events')
       .select('*')
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .eq('min_privilege', 0)
       .gte('start_at', new Date().toISOString())
       .order('start_at', { ascending: true })
@@ -99,3 +99,4 @@ export default async function RootPage({ searchParams }: RootPageProps) {
     </div>
   )
 }
+

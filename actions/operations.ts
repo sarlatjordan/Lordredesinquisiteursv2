@@ -59,9 +59,9 @@ export async function updateOperation(
 
   const { role_slots: _slots, ...opData } = input
 
-  if (opData.status && ['termine', 'annule'].includes(opData.status)) {
+  if (opData.status && ['completed', 'cancelled'].includes(opData.status)) {
     try {
-      await releaseAllOpResources(id, user.id, supabase, opData.status as 'termine' | 'annule')
+      await releaseAllOpResources(id, user.id, supabase, opData.status as 'completed' | 'cancelled')
     } catch (err) {
       return { success: false, error: err instanceof Error ? err.message : 'Erreur mise à jour inventaire' }
     }
@@ -86,7 +86,7 @@ async function releaseAllOpResources(
   operationId: string,
   userId: string,
   supabase: SupabaseClient<Database>,
-  opStatus: 'termine' | 'annule' = 'annule'
+  opStatus: 'completed' | 'cancelled' = 'cancelled'
 ): Promise<void> {
   const { data: reserved } = await supabase
     .from('op_resources')
@@ -96,7 +96,7 @@ async function releaseAllOpResources(
 
   if (!reserved?.length) return
 
-  const isCompleted = opStatus === 'termine'
+  const isCompleted = opStatus === 'completed'
   const withItem = reserved.filter((r): r is typeof r & { item_id: string } => r.item_id !== null)
   if (!withItem.length) return
 

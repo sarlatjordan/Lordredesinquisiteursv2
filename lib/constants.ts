@@ -133,10 +133,10 @@ export const EVENT_TYPE_COLORS: Record<EventType, string> = {
 }
 
 export const EVENT_STATUS = {
-  planifie: 'Planifié',
-  en_cours: 'En cours',
-  termine: 'Terminé',
-  annule: 'Annulé',
+  planned:   'Planifié',
+  active:    'En cours',
+  completed: 'Terminé',
+  cancelled: 'Annulé',
 } as const
 
 export type EventStatus = keyof typeof EVENT_STATUS
@@ -247,18 +247,18 @@ export const OP_TYPE_COLORS: Record<OpType, string> = {
 }
 
 export const OP_STATUS = {
-  planifie:  'Planifiée',
-  en_cours:  'En cours',
-  termine:   'Terminée',
-  annule:    'Annulée',
+  planned:   'Planifiée',
+  active:    'En cours',
+  completed: 'Terminée',
+  cancelled: 'Annulée',
 } as const
 export type OpStatus = keyof typeof OP_STATUS
 
 export const OP_STATUS_COLORS: Record<OpStatus, string> = {
-  planifie:  'text-blue-400 bg-blue-400/10 border-blue-400/30',
-  en_cours:  'text-green-400 bg-green-400/10 border-green-400/30',
-  termine:   'text-muted-foreground bg-muted/50 border-border',
-  annule:    'text-destructive bg-destructive/10 border-destructive/30',
+  planned:   'text-blue-400 bg-blue-400/10 border-blue-400/30',
+  active:    'text-green-400 bg-green-400/10 border-green-400/30',
+  completed: 'text-muted-foreground bg-muted/50 border-border',
+  cancelled: 'text-destructive bg-destructive/10 border-destructive/30',
 }
 
 export const OP_RISK = {

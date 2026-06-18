@@ -12,12 +12,12 @@ interface DiscordScheduledEvent {
   entity_metadata?: { location?: string | null } | null
 }
 
-function mapStatus(status: number | undefined): 'planifie' | 'en_cours' | 'termine' | 'annule' {
+function mapStatus(status: number | undefined): 'planned' | 'active' | 'completed' | 'cancelled' {
   switch (status) {
-    case 2: return 'en_cours'
-    case 3: return 'termine'
-    case 4: return 'annule'
-    default: return 'planifie'
+    case 2: return 'active'
+    case 3: return 'completed'
+    case 4: return 'cancelled'
+    default: return 'planned'
   }
 }
 

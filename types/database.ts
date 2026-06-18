@@ -71,7 +71,7 @@ export interface Database {
           title: string
           description: string | null
           type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
-          status: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at: string
           end_at: string | null
           location: string | null
@@ -88,7 +88,7 @@ export interface Database {
           title: string
           description?: string | null
           type?: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
-          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at: string
           end_at?: string | null
           location?: string | null
@@ -105,7 +105,7 @@ export interface Database {
           title?: string
           description?: string | null
           type?: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
-          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at?: string
           end_at?: string | null
           location?: string | null
@@ -497,7 +497,7 @@ export interface Database {
           title: string
           system_name: string
           type: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status: 'planned' | 'active' | 'completed' | 'cancelled'
           departure_at: string
           estimated_duration_min: number | null
           risk_level: 'low' | 'medium' | 'high' | 'critical'
@@ -514,7 +514,7 @@ export interface Database {
           title: string
           system_name: string
           type: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
           departure_at: string
           estimated_duration_min?: number | null
           risk_level?: 'low' | 'medium' | 'high' | 'critical'
@@ -531,7 +531,7 @@ export interface Database {
           title?: string
           system_name?: string
           type?: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
           departure_at?: string
           estimated_duration_min?: number | null
           risk_level?: 'low' | 'medium' | 'high' | 'critical'

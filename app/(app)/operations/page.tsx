@@ -33,12 +33,12 @@ export default async function OperationsPage() {
     supabase
       .from('operations')
       .select(cols)
-      .in('status', ['planifie', 'en_cours'])
+      .in('status', ['planned', 'active'])
       .order('departure_at', { ascending: true }),
     supabase
       .from('operations')
       .select(cols)
-      .in('status', ['termine', 'annule'])
+      .in('status', ['completed', 'cancelled'])
       .order('departure_at', { ascending: false })
       .limit(20),
   ])

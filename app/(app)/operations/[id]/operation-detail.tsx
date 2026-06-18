@@ -53,7 +53,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
   const opStatus  = op.status    as OpStatus
   const opRisk    = op.risk_level as OpRisk
 
-  const isPast = opStatus === 'termine' || opStatus === 'annule'
+  const isPast = opStatus === 'completed' || opStatus === 'cancelled'
   const isCommanderOrManager = canManage || op.commander_id === currentUserId
 
   const confirmedRegistrations = (op.registrations ?? []).filter((r) => r.status === 'confirmed')
@@ -73,7 +73,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
     })
   }
 
-  function handleStatus(status: 'en_cours' | 'termine' | 'annule') {
+  function handleStatus(status: 'active' | 'completed' | 'cancelled') {
     setActionError(null)
     setLoadingStatus(status)
     startTransition(async () => {
@@ -120,35 +120,35 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
           <div className="ml-auto flex items-center gap-2 flex-wrap">
             {canManage && (
               <>
-                {opStatus === 'planifie' && (
+                {opStatus === 'planned' && (
                   <Button
                     size="sm" variant="outline"
                     className="h-8 gap-1.5 text-xs text-blue-400 border-blue-400/30 hover:bg-blue-400/10"
                     disabled={isPending}
-                    onClick={() => handleStatus('en_cours')}
+                    onClick={() => handleStatus('active')}
                   >
-                    {loadingStatus === 'en_cours' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlayCircle className="h-3.5 w-3.5" />}
+                    {loadingStatus === 'active' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlayCircle className="h-3.5 w-3.5" />}
                     Lancer
                   </Button>
                 )}
-                {(opStatus === 'planifie' || opStatus === 'en_cours') && (
+                {(opStatus === 'planned' || opStatus === 'active') && (
                   <>
                     <Button
                       size="sm" variant="outline"
                       className="h-8 gap-1.5 text-xs text-green-400 border-green-400/30 hover:bg-green-400/10"
                       disabled={isPending}
-                      onClick={() => handleStatus('termine')}
+                      onClick={() => handleStatus('completed')}
                     >
-                      {loadingStatus === 'termine' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                      {loadingStatus === 'completed' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                       Terminer
                     </Button>
                     <Button
                       size="sm" variant="outline"
                       className="h-8 gap-1.5 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
                       disabled={isPending}
-                      onClick={() => handleStatus('annule')}
+                      onClick={() => handleStatus('cancelled')}
                     >
-                      {loadingStatus === 'annule' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
+                      {loadingStatus === 'cancelled' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                       Annuler
                     </Button>
                   </>
@@ -412,7 +412,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
       )}
 
       {/* Section Butin */}
-      {(op.status === 'termine' || loots.length > 0) && (
+      {(op.status === 'completed' || loots.length > 0) && (
         <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <div className="rounded-lg border border-border bg-muted/20 p-4">
             <LootPanel
