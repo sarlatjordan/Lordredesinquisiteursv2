@@ -25,7 +25,7 @@ import { OpResourcesPanel } from '@/components/operations/op-resources-panel'
 import { deleteOperation, saveOperationDebrief, updateOperation } from '@/actions/operations'
 import type { OperationWithDetails, Profile, InventoryItemWithStock } from '@/types'
 import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Label } from '@/components/ui/label'
 
 interface OperationDetailProps {
@@ -375,13 +375,12 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="debrief" className="sr-only">Débrief</Label>
-                <Textarea
+                <MarkdownEditor
                   id="debrief"
                   value={debrief}
-                  onChange={(e) => { setDebrief(e.target.value); setDebriefSaved(false) }}
+                  onChange={(v) => { setDebrief(v); setDebriefSaved(false) }}
                   placeholder="Résumé de l'opération, résultats, points d'amélioration…"
                   rows={8}
-                  className="resize-y"
                 />
               </div>
               {debriefError && (

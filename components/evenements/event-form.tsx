@@ -5,7 +5,7 @@ import { Loader2, Send, Swords } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EVENT_TYPES, EVENT_STATUS, ROLES, ROLE_PRIVILEGES, type Role } from '@/lib/constants'
@@ -116,7 +116,19 @@ export function EventForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="description">Description</Label>
-        <Textarea id="description" placeholder="Détails de l'événement…" rows={3} {...register('description')} />
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <MarkdownEditor
+              id="description"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              placeholder="Détails de l'événement…"
+              rows={3}
+            />
+          )}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-3">

@@ -6,7 +6,7 @@ import { Loader2, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
@@ -175,7 +175,19 @@ export function ShipForm({ onSubmit, isPending = false, onCancel }: ShipFormProp
       {/* Notes */}
       <div className="space-y-1.5">
         <Label htmlFor="notes">Notes</Label>
-        <Textarea id="notes" placeholder="Rôle, équipements particuliers…" rows={2} {...register('notes')} />
+        <Controller
+          name="notes"
+          control={control}
+          render={({ field }) => (
+            <MarkdownEditor
+              id="notes"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              placeholder="Rôle, équipements particuliers…"
+              rows={2}
+            />
+          )}
+        />
       </div>
 
       {/* Vaisseau de l'org */}

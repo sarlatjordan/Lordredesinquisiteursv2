@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   PARTNERSHIP_TYPES, PARTNERSHIP_RELATIONS, PARTNERSHIP_STATUS,
@@ -95,25 +95,23 @@ export function PartnershipForm({ initialData, onSubmit, isPending, onCancel }: 
 
       <div className="space-y-1.5">
         <Label htmlFor="p-terms">Termes / Conditions</Label>
-        <Textarea
+        <MarkdownEditor
           id="p-terms"
           value={terms}
-          onChange={(e) => setTerms(e.target.value)}
+          onChange={setTerms}
           placeholder="Termes de l'accord, conditions de l'alliance, zones d'opérations communes…"
           rows={4}
-          className="resize-none"
         />
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="p-notes">Notes internes</Label>
-        <Textarea
+        <MarkdownEditor
           id="p-notes"
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={setNotes}
           placeholder="Contexte, historique des relations, points de vigilance…"
           rows={3}
-          className="resize-none"
         />
       </div>
 

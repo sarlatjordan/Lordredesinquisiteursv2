@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -233,13 +233,12 @@ export function OpForm({ initialData, members, onSubmit, isPending, onCancel, sh
       {/* Description / briefing */}
       <div className="space-y-1.5">
         <Label htmlFor="op-desc">Briefing</Label>
-        <Textarea
+        <MarkdownEditor
           id="op-desc"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={setDescription}
           placeholder="Objectifs, contexte, consignes tactiques..."
           rows={4}
-          className="resize-none"
         />
       </div>
 

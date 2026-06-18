@@ -24,16 +24,12 @@ import {
   Check as CheckIcon,
   Link2,
   Upload,
-  Bold,
-  Italic,
-  Underline,
-  Heading1,
-  Heading2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -109,97 +105,6 @@ function Feedback({ status, error }: { status: SaveStatus; error?: string }) {
   );
 }
 
-// ─── Bio editor avec toolbar markdown ────────────────────────────────────────
-
-function BioEditor({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-
-  function wrap(before: string, after: string) {
-    const ta = ref.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = value.slice(start, end);
-    const next = value.slice(0, start) + before + selected + after + value.slice(end);
-    onChange(next);
-    requestAnimationFrame(() => {
-      ta.focus();
-      ta.setSelectionRange(start + before.length, end + before.length);
-    });
-  }
-
-  function insertHeading(level: number) {
-    const ta = ref.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    const prefix = "#".repeat(level) + " ";
-    onChange(value.slice(0, lineStart) + prefix + value.slice(lineStart));
-    requestAnimationFrame(() => {
-      ta.focus();
-      ta.setSelectionRange(start + prefix.length, start + prefix.length);
-    });
-  }
-
-  function ToolBtn({
-    onClick,
-    title,
-    children,
-  }: {
-    onClick: () => void;
-    title: string;
-    children: React.ReactNode;
-  }) {
-    return (
-      <button
-        type="button"
-        title={title}
-        onClick={onClick}
-        className="flex items-center justify-center h-7 w-7 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        {children}
-      </button>
-    );
-  }
-
-  return (
-    <div className="space-y-0">
-      <div className="flex items-center gap-0.5 px-2 py-1 rounded-t-md border border-b-0 border-input bg-muted/40">
-        <ToolBtn onClick={() => insertHeading(1)} title="Titre H1">
-          <Heading1 className="h-3.5 w-3.5" />
-        </ToolBtn>
-        <ToolBtn onClick={() => insertHeading(2)} title="Sous-titre H2">
-          <Heading2 className="h-3.5 w-3.5" />
-        </ToolBtn>
-        <div className="w-px h-4 bg-border mx-1" />
-        <ToolBtn onClick={() => wrap("**", "**")} title="Gras">
-          <Bold className="h-3.5 w-3.5" />
-        </ToolBtn>
-        <ToolBtn onClick={() => wrap("*", "*")} title="Italique">
-          <Italic className="h-3.5 w-3.5" />
-        </ToolBtn>
-        <ToolBtn onClick={() => wrap("<u>", "</u>")} title="Souligné">
-          <Underline className="h-3.5 w-3.5" />
-        </ToolBtn>
-      </div>
-      <Textarea
-        ref={ref}
-        id="bio"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Quelques mots sur toi… (markdown supporté)"
-        rows={4}
-        className="rounded-t-none font-mono text-sm"
-      />
-    </div>
-  );
-}
 
 // ─── Section identité ─────────────────────────────────────────────────────────
 
@@ -331,9 +236,12 @@ function SectionIdentite({
 
         <div className="space-y-1.5">
           <Label htmlFor="bio">Bio</Label>
-          <BioEditor
+          <MarkdownEditor
+            id="bio"
             value={bioValue}
             onChange={(v) => setValue("bio", v)}
+            placeholder="Quelques mots sur toi… (markdown supporté)"
+            rows={4}
           />
         </div>
 

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { EventForm, type EventFormData } from './event-form'
 import {
@@ -321,13 +321,12 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
           <TabsContent value="report" className="mt-4 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="report">Rapport d&apos;événement</Label>
-              <Textarea
+              <MarkdownEditor
                 id="report"
                 value={report}
-                onChange={(e) => { setReport(e.target.value); setReportSaved(false) }}
+                onChange={(v) => { setReport(v); setReportSaved(false) }}
                 placeholder="Résumé de l'événement, notes de l'organisateur, résultats…"
                 rows={10}
-                className="resize-y"
               />
             </div>
             {reportError && (
