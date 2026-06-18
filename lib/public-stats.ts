@@ -21,7 +21,7 @@ export const getPublicStats = unstable_cache(
       ] = await Promise.all([
         admin.from('profiles').select('*', { count: 'exact', head: true }).eq('is_active', true),
         admin.from('ships').select('*', { count: 'exact', head: true }),
-        admin.from('operations').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+        admin.from('operations').select('*', { count: 'exact', head: true }).eq('status', 'termine'),
         admin
           .from('operations')
           .select('*', { count: 'exact', head: true })

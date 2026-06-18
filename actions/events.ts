@@ -64,7 +64,7 @@ export async function createEvent(
       description: parsed.data.description || null,
       system_name: parsed.data.location || 'À définir',
       type: 'combat',
-      status: 'planned',
+      status: 'planifie',
       departure_at: parsed.data.start_at,
       risk_level: 'medium',
       min_privilege: parsed.data.min_privilege ?? 100,

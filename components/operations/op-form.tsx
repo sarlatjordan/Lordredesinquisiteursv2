@@ -36,7 +36,7 @@ export function OpForm({ initialData, members, onSubmit, isPending, onCancel, sh
   const [title, setTitle] = useState(initialData?.title ?? '')
   const [systemName, setSystemName] = useState(initialData?.system_name ?? '')
   const [type, setType] = useState<OpType>((initialData?.type as OpType) ?? 'combat')
-  const [status, setStatus] = useState<OpStatus>((initialData?.status as OpStatus) ?? 'planned')
+  const [status, setStatus] = useState<OpStatus>((initialData?.status as OpStatus) ?? 'planifie')
   const [departureAt, setDepartureAt] = useState(initialData?.departure_at ?? '')
   const [durationMin, setDurationMin] = useState(initialData?.estimated_duration_min?.toString() ?? '')
   const [riskLevel, setRiskLevel] = useState<OpRisk>((initialData?.risk_level as OpRisk) ?? 'medium')

@@ -199,7 +199,7 @@ export const OperationCreateSchema = z.object({
   title: z.string().min(3, 'Titre requis (min. 3 car.)').max(100),
   system_name: z.string().min(1, 'Système requis').max(100),
   type: z.enum(['combat', 'salvage', 'mining', 'commerce', 'infiltration', 'rescue']),
-  status: z.enum(['planned', 'active', 'completed', 'cancelled']).default('planned'),
+  status: z.enum(['planifie', 'en_cours', 'termine', 'annule']).default('planifie'),
   departure_at: z.string().min(1, 'Date de départ requise'),
   estimated_duration_min: z.preprocess(
     (v) => (v === '' || v === null || v === undefined ? undefined : Number(v)),
