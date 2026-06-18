@@ -19,13 +19,6 @@
 
 ### 🚀 Features planifiées
 
-#### P1 — Prochainement
-
-| ID | Item | Description |
-|---|---|---|
-| FEAT-31 | Pipeline Kanban candidatures | Vue Kanban (Reçu → En discussion → Accepté/Refusé) pour le Conseil, remplace la liste plate `/admin/candidatures`. |
-| FEAT-33 | Recherche globale | Barre de recherche unifiée sur membres, ressources, opérations et événements. |
-
 #### P2 — Planifié
 
 | ID | Item | Description |
@@ -95,6 +88,8 @@
 | FEAT-21 | Authentification Google OAuth (PKCE) | 2026-06-06 |
 | FEAT-22 | MFA TOTP — enrollment `/profil` + challenge universel `/mfa` | 2026-06-06 |
 | FEAT-23 | Bouton Discord OAuth sur `/login` | 2026-06-06 |
+| FEAT-31 | Pipeline Kanban candidatures — migration 039, statut `en_discussion`, 4 colonnes | 2026-06-18 |
+| FEAT-33 | Recherche globale Ctrl+K — membres, ressources, opérations, événements | 2026-06-18 |
 
 ---
 
