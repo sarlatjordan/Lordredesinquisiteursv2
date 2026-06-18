@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, CalendarDays, LayoutGrid, Rows3 } from 'lucide-react'
+import { Plus, CalendarDays, LayoutGrid, Rows3, Target, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -79,7 +80,17 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Événements</h2>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="text-2xl font-bold text-foreground">Événements</h2>
+            <Link
+              href="/operations"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-primary/30 bg-primary/5 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Target className="h-3 w-3" />
+              Opérations
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             {upcomingEvents.length} à venir · {allEvents.length} total
           </p>

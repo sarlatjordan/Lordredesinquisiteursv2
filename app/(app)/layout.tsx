@@ -77,7 +77,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
       {/* Contenu principal */}
       <div className="lg:pl-64 flex flex-col min-h-screen">
-        <TopBar unreadCount={unreadCount} notifications={notifications} />
+        <TopBar unreadCount={unreadCount} notifications={notifications} profile={profile} />
         <main className="flex-1 relative">
           <PageBackground />
           <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">

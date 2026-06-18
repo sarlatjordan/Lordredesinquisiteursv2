@@ -16,18 +16,56 @@ export interface NavLink {
   href: string
   label: string
   icon: LucideIcon
-  badge?: number
 }
 
+export interface NavGroup {
+  id: string
+  label: string
+  links: NavLink[]
+}
+
+export const NAV_STANDALONE: NavLink[] = [
+  { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { href: '/messages',  label: 'Messages',         icon: MessagesSquare },
+]
+
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    id: 'combat',
+    label: 'Combat & Missions',
+    links: [
+      { href: '/evenements',  label: 'Événements',  icon: CalendarDays },
+      { href: '/operations',  label: 'Opérations',  icon: Target },
+    ],
+  },
+  {
+    id: 'org',
+    label: 'Org',
+    links: [
+      { href: '/membres',      label: 'Membres',      icon: Users },
+      { href: '/partenariats', label: 'Partenariats', icon: Handshake },
+    ],
+  },
+  {
+    id: 'ressources',
+    label: 'Ressources internes',
+    links: [
+      { href: '/flotte',     label: 'Flotte',     icon: Rocket },
+      { href: '/logistique', label: 'Logistique', icon: Package },
+      { href: '/carte',      label: 'Carte',      icon: Map },
+    ],
+  },
+  {
+    id: 'references',
+    label: 'Références',
+    links: [
+      { href: '/ressources', label: 'Wiki', icon: BookOpen },
+    ],
+  },
+]
+
+// Flat list pour la top-bar (titre de page) et la mobile nav
 export const NAV_LINKS: NavLink[] = [
-  { href: '/dashboard',    label: 'Tableau de bord', icon: LayoutDashboard },
-  { href: '/messages',     label: 'Messages',         icon: MessagesSquare },
-  { href: '/membres',      label: 'Membres',          icon: Users },
-  { href: '/evenements',   label: 'Événements',       icon: CalendarDays },
-  { href: '/operations',   label: 'Opérations',       icon: Target },
-  { href: '/logistique',   label: 'Logistique',        icon: Package },
-  { href: '/partenariats', label: 'Partenariats',      icon: Handshake },
-  { href: '/carte',        label: 'Carte',             icon: Map },
-  { href: '/flotte',       label: 'Flotte',           icon: Rocket },
-  { href: '/ressources',   label: 'Ressources',       icon: BookOpen },
+  ...NAV_STANDALONE,
+  ...NAV_GROUPS.flatMap((g) => g.links),
 ]
