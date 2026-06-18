@@ -142,6 +142,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
           </div>
 
           {canCreate && (
+            <>
             <AvailabilityTips open={isCreateOpen} />
             <Dialog open={isCreateOpen} onOpenChange={(v) => { setIsCreateOpen(v); if (!v) setCreateError(null) }}>
               <DialogTrigger asChild>
@@ -165,6 +166,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
                 />
               </DialogContent>
             </Dialog>
+            </>
           )}
         </div>
       </div>

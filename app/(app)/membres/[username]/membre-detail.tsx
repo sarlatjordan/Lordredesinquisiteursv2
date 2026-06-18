@@ -1,6 +1,11 @@
 'use client'
 
 import Markdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
+
+const bioSanitize = { ...defaultSchema, tagNames: [...(defaultSchema.tagNames ?? []), 'u'] }
+const bioRehype = [rehypeRaw, [rehypeSanitize, bioSanitize]] as Parameters<typeof Markdown>[0]['rehypePlugins']
 import { motion } from 'framer-motion'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -96,7 +101,7 @@ export function MembreDetail({
 
           {profile.bio && (
             <div className="text-sm text-muted-foreground pt-1 max-w-lg prose prose-sm prose-invert prose-p:my-1 prose-headings:text-foreground prose-headings:font-semibold prose-h1:text-base prose-h2:text-sm">
-              <Markdown>{profile.bio}</Markdown>
+              <Markdown rehypePlugins={bioRehype}>{profile.bio}</Markdown>
             </div>
           )}
         </div>

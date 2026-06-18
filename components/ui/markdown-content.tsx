@@ -1,7 +1,15 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import { cn } from '@/lib/utils'
+
+const sanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), 'u'],
+}
+const rehypePlugins = [rehypeRaw, [rehypeSanitize, sanitizeSchema]] as Parameters<typeof ReactMarkdown>[0]['rehypePlugins']
 
 interface MarkdownContentProps {
   children: string
@@ -13,6 +21,7 @@ export function MarkdownContent({ children, className, inline = false }: Markdow
   if (inline) {
     return (
       <ReactMarkdown
+        rehypePlugins={rehypePlugins}
         components={{
           p: ({ children }) => <span className={className}>{children}</span>,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -29,6 +38,7 @@ export function MarkdownContent({ children, className, inline = false }: Markdow
 
   return (
     <ReactMarkdown
+      rehypePlugins={rehypePlugins}
       components={{
         p: ({ children }) => <p className={cn('mb-2 last:mb-0', className)}>{children}</p>,
         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,

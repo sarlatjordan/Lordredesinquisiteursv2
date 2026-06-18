@@ -8,6 +8,11 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
+
+const sanitizeSchema = { ...defaultSchema, tagNames: [...(defaultSchema.tagNames ?? []), 'u'] }
+const rehypePlugins = [rehypeRaw, [rehypeSanitize, sanitizeSchema]] as Parameters<typeof ReactMarkdown>[0]['rehypePlugins']
 import type { ChatMessageWithAuthor } from '@/types'
 
 interface ChatWindowProps {
@@ -79,6 +84,7 @@ export function ChatWindow({
                 )}
               >
                 <ReactMarkdown
+                  rehypePlugins={rehypePlugins}
                   components={{
                     p: ({ children }) => <span>{children}</span>,
                     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
