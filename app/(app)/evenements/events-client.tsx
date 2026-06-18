@@ -14,6 +14,7 @@ import { EventViewDialog } from '@/components/evenements/event-view-dialog'
 import { CalendarMonthView } from '@/components/evenements/calendar-month-view'
 import { CalendarWeekView } from '@/components/evenements/calendar-week-view'
 import { createEvent, registerForEvent, unregisterFromEvent } from '@/actions/events'
+import { AvailabilityTips } from '@/components/ui/availability-tips'
 import type { EventWithDetails } from '@/types'
 import { useRouter } from 'next/navigation'
 
@@ -141,6 +142,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
           </div>
 
           {canCreate && (
+            <AvailabilityTips open={isCreateOpen} />
             <Dialog open={isCreateOpen} onOpenChange={(v) => { setIsCreateOpen(v); if (!v) setCreateError(null) }}>
               <DialogTrigger asChild>
                 <Button size="sm" className="gap-1.5">

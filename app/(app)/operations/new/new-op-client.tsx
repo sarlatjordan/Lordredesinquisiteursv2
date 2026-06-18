@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { OpForm } from '@/components/operations/op-form'
 import { createOperation } from '@/actions/operations'
+import { AvailabilityTips } from '@/components/ui/availability-tips'
 import type { OperationCreateInput, Profile } from '@/types'
 import { AlertCircle } from 'lucide-react'
 
@@ -30,6 +31,7 @@ export function NewOpClient({ members }: NewOpClientProps) {
 
   return (
     <div className="space-y-4">
+      <AvailabilityTips open />
       {error && (
         <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
