@@ -497,7 +497,7 @@ export interface Database {
           title: string
           system_name: string
           type: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status: 'planned' | 'active' | 'completed' | 'cancelled'
+          status: 'planifie' | 'en_cours' | 'termine' | 'annule'
           departure_at: string
           estimated_duration_min: number | null
           risk_level: 'low' | 'medium' | 'high' | 'critical'
@@ -514,7 +514,7 @@ export interface Database {
           title: string
           system_name: string
           type: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
           departure_at: string
           estimated_duration_min?: number | null
           risk_level?: 'low' | 'medium' | 'high' | 'critical'
@@ -531,7 +531,7 @@ export interface Database {
           title?: string
           system_name?: string
           type?: 'combat' | 'salvage' | 'mining' | 'commerce' | 'infiltration' | 'rescue'
-          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          status?: 'planifie' | 'en_cours' | 'termine' | 'annule'
           departure_at?: string
           estimated_duration_min?: number | null
           risk_level?: 'low' | 'medium' | 'high' | 'critical'
