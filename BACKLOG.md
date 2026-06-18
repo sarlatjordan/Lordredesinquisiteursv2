@@ -24,11 +24,6 @@
 | ID | Item | Description |
 |---|---|---|
 | FEAT-25 | Planificateur composition de flotte | Avant une op, assigner les vaisseaux de la flotte aux slots de rôle (tank/support/DPS). Vue drag-and-drop sauvegardée sur l'opération. |
-| FEAT-26 | Tracker de disponibilité | Chaque membre indique ses créneaux dispo de la semaine. Page opérations affiche combien de membres sont dispo pour un slot donné. |
-| FEAT-27 | Système de loot / butin | Distribuer équitablement les gains d'une opération entre participants (points ou crédits internes tracés en DB). |
-| FEAT-28 | Journal de guerre | Après une op terminée, créer un "highlight" avec texte + screenshots. Consultable sur la landing publique. |
-| FEAT-29 | Badges / achievements | Achievements débloqués automatiquement (1ère op, 5 events, 1er rapport…). Affichés sur la fiche membre. |
-| FEAT-30 | Widget "Qui est en vocal" | Appel au bot Discord déjà connecté pour afficher les membres actuellement dans un canal vocal. |
 | FEAT-32 | Notifications push web | Alertes navigateur (Web Push API) quand une op commence, un event approche ou un message est reçu. |
 | FEAT-34 | Mode "en opération" | Statut activable "Je suis en jeu" visible sur le dashboard avec horodatage. |
 
@@ -88,6 +83,11 @@
 | FEAT-21 | Authentification Google OAuth (PKCE) | 2026-06-06 |
 | FEAT-22 | MFA TOTP — enrollment `/profil` + challenge universel `/mfa` | 2026-06-06 |
 | FEAT-23 | Bouton Discord OAuth sur `/login` | 2026-06-06 |
+| FEAT-26 | Tracker disponibilité hebdomadaire — grille 7j × 4 créneaux sur /profil, migration 040 | 2026-06-18 |
+| FEAT-27 | Loot panel opérations — distribution aUEC entre participants, badge Butinneur, migration 043 | 2026-06-18 |
+| FEAT-28 | Journal de guerre — admin CRUD MI+, section landing publique, migration 042 | 2026-06-18 |
+| FEAT-29 | Badges / achievements — 9 badges auto sur fiche membre, migration 041 | 2026-06-18 |
+| FEAT-30 | Widget Discord vocal — membres en vocal sur dashboard, polling 30s | 2026-06-18 |
 | FEAT-31 | Pipeline Kanban candidatures — migration 039, statut `en_discussion`, 4 colonnes | 2026-06-18 |
 | FEAT-33 | Recherche globale Ctrl+K — membres, ressources, opérations, événements | 2026-06-18 |
 | FEAT-35 | Éditeur markdown unifié — toolbar H1/H2/Gras/Italique/Souligné sur tous les champs texte | 2026-06-18 |
