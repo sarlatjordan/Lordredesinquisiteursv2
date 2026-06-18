@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Users, BookOpen, Swords, CalendarDays, Loader2 } from 'lucide-react'
+import { Search, Users, BookOpen, Target, CalendarDays, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   CommandDialog,
@@ -17,7 +17,7 @@ import { searchGlobal, type SearchResult } from '@/actions/search'
 const TYPE_CONFIG: Record<SearchResult['type'], { label: string; Icon: React.ElementType }> = {
   membre:    { label: 'Membres',    Icon: Users },
   ressource: { label: 'Ressources', Icon: BookOpen },
-  operation: { label: 'Opérations', Icon: Swords },
+  operation: { label: 'Opérations', Icon: Target },
   evenement: { label: 'Événements', Icon: CalendarDays },
 }
 
