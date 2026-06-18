@@ -418,7 +418,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
             <LootPanel
               operationId={op.id}
               loots={loots}
-              participants={op.registrations
+              participants={(op.registrations ?? [])
                 .filter((r) => r.status === 'confirmed')
                 .map((r) => r.profile)
                 .filter(Boolean) as import('@/types').Profile[]}
