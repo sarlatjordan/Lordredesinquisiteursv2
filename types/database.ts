@@ -317,7 +317,7 @@ export interface Database {
           full_name: string | null
           motivation: string
           how_found: string
-          status: 'pending' | 'accepted' | 'refused'
+          status: 'pending' | 'en_discussion' | 'accepted' | 'refused'
           submitted_at: string
           reviewed_at: string | null
           reviewed_by: string | null
@@ -331,7 +331,7 @@ export interface Database {
           full_name?: string | null
           motivation: string
           how_found: string
-          status?: 'pending' | 'accepted' | 'refused'
+          status?: 'pending' | 'en_discussion' | 'accepted' | 'refused'
           submitted_at?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -345,7 +345,7 @@ export interface Database {
           full_name?: string | null
           motivation?: string
           how_found?: string
-          status?: 'pending' | 'accepted' | 'refused'
+          status?: 'pending' | 'en_discussion' | 'accepted' | 'refused'
           submitted_at?: string
           reviewed_at?: string | null
           reviewed_by?: string | null

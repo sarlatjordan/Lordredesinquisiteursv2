@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +15,7 @@ import {
 import {
   acceptApplication,
   rejectApplication,
+  moveToDiscussion,
 } from '@/actions/applications'
 import type { Application } from '@/types'
 import {
@@ -27,6 +27,8 @@ import {
   ChevronUp,
   Loader2,
   ExternalLink,
+  MessageSquare,
+  ArrowRight,
 } from 'lucide-react'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -39,24 +41,6 @@ function formatDate(iso: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(iso))
-}
-
-function StatusBadge({ status }: { status: Application['status'] }) {
-  const styles = {
-    pending:  'text-amber-400 bg-amber-400/10 border-amber-400/30',
-    accepted: 'text-green-400 bg-green-400/10 border-green-400/30',
-    refused:  'text-red-400 bg-red-400/10 border-red-400/30',
-  }
-  const labels = {
-    pending:  'En attente',
-    accepted: 'Acceptée',
-    refused:  'Refusée',
-  }
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status]}`}>
-      {labels[status]}
-    </span>
-  )
 }
 
 // ─── Dialog Accepter ──────────────────────────────────────────────────────────
@@ -232,11 +216,7 @@ function RefuseDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button
-            onClick={handleRefuse}
-            disabled={isPending}
-            variant="destructive"
-          >
+          <Button onClick={handleRefuse} disabled={isPending} variant="destructive">
             {isPending ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Traitement…</>
             ) : (
@@ -253,15 +233,31 @@ function RefuseDialog({
 
 function CandidatureCard({
   application,
+  onMoved,
   onAccepted,
   onRefused,
 }: {
   application: Application
+  onMoved: (id: string, status: Application['status']) => void
   onAccepted: (id: string) => void
   onRefused: (id: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const [dialog, setDialog] = useState<'accept' | 'refuse' | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+
+  function handleMoveToDiscussion() {
+    setError(null)
+    startTransition(async () => {
+      const result = await moveToDiscussion(application.id)
+      if (result.success) {
+        onMoved(application.id, 'en_discussion')
+      } else {
+        setError(result.error ?? 'Erreur')
+      }
+    })
+  }
 
   return (
     <>
@@ -269,92 +265,60 @@ function CandidatureCard({
         layout
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
+        exit={{ opacity: 0, scale: 0.95 }}
         className="rounded-xl border border-border bg-card overflow-hidden"
       >
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-foreground font-mono">{application.rsi_handle}</h3>
-                <StatusBadge status={application.status} />
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-                <span>Discord : <strong className="text-foreground">{application.discord_handle}</strong></span>
-                <span>Email : <strong className="text-foreground">{application.email}</strong></span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Soumis le {formatDate(application.submitted_at)}
-                {application.reviewed_at && (
-                  <> · Traité le {formatDate(application.reviewed_at)}</>
-                )}
-              </p>
+        <div className="p-4">
+          <div className="space-y-1 mb-3">
+            <h3 className="font-semibold text-foreground font-mono text-sm">{application.rsi_handle}</h3>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+              <span>Discord : <strong className="text-foreground">{application.discord_handle}</strong></span>
+              <span className="truncate max-w-[160px]">{application.email}</span>
             </div>
-
-            {application.status === 'pending' && (
-              <div className="flex gap-2 shrink-0">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-400"
-                  onClick={() => setDialog('refuse')}
-                >
-                  <XCircle className="h-3.5 w-3.5 mr-1" />
-                  Refuser
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => setDialog('accept')}
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                  Accepter
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Découverte + motivation */}
-          <div className="mt-4 space-y-2">
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground/70">Découverte via :</span>{' '}
-              {application.how_found}
+              {formatDate(application.submitted_at)}
             </p>
-
-            <div>
-              <button
-                onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-              >
-                {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                {expanded ? 'Masquer' : 'Lire'} la motivation
-              </button>
-              <AnimatePresence>
-                {expanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap border-l-2 border-border pl-3">
-                      {application.motivation}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {application.admin_notes && (
-              <p className="text-xs text-muted-foreground/70 italic">
-                Notes : {application.admin_notes}
-              </p>
-            )}
           </div>
 
-          {/* Lien RSI */}
-          <div className="mt-3">
+          <p className="text-xs text-muted-foreground mb-3">
+            <span className="text-foreground/60">Via :</span> {application.how_found}
+          </p>
+
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors mb-2"
+          >
+            {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            {expanded ? 'Masquer' : 'Voir'} la motivation
+          </button>
+
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap border-l-2 border-border pl-3 mb-3">
+                  {application.motivation}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {application.admin_notes && (
+            <p className="text-xs text-muted-foreground/70 italic mb-3">
+              Notes : {application.admin_notes}
+            </p>
+          )}
+
+          {error && (
+            <p className="text-xs text-destructive mb-2">{error}</p>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap">
             <a
               href={`https://robertsspaceindustries.com/en/citizens/${application.rsi_handle}`}
               target="_blank"
@@ -362,8 +326,50 @@ function CandidatureCard({
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
-              Profil RSI
+              RSI
             </a>
+
+            {application.status === 'pending' && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isPending}
+                onClick={handleMoveToDiscussion}
+                className="ml-auto text-xs h-7 border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:text-blue-400"
+              >
+                {isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <>
+                    <MessageSquare className="h-3 w-3 mr-1" />
+                    En discussion
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </>
+                )}
+              </Button>
+            )}
+
+            {application.status === 'en_discussion' && (
+              <div className="ml-auto flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs h-7 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                  onClick={() => setDialog('refuse')}
+                >
+                  <XCircle className="h-3 w-3 mr-1" />
+                  Refuser
+                </Button>
+                <Button
+                  size="sm"
+                  className="text-xs h-7 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => setDialog('accept')}
+                >
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Accepter
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -386,22 +392,61 @@ function CandidatureCard({
   )
 }
 
-// ─── Composant principal ──────────────────────────────────────────────────────
+// ─── Colonne Kanban ───────────────────────────────────────────────────────────
 
-type Tab = 'pending' | 'accepted' | 'refused'
+type ColumnConfig = {
+  id: Application['status']
+  label: string
+  color: string
+  headerColor: string
+  dotColor: string
+}
+
+const COLUMNS: ColumnConfig[] = [
+  {
+    id: 'pending',
+    label: 'Reçu',
+    color: 'border-amber-500/20 bg-amber-500/3',
+    headerColor: 'text-amber-400',
+    dotColor: 'bg-amber-400',
+  },
+  {
+    id: 'en_discussion',
+    label: 'En discussion',
+    color: 'border-blue-500/20 bg-blue-500/3',
+    headerColor: 'text-blue-400',
+    dotColor: 'bg-blue-400',
+  },
+  {
+    id: 'accepted',
+    label: 'Accepté',
+    color: 'border-green-500/20 bg-green-500/3',
+    headerColor: 'text-green-400',
+    dotColor: 'bg-green-400',
+  },
+  {
+    id: 'refused',
+    label: 'Refusé',
+    color: 'border-red-500/20 bg-red-500/3',
+    headerColor: 'text-red-400',
+    dotColor: 'bg-red-400',
+  },
+]
+
+// ─── Composant principal ──────────────────────────────────────────────────────
 
 interface CandidaturesClientProps {
   applications: Application[]
 }
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'pending',  label: 'En attente' },
-  { id: 'accepted', label: 'Acceptées' },
-  { id: 'refused',  label: 'Refusées' },
-]
-
 export function CandidaturesClient({ applications: initial }: CandidaturesClientProps) {
   const [applications, setApplications] = useState<Application[]>(initial)
+
+  function handleMoved(id: string, status: Application['status']) {
+    setApplications((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status } : a))
+    )
+  }
 
   function handleAccepted(id: string) {
     setApplications((prev) =>
@@ -419,61 +464,45 @@ export function CandidaturesClient({ applications: initial }: CandidaturesClient
     )
   }
 
-  const counts = {
-    pending:  applications.filter((a) => a.status === 'pending').length,
-    accepted: applications.filter((a) => a.status === 'accepted').length,
-    refused:  applications.filter((a) => a.status === 'refused').length,
-  }
-
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="pending">
-        <TabsList className="h-auto bg-transparent p-0 gap-2 flex-wrap">
-          {TABS.map((tab) => (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              className="group flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors
-                data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30
-                data-[state=inactive]:bg-card data-[state=inactive]:text-muted-foreground data-[state=inactive]:border-border
-                data-[state=inactive]:hover:border-primary/20 data-[state=inactive]:hover:text-foreground"
-            >
-              {tab.label}
-              <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-bold
-                group-data-[state=active]:bg-primary/20 group-data-[state=active]:text-primary
-                group-data-[state=inactive]:bg-muted group-data-[state=inactive]:text-muted-foreground">
-                {counts[tab.id]}
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      {COLUMNS.map((col) => {
+        const items = applications.filter((a) => a.status === col.id)
+        return (
+          <div
+            key={col.id}
+            className={`rounded-xl border ${col.color} flex flex-col min-h-[200px]`}
+          >
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50">
+              <span className={`h-2 w-2 rounded-full ${col.dotColor}`} />
+              <span className={`text-sm font-semibold ${col.headerColor}`}>{col.label}</span>
+              <span className="ml-auto text-xs font-bold text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                {items.length}
               </span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+            </div>
 
-        {TABS.map(({ id }) => {
-          const items = applications.filter((a) => a.status === id)
-          return (
-            <TabsContent key={id} value={id} className="mt-6">
-              {items.length === 0 ? (
-                <div className="py-16 text-center text-muted-foreground">
-                  <p className="text-sm">Aucune candidature dans cette catégorie.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <AnimatePresence mode="popLayout">
-                    {items.map((app) => (
-                      <CandidatureCard
-                        key={app.id}
-                        application={app}
-                        onAccepted={handleAccepted}
-                        onRefused={handleRefused}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </div>
-              )}
-            </TabsContent>
-          )
-        })}
-      </Tabs>
+            <div className="flex-1 p-3 space-y-3 overflow-y-auto max-h-[calc(100vh-280px)]">
+              <AnimatePresence mode="popLayout">
+                {items.length === 0 ? (
+                  <p className="text-xs text-muted-foreground/50 text-center py-8">
+                    Aucune candidature
+                  </p>
+                ) : (
+                  items.map((app) => (
+                    <CandidatureCard
+                      key={app.id}
+                      application={app}
+                      onMoved={handleMoved}
+                      onAccepted={handleAccepted}
+                      onRefused={handleRefused}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

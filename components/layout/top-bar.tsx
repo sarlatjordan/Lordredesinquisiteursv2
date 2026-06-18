@@ -1,10 +1,9 @@
 'use client'
 
-import { Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { NAV_LINKS } from './nav-links'
 import { NotificationsDropdown } from './notifications-dropdown'
+import { GlobalSearch } from './global-search'
 import type { Notification } from '@/types'
 
 interface TopBarProps {
@@ -26,16 +25,7 @@ export function TopBar({ unreadCount = 0, notifications = [] }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Recherche — fonctionnalité future */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-          aria-label="Rechercher"
-        >
-          <Search className="h-4 w-4" />
-        </Button>
-
+        <GlobalSearch />
         <NotificationsDropdown unreadCount={unreadCount} notifications={notifications} />
       </div>
     </header>

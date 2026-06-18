@@ -175,6 +175,36 @@ export async function acceptApplication(id: string): Promise<AcceptResult> {
   return { success: true, magicLink }
 }
 
+// ─── Passer en discussion (Sage requis) ──────────────────────────────────────
+
+export async function moveToDiscussion(id: string): Promise<SimpleResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!myProfile || getRolePrivilege(myProfile.role) < 1000) {
+    return { success: false, error: 'Droits insuffisants — Sage requis' }
+  }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('applications')
+    .update({ status: 'en_discussion' })
+    .eq('id', id)
+    .eq('status', 'pending')
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/admin/candidatures')
+  return { success: true }
+}
+
 // ─── Refuser une candidature (Sage requis) ────────────────────────────────────
 
 export async function rejectApplication(
