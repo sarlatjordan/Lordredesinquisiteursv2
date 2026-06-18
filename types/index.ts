@@ -29,6 +29,11 @@ export type ChatChannel = Database['public']['Tables']['chat_channels']['Row']
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 export type ChatMemberSeen = Database['public']['Tables']['chat_member_seen']['Row']
 export type RankEvaluation = Database['public']['Tables']['rank_evaluations']['Row']
+export type MemberAvailability = Database['public']['Tables']['member_availability']['Row']
+export type MemberBadge        = Database['public']['Tables']['member_badges']['Row']
+export type WarJournal         = Database['public']['Tables']['war_journal']['Row']
+export type OperationLoot      = Database['public']['Tables']['operation_loot']['Row']
+export type LootShare          = Database['public']['Tables']['loot_shares']['Row']
 
 // ─── Types enrichis (avec jointures) ─────────────────────────────────────────
 export type ProfileSummary = Pick<Profile, 'id' | 'role' | 'display_name' | 'username' | 'avatar_url'>
@@ -295,3 +300,39 @@ export type ProfileWithPendingAvatar = Pick<Profile, 'id' | 'username' | 'displa
 export type ActionResult<T = void> =
   | { success: true; data: T }
   | { success: false; error: string }
+
+// ─── FEAT-26 : Disponibilité ──────────────────────────────────────────────────
+export const AvailabilitySlot = { day: 0, slot: 0 }
+export type AvailabilityGrid = Record<number, number[]> // day_of_week → slot[]
+
+// ─── FEAT-28 : Journal de guerre ─────────────────────────────────────────────
+export const WarJournalSchema = z.object({
+  title:        z.string().min(3, 'Titre requis (min. 3 car.)').max(150),
+  content:      z.string().min(10, 'Contenu requis (min. 10 car.)').max(10000),
+  operation_id: z.string().uuid().optional().or(z.literal('')).transform((v) => v || undefined),
+  is_published: z.boolean().default(false),
+})
+export type WarJournalInput = z.infer<typeof WarJournalSchema>
+
+export type WarJournalWithAuthor = WarJournal & {
+  author: Pick<Profile, 'username' | 'display_name' | 'avatar_url'>
+  operation?: Pick<Operation, 'id' | 'title'> | null
+}
+
+// ─── FEAT-27 : Loot ──────────────────────────────────────────────────────────
+export const LootSchema = z.object({
+  total_auec: z.preprocess(
+    (v) => (v === '' ? 0 : Number(v)),
+    z.number().int().positive('Montant requis')
+  ),
+  note: z.string().max(500).optional(),
+  participant_ids: z.array(z.string().uuid()).min(1, 'Au moins un participant requis'),
+})
+export type LootInput = z.infer<typeof LootSchema>
+
+export type LootShareWithProfile = LootShare & {
+  profile: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+}
+export type OperationLootWithShares = OperationLoot & {
+  shares: LootShareWithProfile[]
+}

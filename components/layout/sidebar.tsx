@@ -207,11 +207,12 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
               Administration
             </p>
             {[
-              { href: '/admin/candidatures', label: 'Candidatures', Icon: ClipboardList },
-              { href: '/admin/galerie',      label: 'Galerie',       Icon: ImageIcon },
-              { href: '/admin/avatars',      label: 'Avatars',       Icon: ImageIcon },
-              { href: '/admin/activite',     label: 'Activité',      Icon: Activity },
-              { href: '/admin/points',       label: 'Points',        Icon: Zap },
+              { href: '/admin/candidatures', label: 'Candidatures',     Icon: ClipboardList },
+              { href: '/admin/galerie',      label: 'Galerie',          Icon: ImageIcon },
+              { href: '/admin/avatars',      label: 'Avatars',          Icon: ImageIcon },
+              { href: '/admin/activite',     label: 'Activité',         Icon: Activity },
+              { href: '/admin/points',       label: 'Points',           Icon: Zap },
+              { href: '/admin/journal',      label: 'Journal de guerre', Icon: BookOpen },
             ].map(({ href, label, Icon }) => (
               <NavItem key={href} href={href} label={label} icon={Icon} isActive={pathname.startsWith(href)} />
             ))}

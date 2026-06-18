@@ -8,6 +8,7 @@ import { GuildBankCard } from '@/components/dashboard/guild-bank-card'
 import { RecentEvents } from '@/components/dashboard/recent-events'
 import { FleetSummary } from '@/components/dashboard/fleet-summary'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
+import { DiscordVoiceWidget } from '@/components/dashboard/discord-voice-widget'
 import type { EventWithDetails, ShipWithOwner, InventoryStockRow } from '@/types'
 import { ONBOARDING_CONFIGS, type RankOnboardingConfig } from '@/lib/constants'
 import { getCachedOrgSettings } from '@/lib/cached-org-settings'
@@ -216,6 +217,8 @@ export default async function DashboardPage() {
         <RecentEvents events={normalizedEvents} />
         <FleetSummary ships={(recentShips as unknown as ShipWithOwner[]) ?? []} />
       </div>
+
+      <DiscordVoiceWidget />
     </div>
   )
 }

@@ -15,7 +15,8 @@ import {
 import { ProgressionForm } from '@/components/membres/progression-form'
 import { AwardPointsDialog } from '@/components/membres/award-points-dialog'
 import { Shield, Star, ExternalLink, CalendarDays, Target, Rocket, Zap, ChevronUp, ChevronDown, FileText, Lock } from 'lucide-react'
-import type { ProfileWithPoints, MemberProgression, MemberPromotion, MemberPoints } from '@/types'
+import { MemberBadges } from '@/components/membres/member-badges'
+import type { ProfileWithPoints, MemberProgression, MemberPromotion, MemberPoints, MemberBadge } from '@/types'
 
 interface Stats {
   eventCount: number
@@ -34,12 +35,13 @@ interface MembreDetailProps {
   progression: MemberProgression | null
   promotions: (MemberPromotion & { promoter_name?: string })[]
   points: (MemberPoints & { awarder_name?: string })[]
+  badges: MemberBadge[]
   stats: Stats
   permissions: Permissions
 }
 
 export function MembreDetail({
-  profile, progression, promotions, points,
+  profile, progression, promotions, points, badges,
   stats: { eventCount, opCount, shipCount },
   permissions: { isSage, canAwardPoints, isOwnProfile },
 }: MembreDetailProps) {
@@ -114,6 +116,8 @@ export function MembreDetail({
           )}
         </div>
       </motion.div>
+
+      <MemberBadges badges={badges} />
 
       {/* Stats */}
       <motion.div

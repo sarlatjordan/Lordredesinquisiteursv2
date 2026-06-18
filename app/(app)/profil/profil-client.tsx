@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { updateProfile, submitAvatarForApproval, uploadAvatarFile } from "@/actions/members";
+import { AvailabilityEditor } from "@/components/profil/availability-editor";
 import { requestDataExport } from "@/actions/rgpd";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES, ROLE_COLORS, type Role } from "@/lib/constants";
@@ -51,6 +52,7 @@ interface ProfilClientProps {
   } | null;
   icsParams: { uid: string; token: string } | null;
   appOrigin: string;
+  availability: import('@/types').AvailabilityGrid;
 }
 
 type SaveStatus = "idle" | "saving" | "success" | "error";
@@ -1318,6 +1320,7 @@ export function ProfilClient({
   activeEvaluation,
   icsParams,
   appOrigin,
+  availability,
 }: ProfilClientProps) {
   const router = useRouter();
 
@@ -1340,6 +1343,12 @@ export function ProfilClient({
         activeEvaluation={activeEvaluation}
       />
       <SectionStarCitizen profile={profile} onSaved={handleSaved} />
+      <Section icon={<CalendarDays className="h-5 w-5" />} title="Disponibilités">
+        <p className="text-sm text-muted-foreground mb-4">
+          Indiquez vos créneaux habituels pour que l&apos;Ordre sache quand vous êtes disponible.
+        </p>
+        <AvailabilityEditor initial={availability} />
+      </Section>
       <SectionSecurite email={email} />
       <SectionMFA />
       <SectionComptes />

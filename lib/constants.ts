@@ -46,6 +46,25 @@ export function getRolePrivilege(role: string): number {
   return ROLE_PRIVILEGES[role as Role] ?? 0
 }
 
+// ─── FEAT-29 : Badges / achievements ─────────────────────────────────────────
+export const BADGES = {
+  first_op:      { label: 'Première Opération',  description: 'Première inscription à une opération', emoji: '⚔️',  color: 'amber'  },
+  ops_5:         { label: 'Vétéran',             description: '5 opérations', emoji: '🎖️',  color: 'amber'  },
+  ops_10:        { label: 'Guerrier Aguerri',    description: '10 opérations', emoji: '🏅',  color: 'orange' },
+  first_event:   { label: 'Premier Événement',   description: 'Première participation à un événement', emoji: '🎯',  color: 'blue'   },
+  events_5:      { label: 'Habitué',             description: '5 événements', emoji: '⭐',  color: 'blue'   },
+  first_ship:    { label: 'Pilote',              description: 'Premier vaisseau enregistré', emoji: '🚀',  color: 'cyan'   },
+  first_report:  { label: 'Chroniqueur',         description: "Premier rapport d'événement", emoji: '📋',  color: 'green'  },
+  first_debrief: { label: 'Stratège',            description: "Premier débrief d'opération", emoji: '🗺️', color: 'purple' },
+  loot_received: { label: 'Butinneur',           description: 'Premier partage de butin reçu', emoji: '💰',  color: 'yellow' },
+} as const
+
+export type BadgeKey = keyof typeof BADGES
+
+// ─── FEAT-26 : Disponibilité ─────────────────────────────────────────────────
+export const AVAILABILITY_DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] as const
+export const AVAILABILITY_SLOTS = ['Matin', 'Après-midi', 'Soir', 'Nuit'] as const
+
 export type RankProgressionEntry = {
   nextRank: Role
   title: string

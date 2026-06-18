@@ -6,10 +6,12 @@ import { getRolePrivilege } from '@/lib/constants'
 import { isUUID } from '@/lib/utils'
 import { OperationDetail } from './operation-detail'
 import { ArrowLeft } from 'lucide-react'
+import { getOperationLoot } from '@/actions/loot'
 import type {
   OperationWithDetails, OpRoleSlotWithProfile,
   OpRegistrationWithProfile, Profile,
   InventoryItem, InventoryStock, InventoryItemWithStock, OpResource,
+  OperationLootWithShares,
 } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -116,6 +118,8 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
 
   const myRegistration = registrations.find((r) => r.profile_id === user.id) ?? null
 
+  const loots = await getOperationLoot(id)
+
   const stockMap = (stocksRaw ?? []).reduce<Record<string, InventoryStock>>((acc, s) => {
     acc[s.item_id] = s as InventoryStock
     return acc
@@ -154,6 +158,7 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
         canManage={canManage}
         members={members ?? []}
         inventoryItems={inventoryItems}
+        loots={loots as unknown as OperationLootWithShares[]}
       />
     </div>
   )

@@ -13,7 +13,9 @@ import { EventsPreview } from '@/components/landing/events-preview'
 import { CtaSection } from '@/components/landing/cta-section'
 import { DiscordSection } from '@/components/landing/discord-section'
 import { LandingFooter } from '@/components/landing/landing-footer'
-import type { Event } from '@/types'
+import { WarJournalSection } from '@/components/landing/war-journal-section'
+import { getPublishedJournalEntries } from '@/actions/war-journal'
+import type { Event, WarJournalWithAuthor } from '@/types'
 
 export const metadata: Metadata = {
   title: "L'Ordre des Inquisiteurs — Organisation Star Citizen",
@@ -47,7 +49,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
   const isLoggedIn = !!user
 
   const admin = createAdminClient()
-  const [stats, { data: publicEvents }] = await Promise.all([
+  const [stats, { data: publicEvents }, journalEntries] = await Promise.all([
     getPublicStats(),
     admin
       .from('events')
@@ -57,6 +59,7 @@ export default async function RootPage({ searchParams }: RootPageProps) {
       .gte('start_at', new Date().toISOString())
       .order('start_at', { ascending: true })
       .limit(3),
+    getPublishedJournalEntries(),
   ])
   const { memberCount, shipCount, opCompletedCount } = stats
 
@@ -83,6 +86,8 @@ export default async function RootPage({ searchParams }: RootPageProps) {
           events={(publicEvents as Event[]) ?? []}
           isLoggedIn={isLoggedIn}
         />
+
+        <WarJournalSection entries={journalEntries as WarJournalWithAuthor[]} />
 
         <DiscordSection />
 

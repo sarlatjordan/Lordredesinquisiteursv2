@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ShipCreateSchema, type ShipCreateInput, type ActionResult } from '@/types'
 import type { Ship } from '@/types'
 import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
+import { awardBadge } from '@/lib/award-badge'
 
 const ShipNameSchema = z.object({
   name: z.string().min(2, 'Minimum 2 caractères').max(100, 'Maximum 100 caractères'),
@@ -29,6 +30,7 @@ export async function createShip(input: ShipCreateInput): Promise<ActionResult<S
 
   if (error) return { success: false, error: error.message }
 
+  void awardBadge(user.id, 'first_ship')
   revalidatePath('/flotte')
   revalidatePath('/dashboard')
   revalidateTag('public-stats', { expire: 0 })

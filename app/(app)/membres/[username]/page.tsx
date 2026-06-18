@@ -8,7 +8,7 @@ import { ArrowLeft } from 'lucide-react'
 import { MembreDetail } from './membre-detail'
 import type {
   Profile, MemberProgression, MemberPromotion,
-  MemberPoints, ProfileWithPoints,
+  MemberPoints, ProfileWithPoints, MemberBadge,
 } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -65,6 +65,7 @@ export default async function MembrePage({ params }: { params: Promise<{ usernam
     { count: eventCount },
     { count: opCount },
     { count: shipCount },
+    { data: badgesRaw },
   ] = await Promise.all([
     supabase.from('member_progressions').select('*').eq('profile_id', profile.id).single(),
     supabase.from('member_promotions')
@@ -81,6 +82,7 @@ export default async function MembrePage({ params }: { params: Promise<{ usernam
     supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('profile_id', profile.id).eq('status', 'confirme'),
     supabase.from('op_registrations').select('*', { count: 'exact', head: true }).eq('profile_id', profile.id).eq('status', 'confirmed'),
     supabase.from('ships').select('*', { count: 'exact', head: true }).eq('owner_id', profile.id),
+    supabase.from('member_badges').select('*').eq('profile_id', profile.id).order('earned_at', { ascending: true }),
   ])
 
   const promotions: (MemberPromotion & { promoter_name?: string })[] = (
@@ -118,6 +120,7 @@ export default async function MembrePage({ params }: { params: Promise<{ usernam
         progression={progression as MemberProgression | null}
         promotions={promotions}
         points={points}
+        badges={(badgesRaw as MemberBadge[]) ?? []}
         stats={{ eventCount: eventCount ?? 0, opCount: opCount ?? 0, shipCount: shipCount ?? 0 }}
         permissions={{ isSage, canAwardPoints, isOwnProfile }}
       />

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { getAuthWithPrivilege } from '@/lib/auth-helpers'
 import { PRIVILEGE } from '@/lib/constants'
+import { checkAndAwardOpBadges, awardBadge } from '@/lib/award-badge'
 import {
   OperationCreateSchema,
   OpRegisterSchema,
@@ -251,6 +252,7 @@ export async function registerForOperation(
 
   if (error) return { success: false, error: error.message }
 
+  void checkAndAwardOpBadges(user.id)
   revalidatePath(`/operations/${operationId}`)
   return { success: true, data: undefined }
 }
@@ -505,6 +507,7 @@ export async function saveOperationDebrief(id: string, debrief: string): Promise
 
   if (error) return { success: false, error: error.message }
 
+  if (debrief.trim()) void awardBadge(user.id, 'first_debrief')
   revalidatePath(`/operations/${id}`)
   revalidatePath('/operations')
   return { success: true, data: undefined }

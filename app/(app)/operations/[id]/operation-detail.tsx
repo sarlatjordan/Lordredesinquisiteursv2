@@ -27,6 +27,7 @@ import type { OperationWithDetails, Profile, InventoryItemWithStock } from '@/ty
 import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react'
 import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { MarkdownContent } from '@/components/ui/markdown-content'
+import { LootPanel } from '@/components/operations/loot-panel'
 import { Label } from '@/components/ui/label'
 
 interface OperationDetailProps {
@@ -35,9 +36,10 @@ interface OperationDetailProps {
   canManage: boolean
   members: Pick<Profile, 'id' | 'username' | 'display_name'>[]
   inventoryItems: InventoryItemWithStock[]
+  loots: import('@/types').OperationLootWithShares[]
 }
 
-export function OperationDetail({ operation: initialOp, currentUserId, canManage, members, inventoryItems }: OperationDetailProps) {
+export function OperationDetail({ operation: initialOp, currentUserId, canManage, members, inventoryItems, loots }: OperationDetailProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null)
@@ -406,6 +408,23 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
               </div>
             )
           )}
+        </motion.section>
+      )}
+
+      {/* Section Butin */}
+      {(op.status === 'termine' || loots.length > 0) && (
+        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <LootPanel
+              operationId={op.id}
+              loots={loots}
+              participants={op.registrations
+                .filter((r) => r.status === 'confirmed')
+                .map((r) => r.profile)
+                .filter(Boolean) as import('@/types').Profile[]}
+              canManage={canManage}
+            />
+          </div>
         </motion.section>
       )}
     </div>

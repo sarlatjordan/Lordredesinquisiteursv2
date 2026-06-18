@@ -1016,6 +1016,126 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      member_availability: {
+        Row: {
+          profile_id: string
+          day_of_week: number
+          slot: number
+        }
+        Insert: {
+          profile_id: string
+          day_of_week: number
+          slot: number
+        }
+        Update: {
+          profile_id?: string
+          day_of_week?: number
+          slot?: number
+        }
+        Relationships: TableRelationship[]
+      }
+      member_badges: {
+        Row: {
+          id: string
+          profile_id: string
+          badge_key: string
+          earned_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          badge_key: string
+          earned_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          badge_key?: string
+          earned_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
+      war_journal: {
+        Row: {
+          id: string
+          operation_id: string | null
+          title: string
+          content: string
+          author_id: string
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          operation_id?: string | null
+          title: string
+          content?: string
+          author_id: string
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          operation_id?: string | null
+          title?: string
+          content?: string
+          author_id?: string
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
+      operation_loot: {
+        Row: {
+          id: string
+          operation_id: string
+          total_auec: number
+          note: string | null
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          operation_id: string
+          total_auec: number
+          note?: string | null
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          operation_id?: string
+          total_auec?: number
+          note?: string | null
+          created_by?: string
+          created_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
+      loot_shares: {
+        Row: {
+          id: string
+          loot_id: string
+          profile_id: string
+          amount: number
+        }
+        Insert: {
+          id?: string
+          loot_id: string
+          profile_id: string
+          amount: number
+        }
+        Update: {
+          id?: string
+          loot_id?: string
+          profile_id?: string
+          amount?: number
+        }
+        Relationships: TableRelationship[]
+      }
     }
     Views: EmptySchema
     Functions: {

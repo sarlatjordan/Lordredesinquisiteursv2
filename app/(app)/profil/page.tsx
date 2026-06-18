@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfilClient } from './profil-client'
 import { redirect } from 'next/navigation'
 import { generateIcsToken } from '@/lib/ics-token'
+import { getMyAvailability } from '@/actions/availability'
+import type { AvailabilityGrid } from '@/types'
 
 export const metadata: Metadata = { title: 'Mon profil' }
 export const dynamic = 'force-dynamic'
@@ -20,7 +22,7 @@ export default async function ProfilPage() {
     created_at: string
   }
 
-  const [{ data: profile }, evalResult] = await Promise.all([
+  const [{ data: profile }, evalResult, availability] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase
       .from('rank_evaluations')
@@ -28,6 +30,7 @@ export default async function ProfilPage() {
       .eq('member_id', user.id)
       .in('status', ['pending', 'in_progress'])
       .maybeSingle(),
+    getMyAvailability(),
   ])
   const activeEval = evalResult.data as ActiveEval | null
 
@@ -51,6 +54,7 @@ export default async function ProfilPage() {
       activeEvaluation={activeEval ?? null}
       icsParams={icsParams}
       appOrigin={appOrigin}
+      availability={availability as AvailabilityGrid}
     />
   )
 }

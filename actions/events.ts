@@ -13,6 +13,7 @@ import {
 } from '@/types'
 import type { Event } from '@/types'
 import { PRIVILEGE } from '@/lib/constants'
+import { checkAndAwardEventBadges, awardBadge } from '@/lib/award-badge'
 import { createDiscordScheduledEvent } from '@/lib/discord'
 
 interface CreateEventOptions {
@@ -111,6 +112,7 @@ export async function saveEventReport(id: string, report: string): Promise<Actio
 
   if (error) return { success: false, error: error.message }
 
+  void awardBadge(user.id, 'first_report')
   revalidatePath('/evenements')
   return { success: true, data: undefined }
 }
@@ -201,6 +203,7 @@ export async function registerForEvent(
 
   if (error) return { success: false, error: error.message }
 
+  void checkAndAwardEventBadges(user.id)
   revalidatePath('/evenements')
   return { success: true, data: undefined }
 }
