@@ -72,14 +72,12 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
   const router = useRouter()
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
-  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) setCollapsed(JSON.parse(stored) as Record<string, boolean>)
     } catch {}
-    setHydrated(true)
   }, [])
 
   function toggleGroup(id: string) {
@@ -129,7 +127,7 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
         ))}
 
         {/* Grouped links */}
-        {hydrated && NAV_GROUPS.map((group) => {
+        {NAV_GROUPS.map((group) => {
           const isOpen = !collapsed[group.id]
           const hasActive = group.links.some(
             (l) => pathname === l.href || pathname.startsWith(l.href + '/')
