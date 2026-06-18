@@ -90,6 +90,7 @@
 | FEAT-23 | Bouton Discord OAuth sur `/login` | 2026-06-06 |
 | FEAT-31 | Pipeline Kanban candidatures — migration 039, statut `en_discussion`, 4 colonnes | 2026-06-18 |
 | FEAT-33 | Recherche globale Ctrl+K — membres, ressources, opérations, événements | 2026-06-18 |
+| FEAT-35 | Éditeur markdown unifié — toolbar H1/H2/Gras/Italique/Souligné sur tous les champs texte | 2026-06-18 |
 
 ---
 
