@@ -7,9 +7,7 @@ export async function awardBadge(profileId: string, badgeKey: BadgeKey): Promise
   const supabase = createAdminClient()
   await supabase
     .from('member_badges')
-    .insert({ profile_id: profileId, badge_key: badgeKey })
-    .onConflict('profile_id,badge_key')
-    .ignoreDuplicates()
+    .upsert({ profile_id: profileId, badge_key: badgeKey }, { onConflict: 'profile_id,badge_key', ignoreDuplicates: true })
 }
 
 export async function checkAndAwardOpBadges(profileId: string): Promise<void> {
