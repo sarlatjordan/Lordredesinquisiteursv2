@@ -15,6 +15,17 @@
 
 ---
 
+## 📋 Planifié
+
+### 🚀 Features
+
+| ID | Item | Priorité |
+|---|---|---|
+| FEAT-36 | Commentaires contextuels sur ops & événements — fil de discussion minimal par item, remplace le retour Discord pour les échanges liés à une op/event spécifique | P1 |
+| FEAT-37 | Sondages / votes — question + options + deadline + rang minimum pour voter, couvre promotions par vote Sage et décisions d'org | P1 |
+| FEAT-38 | Vue "cockpit" chef d'op live — page compacte : slots confirmés, membres en jeu (`in_game_since`), briefing affiché, pour piloter une op sans quitter INQFR | P1 |
+| FEAT-39 | PWA installable + notifications granulaires — manifeste + icône installation bureau/mobile, filtrage des push par type (op urgente, événement, message direct) | P2 |
+
 ---
 
 ## ✅ Items terminés
