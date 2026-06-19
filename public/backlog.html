@@ -854,54 +854,50 @@
           </div>
         </div>
       </div>
+      <!-- Sprint 6 - 19 juin -->
+      <div class="release">
+        <div class="release-dot dot-recent"></div>
+        <div class="release-header">
+          <div class="release-version">Sprint 6 — Statut, flotte & push</div>
+          <div class="release-date">19 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Mode "en opération"</strong> — Statut "Je suis en jeu"
+              toggleable depuis le dashboard avec horodatage, liste des membres
+              actuellement en jeu visible par tous (FEAT-34)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Planificateur de composition de flotte</strong> — Sélecteur
+              de vaisseau par slot de rôle dans chaque opération, combobox avec
+              recherche parmi tous les vaisseaux de la flotte (FEAT-25)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Notifications push web</strong> — Alertes navigateur même
+              onglet fermé via Web Push API (VAPID), service worker, toggle
+              on/off sur /profil, déclenchées sur toutes les notifs in-app
+              (FEAT-32)
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- /changelog -->
 
     <!-- ══════════════ BACKLOG ══════════════ -->
     <div id="backlog" class="section">
       <div class="pills">
-        <span class="pill pill-g">✓ 46 terminés</span>
+        <span class="pill pill-g">✓ 49 terminés</span>
         <span class="pill pill-a">↑ 0 priorité haute</span>
-        <span class="pill pill-b">· 3 planifiés</span>
-      </div>
-
-      <div class="bl-section">
-        <div class="bl-label">Planifié — idées validées</div>
-        <div class="bl-cards">
-          <div class="bl-card card-p2">
-            <div class="bl-icon">🚀</div>
-            <div class="bl-body">
-              <div class="bl-name">Planificateur de composition de flotte</div>
-              <div class="bl-desc">
-                Avant une opération, assigner les vaisseaux aux rôles (tank,
-                support, DPS). Sauvegardé sur l'opération.
-              </div>
-            </div>
-            <div class="bl-id">FEAT-25</div>
-          </div>
-          <div class="bl-card card-p2">
-            <div class="bl-icon">🔔</div>
-            <div class="bl-body">
-              <div class="bl-name">Notifications push navigateur</div>
-              <div class="bl-desc">
-                Alertes envoyées même si l'onglet est fermé : opération qui
-                commence, événement proche, message reçu.
-              </div>
-            </div>
-            <div class="bl-id">FEAT-32</div>
-          </div>
-          <div class="bl-card card-p2">
-            <div class="bl-icon">🎮</div>
-            <div class="bl-body">
-              <div class="bl-name">Mode "en opération"</div>
-              <div class="bl-desc">
-                Statut "Je suis en jeu" activable depuis le tableau de bord,
-                visible par tous avec l'heure de début.
-              </div>
-            </div>
-            <div class="bl-id">FEAT-34</div>
-          </div>
-        </div>
+        <span class="pill pill-b">· 0 planifiés</span>
       </div>
 
       <div class="bl-section">
@@ -925,7 +921,21 @@
             <div class="done-cat">🚀 Flotte & Opérations</div>
             <div class="done-desc">
               Grille flotte, filtres, édition inline, 250 modèles RSI, Discord
-              sync bidirectionnel
+              sync, planificateur de composition de flotte par slot (FEAT-25)
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🎮 Statut en jeu</div>
+            <div class="done-desc">
+              Mode "Je suis en jeu" toggleable depuis le dashboard, horodatage
+              et liste des membres actuellement en jeu (FEAT-34)
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🔔 Notifications push</div>
+            <div class="done-desc">
+              Web Push VAPID + service worker, toggle sur /profil, déclenché
+              automatiquement sur chaque notif in-app (FEAT-32)
             </div>
           </div>
           <div class="done-item">
