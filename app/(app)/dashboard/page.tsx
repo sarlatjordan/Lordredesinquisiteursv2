@@ -9,6 +9,7 @@ import { RecentEvents } from '@/components/dashboard/recent-events'
 import { FleetSummary } from '@/components/dashboard/fleet-summary'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
 import { DiscordVoiceWidget } from '@/components/dashboard/discord-voice-widget'
+import { InGameWidget } from '@/components/dashboard/in-game-widget'
 import type { EventWithDetails, ShipWithOwner, InventoryStockRow } from '@/types'
 import { ONBOARDING_CONFIGS, type RankOnboardingConfig } from '@/lib/constants'
 import { getCachedOrgSettings } from '@/lib/cached-org-settings'
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
 
   const { data: { user } } = await supabase.auth.getUser()
   const { data: me } = user
-    ? await supabase.from('profiles').select('role, bio, star_citizen_handle').eq('id', user.id).single()
+    ? await supabase.from('profiles').select('role, bio, star_citizen_handle, in_game_since').eq('id', user.id).single()
     : { data: null }
   const privilege = getRolePrivilege(me?.role ?? '')
 
@@ -42,6 +43,7 @@ export default async function DashboardPage() {
     orgSettings,
     { data: uecItemsRaw },
     { data: attendeeCounts },
+    { data: inGameMembers },
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('events').select('*', { count: 'exact', head: true }).in('status', ['planned', 'active']),
@@ -67,6 +69,11 @@ export default async function DashboardPage() {
           .eq('type', 'uec')
       : Promise.resolve({ data: [] }),
     supabase.from('event_attendees').select('event_id').eq('status', 'confirme'),
+    supabase
+      .from('profiles')
+      .select('id, username, display_name, avatar_url, in_game_since')
+      .not('in_game_since', 'is', null)
+      .eq('is_active', true),
   ])
 
   // Calcul du solde UEC disponible (quantité totale - réservée)
@@ -218,7 +225,13 @@ export default async function DashboardPage() {
         <FleetSummary ships={(recentShips as unknown as ShipWithOwner[]) ?? []} />
       </div>
 
-      <DiscordVoiceWidget />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <InGameWidget
+          members={(inGameMembers ?? []) as { id: string; username: string; display_name: string | null; avatar_url: string | null; in_game_since: string }[]}
+          myInGameSince={me?.in_game_since ?? null}
+        />
+        <DiscordVoiceWidget />
+      </div>
     </div>
   )
 }

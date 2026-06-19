@@ -28,6 +28,7 @@ export interface Database {
           joined_at: string
           last_seen_at: string
           is_active: boolean
+          in_game_since: string | null
           created_at: string
           updated_at: string
         }
@@ -44,6 +45,7 @@ export interface Database {
           joined_at?: string
           last_seen_at?: string
           is_active?: boolean
+          in_game_since?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -60,6 +62,7 @@ export interface Database {
           joined_at?: string
           last_seen_at?: string
           is_active?: boolean
+          in_game_since?: string | null
           created_at?: string
           updated_at?: string
         }
