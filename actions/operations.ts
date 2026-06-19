@@ -228,6 +228,26 @@ export async function assignSlot(
   return { success: true, data: undefined }
 }
 
+export async function assignShipToSlot(
+  slotId: string,
+  shipId: string | null,
+  operationId: string
+): Promise<ActionResult> {
+  const { supabase, user, privilege } = await getAuthWithPrivilege()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  if (privilege < 300) return { success: false, error: 'Privilege insuffisant' }
+
+  const { error } = await supabase
+    .from('op_role_slots')
+    .update({ ship_id: shipId })
+    .eq('id', slotId)
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath(`/operations/${operationId}`)
+  return { success: true, data: undefined }
+}
+
 // ─── Inscriptions ─────────────────────────────────────────────────────────────
 
 export async function registerForOperation(

@@ -2,24 +2,25 @@
 
 import { useTransition, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Trash2, User, UserCheck } from 'lucide-react'
+import { Plus, Trash2, User, UserCheck, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { OP_ROLES, type OpRole } from '@/lib/constants'
-import { addRoleSlot, removeRoleSlot, assignSlot } from '@/actions/operations'
-import type { OpRoleSlot, OpRoleSlotWithProfile, OpRegistrationWithProfile } from '@/types'
+import { addRoleSlot, removeRoleSlot, assignSlot, assignShipToSlot } from '@/actions/operations'
+import type { OpRoleSlot, OpRoleSlotWithProfile, OpRegistrationWithProfile, Ship } from '@/types'
 
 interface OpRoleManagerProps {
   operationId: string
   slots: OpRoleSlotWithProfile[]
   confirmedRegistrations: OpRegistrationWithProfile[]
+  ships: Pick<Ship, 'id' | 'name' | 'model' | 'ship_type' | 'is_org_ship' | 'status'>[]
   onUpdate: () => void
 }
 
-export function OpRoleManager({ operationId, slots, confirmedRegistrations, onUpdate }: OpRoleManagerProps) {
+export function OpRoleManager({ operationId, slots, confirmedRegistrations, ships, onUpdate }: OpRoleManagerProps) {
   const [isPending, startTransition] = useTransition()
   const [addingRole, setAddingRole] = useState<OpRoleSlot['role']>('pilot')
   const [roleError, setRoleError] = useState<string | null>(null)
@@ -46,6 +47,15 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, onUp
     setRoleError(null)
     startTransition(async () => {
       const result = await assignSlot(slotId, profileId, operationId)
+      if (!result.success) { setRoleError(result.error); return }
+      onUpdate()
+    })
+  }
+
+  function handleAssignShip(slotId: string, shipId: string | null) {
+    setRoleError(null)
+    startTransition(async () => {
+      const result = await assignShipToSlot(slotId, shipId, operationId)
       if (!result.success) { setRoleError(result.error); return }
       onUpdate()
     })
@@ -89,7 +99,23 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, onUp
                   )}
                 </div>
 
-                {/* Combobox assignation */}
+                {/* Vaisseau assigné */}
+                {slot.ship_id && (
+                  <span className="hidden sm:flex items-center gap-1 text-xs text-primary/80 shrink-0">
+                    <Rocket className="h-3 w-3" />
+                    {ships.find(s => s.id === slot.ship_id)?.name ?? '—'}
+                  </span>
+                )}
+
+                {/* Combobox vaisseau */}
+                <ShipCombobox
+                  slot={slot}
+                  ships={ships}
+                  onAssign={(shipId) => handleAssignShip(slot.id, shipId)}
+                  disabled={isPending}
+                />
+
+                {/* Combobox assignation membre */}
                 <AssignCombobox
                   slot={slot}
                   confirmedRegistrations={confirmedRegistrations}
@@ -137,6 +163,64 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, onUp
         </Button>
       </div>
     </div>
+  )
+}
+
+function ShipCombobox({
+  slot, ships, onAssign, disabled,
+}: {
+  slot: OpRoleSlotWithProfile
+  ships: Pick<Ship, 'id' | 'name' | 'model' | 'ship_type' | 'is_org_ship' | 'status'>[]
+  onAssign: (shipId: string | null) => void
+  disabled: boolean
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" variant="outline" className="h-7 px-2 text-[11px] gap-1" disabled={disabled}>
+          <Rocket className="h-3 w-3" />
+          {slot.ship_id ? 'Changer' : 'Vaisseau'}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-0" align="end">
+        <Command>
+          <CommandInput placeholder="Chercher un vaisseau..." className="h-8 text-xs" />
+          <CommandList>
+            <CommandEmpty className="text-xs py-2 text-center text-muted-foreground">Aucun vaisseau.</CommandEmpty>
+            <CommandGroup>
+              {slot.ship_id && (
+                <CommandItem
+                  value="__unassign__"
+                  onSelect={() => { onAssign(null); setOpen(false) }}
+                  className="text-xs text-destructive"
+                >
+                  Retirer le vaisseau
+                </CommandItem>
+              )}
+              {ships.map((s) => (
+                <CommandItem
+                  key={s.id}
+                  value={`${s.name} ${s.model}`}
+                  onSelect={() => { onAssign(s.id); setOpen(false) }}
+                  className="text-xs"
+                >
+                  <Badge
+                    variant="outline"
+                    className={`mr-2 h-4 w-4 p-0 flex items-center justify-center text-[8px] ${
+                      slot.ship_id === s.id ? 'border-primary bg-primary/10' : ''
+                    }`}
+                  />
+                  <span className="truncate">{s.name}</span>
+                  <span className="ml-1 text-muted-foreground shrink-0">{s.model}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

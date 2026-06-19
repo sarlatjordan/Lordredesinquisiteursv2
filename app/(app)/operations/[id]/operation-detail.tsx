@@ -23,7 +23,7 @@ import { OpRoleManager } from '@/components/operations/op-role-manager'
 import { OpRegistrationsPanel } from '@/components/operations/op-registrations-panel'
 import { OpResourcesPanel } from '@/components/operations/op-resources-panel'
 import { deleteOperation, saveOperationDebrief, updateOperation } from '@/actions/operations'
-import type { OperationWithDetails, Profile, InventoryItemWithStock } from '@/types'
+import type { OperationWithDetails, Profile, Ship, InventoryItemWithStock } from '@/types'
 import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react'
 import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { MarkdownContent } from '@/components/ui/markdown-content'
@@ -37,9 +37,10 @@ interface OperationDetailProps {
   members: Pick<Profile, 'id' | 'username' | 'display_name'>[]
   inventoryItems: InventoryItemWithStock[]
   loots: import('@/types').OperationLootWithShares[]
+  ships: Pick<Ship, 'id' | 'name' | 'model' | 'ship_type' | 'is_org_ship' | 'status'>[]
 }
 
-export function OperationDetail({ operation: initialOp, currentUserId, canManage, members, inventoryItems, loots }: OperationDetailProps) {
+export function OperationDetail({ operation: initialOp, currentUserId, canManage, members, inventoryItems, loots, ships }: OperationDetailProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null)
@@ -287,6 +288,7 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
                 operationId={op.id}
                 slots={op.role_slots ?? []}
                 confirmedRegistrations={confirmedRegistrations}
+                ships={ships}
                 onUpdate={() => router.refresh()}
               />
             ) : (

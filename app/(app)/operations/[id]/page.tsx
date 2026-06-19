@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react'
 import { getOperationLoot } from '@/actions/loot'
 import type {
   OperationWithDetails, OpRoleSlotWithProfile,
-  OpRegistrationWithProfile, Profile,
+  OpRegistrationWithProfile, Profile, Ship,
   InventoryItem, InventoryStock, InventoryItemWithStock, OpResource,
   OperationLootWithShares,
 } from '@/types'
@@ -61,6 +61,7 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
     { data: resourcesRaw },
     { data: itemsRaw },
     { data: stocksRaw },
+    { data: shipsRaw },
   ] = await Promise.all([
     supabase
       .from('op_role_slots')
@@ -92,6 +93,10 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
     canManage
       ? supabase.from('inventory_stock').select('*')
       : empty<InventoryStock>(),
+    supabase
+      .from('ships')
+      .select('id, name, model, ship_type, is_org_ship, status')
+      .order('name'),
   ])
 
   type SlotRow = {
@@ -159,6 +164,7 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
         members={members ?? []}
         inventoryItems={inventoryItems}
         loots={loots as unknown as OperationLootWithShares[]}
+        ships={(shipsRaw as unknown as Pick<Ship, 'id' | 'name' | 'model' | 'ship_type' | 'is_org_ship' | 'status'>[]) ?? []}
       />
     </div>
   )
