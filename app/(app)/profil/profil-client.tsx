@@ -9,6 +9,7 @@ import {
   Shield,
   Rocket,
   Lock,
+  Bell,
   CheckCircle,
   AlertCircle,
   Loader2,
@@ -35,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { updateProfile, submitAvatarForApproval, uploadAvatarFile } from "@/actions/members";
 import { AvailabilityEditor } from "@/components/profil/availability-editor";
+import { PushToggle } from "@/components/profil/push-toggle";
 import { requestDataExport } from "@/actions/rgpd";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES, ROLE_COLORS, type Role } from "@/lib/constants";
@@ -1350,6 +1352,9 @@ export function ProfilClient({
         <AvailabilityEditor initial={availability} />
       </Section>
       <SectionSecurite email={email} />
+      <Section icon={<Bell className="h-4 w-4" />} title="Notifications">
+        <PushToggle />
+      </Section>
       <SectionMFA />
       <SectionComptes />
       {icsParams && (

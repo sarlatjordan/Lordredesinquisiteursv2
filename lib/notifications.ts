@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import { sendPushToUser } from '@/lib/push'
 
 export async function createNotification(
   supabase: SupabaseClient<Database>,
@@ -24,4 +25,6 @@ export async function createNotification(
     message: message ?? null,
     link: link ?? null,
   })
+
+  await sendPushToUser(profile_id, { title, body: message, url: link })
 }

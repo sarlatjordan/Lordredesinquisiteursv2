@@ -548,6 +548,33 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      push_subscriptions: {
+        Row: {
+          id: string
+          profile_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          endpoint?: string
+          p256dh?: string
+          auth?: string
+          created_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
       op_role_slots: {
         Row: {
           id: string
