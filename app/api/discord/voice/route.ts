@@ -3,19 +3,22 @@ import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-interface DiscordVoiceState {
-  user_id: string
-  channel_id: string | null
-  member?: {
-    nick: string | null
-    user: { id: string; username: string; global_name: string | null }
-  }
+interface WidgetMember {
+  id: string
+  username: string
+  channel_id?: string | null
+  avatar_url?: string
 }
 
-interface DiscordChannel {
+interface WidgetChannel {
   id: string
   name: string
-  type: number
+  position: number
+}
+
+interface DiscordWidget {
+  channels: WidgetChannel[]
+  members: WidgetMember[]
 }
 
 export async function GET() {
@@ -23,44 +26,44 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
-  const token = process.env.DISCORD_BOT_TOKEN
   const guildId = process.env.DISCORD_GUILD_ID
 
-  if (!token || !guildId) {
+  if (!guildId) {
     return NextResponse.json({ channels: [] })
   }
 
   try {
-    const [voiceRes, channelRes] = await Promise.all([
-      fetch(`https://discord.com/api/v10/guilds/${guildId}/voice-states`, {
-        headers: { Authorization: `Bot ${token}` },
-        next: { revalidate: 0 },
-      }),
-      fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-        headers: { Authorization: `Bot ${token}` },
-        next: { revalidate: 30 },
-      }),
-    ])
+    const res = await fetch(`https://discord.com/api/guilds/${guildId}/widget.json`, {
+      next: { revalidate: 0 },
+    })
 
-    if (!voiceRes.ok || !channelRes.ok) {
-      return NextResponse.json({ channels: [] })
+    if (!res.ok) {
+      return NextResponse.json({ channels: [], widgetDisabled: res.status === 403 })
     }
 
-    const voiceStates: DiscordVoiceState[] = await voiceRes.json()
-    const allChannels: DiscordChannel[] = await channelRes.json()
+    const widget: DiscordWidget = await res.json()
 
-    const voiceChannels = allChannels.filter((c) => c.type === 2)
+    const voiceChannelMap = new Map(widget.channels.map((c) => [c.id, c.name]))
 
-    const result = voiceChannels
-      .map((ch) => {
-        const members = voiceStates
-          .filter((vs) => vs.channel_id === ch.id)
-          .map((vs) => vs.member?.nick ?? vs.member?.user?.global_name ?? vs.member?.user?.username ?? 'Inconnu')
-        return { channelId: ch.id, channelName: ch.name, members }
-      })
-      .filter((ch) => ch.members.length > 0)
+    const byChannel = new Map<string, { channelName: string; members: string[] }>()
 
-    return NextResponse.json({ channels: result })
+    for (const member of widget.members) {
+      if (!member.channel_id) continue
+      const channelName = voiceChannelMap.get(member.channel_id)
+      if (!channelName) continue
+      if (!byChannel.has(member.channel_id)) {
+        byChannel.set(member.channel_id, { channelName, members: [] })
+      }
+      byChannel.get(member.channel_id)!.members.push(member.username)
+    }
+
+    const channels = Array.from(byChannel.entries()).map(([channelId, data]) => ({
+      channelId,
+      channelName: data.channelName,
+      members: data.members,
+    }))
+
+    return NextResponse.json({ channels })
   } catch {
     return NextResponse.json({ channels: [] })
   }

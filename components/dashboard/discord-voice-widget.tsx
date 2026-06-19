@@ -12,12 +12,14 @@ interface VoiceChannel {
 export function DiscordVoiceWidget() {
   const [channels, setChannels] = useState<VoiceChannel[]>([])
   const [loading, setLoading] = useState(true)
+  const [widgetDisabled, setWidgetDisabled] = useState(false)
 
   async function fetchVoice() {
     try {
       const res = await fetch('/api/discord/voice')
       const json = await res.json()
       setChannels(json.channels ?? [])
+      setWidgetDisabled(json.widgetDisabled ?? false)
     } catch {
       setChannels([])
     } finally {
@@ -39,7 +41,11 @@ export function DiscordVoiceWidget() {
         {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground ml-auto" />}
       </div>
 
-      {!loading && channels.length === 0 && (
+      {!loading && widgetDisabled && (
+        <p className="text-xs text-muted-foreground">Widget Discord désactivé — activer dans Server Settings → Widget.</p>
+      )}
+
+      {!loading && !widgetDisabled && channels.length === 0 && (
         <p className="text-xs text-muted-foreground">Personne en vocal pour le moment.</p>
       )}
 
