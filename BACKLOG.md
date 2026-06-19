@@ -15,18 +15,6 @@
 
 ---
 
-## ⏳ Items actifs
-
-### 🚀 Features planifiées
-
-#### P2 — Planifié
-
-| ID | Item | Description |
-|---|---|---|
-| FEAT-25 | Planificateur composition de flotte | Avant une op, assigner les vaisseaux de la flotte aux slots de rôle (tank/support/DPS). Vue drag-and-drop sauvegardée sur l'opération. |
-| FEAT-32 | Notifications push web | Alertes navigateur (Web Push API) quand une op commence, un event approche ou un message est reçu. |
-| FEAT-34 | Mode "en opération" | Statut activable "Je suis en jeu" visible sur le dashboard avec horodatage. |
-
 ---
 
 ## ✅ Items terminés
@@ -91,6 +79,9 @@
 | FEAT-31 | Pipeline Kanban candidatures — migration 039, statut `en_discussion`, 4 colonnes | 2026-06-18 |
 | FEAT-33 | Recherche globale Ctrl+K — membres, ressources, opérations, événements | 2026-06-18 |
 | FEAT-35 | Éditeur markdown unifié — toolbar H1/H2/Gras/Italique/Souligné sur tous les champs texte | 2026-06-18 |
+| FEAT-34 | Mode "en opération" — `in_game_since` sur profiles (migration 044), widget dashboard toggle + liste membres en jeu | 2026-06-19 |
+| FEAT-25 | Planificateur composition de flotte — sélecteur vaisseau par slot de rôle dans les opérations | 2026-06-19 |
+| FEAT-32 | Notifications push web — VAPID, service worker, toggle /profil, hook `createNotification` → push (migration 045, `web-push`) | 2026-06-19 |
 
 ---
 
