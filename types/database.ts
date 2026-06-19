@@ -788,6 +788,30 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      discord_voice_states: {
+        Row: {
+          user_id: string
+          username: string
+          channel_id: string
+          channel_name: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          username: string
+          channel_id: string
+          channel_name: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          username?: string
+          channel_id?: string
+          channel_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inventory_stock: {
         Row: {
           item_id: string
