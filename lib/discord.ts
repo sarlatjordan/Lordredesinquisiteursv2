@@ -33,13 +33,8 @@ export async function postToDiscordChannel(channelId: string, content: string): 
       headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),
     })
-    if (!res.ok) {
-      const err = await res.text()
-      console.error('[Discord] postToDiscordChannel error:', res.status, err)
-    }
     return res.ok
-  } catch (e) {
-    console.error('[Discord] postToDiscordChannel exception:', e)
+  } catch {
     return false
   }
 }
