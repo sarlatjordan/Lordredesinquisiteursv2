@@ -24,7 +24,6 @@
 | FEAT-36 | Commentaires contextuels sur ops & événements — fil de discussion minimal par item, remplace le retour Discord pour les échanges liés à une op/event spécifique | P1 |
 | FEAT-37 | Sondages / votes — question + options + deadline + rang minimum pour voter, couvre promotions par vote Sage et décisions d'org | P1 |
 | FEAT-38 | Vue "cockpit" chef d'op live — page compacte : slots confirmés, membres en jeu (`in_game_since`), briefing affiché, pour piloter une op sans quitter INQFR | P1 |
-| FEAT-47 | Système d'absences — déclaration d'absence sur le profil (dates + motif), notification Sage, vue récapitulative admin — nécessite migration 048 | P1 |
 | FEAT-39 | PWA installable + notifications granulaires — manifeste + icône installation bureau/mobile, filtrage des push par type (op urgente, événement, message direct) | P2 |
 
 ---
@@ -106,6 +105,7 @@
 | FEAT-45 | Gestion Membres fusionnée — toggle Promotions / Candidatures sur `/admin/gestion-membres`, badge compteur candidatures pending | 2026-06-20 |
 | FEAT-46 | Panneau admin hub `/admin` — cards par fonctionnalité, accès MI+ avec filtre Sage pour les outils avancés | 2026-06-20 |
 | FEAT-48 | Page profil pleine largeur — layout 2 colonnes `lg:grid-cols-2` au lieu de `max-w-2xl` colonne unique | 2026-06-20 |
+| FEAT-47 | Système d'absences — déclaration /profil (dates + motif), notification Sages, onglet admin gestion-membres — migration 048 | 2026-06-20 |
 
 ---
 
