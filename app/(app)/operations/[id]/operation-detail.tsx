@@ -300,12 +300,18 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
                   (op.role_slots ?? []).map((slot) => {
                     const slotRole = slot.role as OpRole
                     const assignedName = slot.assigned_profile?.display_name ?? slot.assigned_profile?.username
+                    const shipName = slot.ship_id ? (ships.find(s => s.id === slot.ship_id)?.name ?? null) : null
                     return (
                       <div key={slot.id} className="flex items-center justify-between rounded-md border border-border bg-muted/20 px-3 py-2">
-                        <span className="text-xs font-medium">{OP_ROLES[slotRole]}</span>
-                        <span className={`text-xs ${assignedName ? 'text-green-400' : 'text-muted-foreground'}`}>
-                          {assignedName ?? '—'}
-                        </span>
+                        <span className="text-xs font-medium w-28 shrink-0">{OP_ROLES[slotRole]}</span>
+                        <div className="flex-1 min-w-0 text-right">
+                          <span className={`text-xs ${assignedName ? 'text-green-400' : 'text-muted-foreground'}`}>
+                            {assignedName ?? '—'}
+                          </span>
+                          {shipName && (
+                            <p className="text-[10px] text-primary/60 truncate">{shipName}</p>
+                          )}
+                        </div>
                       </div>
                     )
                   })

@@ -106,12 +106,22 @@ export const RANK_PROGRESSION: Partial<Record<Role, RankProgressionEntry>> = {
 
 export const ROLE_COLORS: Record<Role, string> = {
   visiteur:           'text-slate-400 bg-slate-400/10 border-slate-400/20',
-  aspirant:           'text-slate-300 bg-slate-300/10 border-slate-300/20',
-  consacre:           'text-green-400 bg-green-400/10 border-green-400/30',
-  gardien:            'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
-  inquisiteur:        'text-blue-400 bg-blue-400/10 border-blue-400/30',
-  maitre_inquisiteur: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
-  sage:               'text-amber-400 bg-amber-400/10 border-amber-400/30',
+  aspirant:           'text-green-400 bg-green-400/10 border-green-400/30',
+  consacre:           'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
+  gardien:            'text-violet-400 bg-violet-400/10 border-violet-400/30',
+  inquisiteur:        'text-pink-400 bg-pink-400/10 border-pink-400/30',
+  maitre_inquisiteur: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
+  sage:               'text-orange-400 bg-orange-400/10 border-orange-400/30',
+}
+
+export const ROLE_DOT_COLORS: Record<Role, string> = {
+  visiteur:           'bg-slate-400',
+  aspirant:           'bg-green-400',
+  consacre:           'bg-cyan-400',
+  gardien:            'bg-violet-400',
+  inquisiteur:        'bg-pink-400',
+  maitre_inquisiteur: 'bg-yellow-400',
+  sage:               'bg-orange-400',
 }
 
 export const EVENT_TYPES = {

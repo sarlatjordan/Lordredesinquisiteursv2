@@ -8,8 +8,7 @@ import { GuildBankCard } from '@/components/dashboard/guild-bank-card'
 import { RecentEvents } from '@/components/dashboard/recent-events'
 import { FleetSummary } from '@/components/dashboard/fleet-summary'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
-import { InGameWidget } from '@/components/dashboard/in-game-widget'
-import { DiscordVoiceWidget } from '@/components/dashboard/discord-voice-widget'
+import { PresenceWidget } from '@/components/dashboard/presence-widget'
 import type { EventWithDetails, ShipWithOwner, InventoryStockRow } from '@/types'
 import { ONBOARDING_CONFIGS, type RankOnboardingConfig } from '@/lib/constants'
 import { getCachedOrgSettings } from '@/lib/cached-org-settings'
@@ -225,13 +224,10 @@ export default async function DashboardPage() {
         <FleetSummary ships={(recentShips as unknown as ShipWithOwner[]) ?? []} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <InGameWidget
-          members={(inGameMembers ?? []) as { id: string; username: string; display_name: string | null; avatar_url: string | null; in_game_since: string }[]}
-          myInGameSince={me?.in_game_since ?? null}
-        />
-        <DiscordVoiceWidget />
-      </div>
+      <PresenceWidget
+        inGameMembers={(inGameMembers ?? []) as { id: string; username: string; display_name: string | null; avatar_url: string | null; in_game_since: string }[]}
+        myInGameSince={me?.in_game_since ?? null}
+      />
     </div>
   )
 }

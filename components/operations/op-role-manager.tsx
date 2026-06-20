@@ -84,7 +84,7 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, ship
                   {OP_ROLES[slotRole]}
                 </span>
 
-                {/* Assignation */}
+                {/* Assignation + vaisseau */}
                 <div className="flex-1 min-w-0">
                   {slot.assigned_profile_id ? (
                     <div className="flex items-center gap-1.5">
@@ -97,15 +97,15 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, ship
                       <span className="text-xs">Non assigné</span>
                     </div>
                   )}
+                  {slot.ship_id && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Rocket className="h-2.5 w-2.5 text-primary/60 shrink-0" />
+                      <span className="text-[10px] text-primary/60 truncate">
+                        {ships.find(s => s.id === slot.ship_id)?.name ?? '—'}
+                      </span>
+                    </div>
+                  )}
                 </div>
-
-                {/* Vaisseau assigné */}
-                {slot.ship_id && (
-                  <span className="hidden sm:flex items-center gap-1 text-xs text-primary/80 shrink-0">
-                    <Rocket className="h-3 w-3" />
-                    {ships.find(s => s.id === slot.ship_id)?.name ?? '—'}
-                  </span>
-                )}
 
                 {/* Combobox vaisseau */}
                 <ShipCombobox

@@ -28,7 +28,7 @@ export default async function MessagesPage() {
   if (user && firstChannel) {
     const { data } = await supabase
       .from('chat_messages')
-      .select('*, author:profiles(id, username, display_name, avatar_url)')
+      .select('*, author:profiles(id, username, display_name, avatar_url, role)')
       .eq('channel_id', firstChannel.id)
       .order('created_at', { ascending: false })
       .limit(50)

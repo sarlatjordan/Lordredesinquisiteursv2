@@ -119,7 +119,7 @@ export async function getChannelMessages(channelId: string): Promise<ActionResul
 
   const { data, error } = await supabase
     .from('chat_messages')
-    .select('*, author:profiles(id, username, display_name, avatar_url)')
+    .select('*, author:profiles(id, username, display_name, avatar_url, role)')
     .eq('channel_id', channelId)
     .order('created_at', { ascending: false })
     .limit(50)
@@ -138,7 +138,7 @@ export async function loadMoreMessages(
 
   const { data, error } = await supabase
     .from('chat_messages')
-    .select('*, author:profiles(id, username, display_name, avatar_url)')
+    .select('*, author:profiles(id, username, display_name, avatar_url, role)')
     .eq('channel_id', channelId)
     .lt('created_at', before)
     .order('created_at', { ascending: false })

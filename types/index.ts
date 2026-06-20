@@ -245,7 +245,7 @@ export const InventoryItemSchema = z.object({
 export type InventoryItemInput = z.infer<typeof InventoryItemSchema>
 
 export type ChatMessageWithAuthor = ChatMessage & {
-  author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+  author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'role'>
 }
 
 export const SendMessageSchema = z.object({

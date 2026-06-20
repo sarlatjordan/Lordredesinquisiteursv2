@@ -1331,7 +1331,7 @@ export function ProfilClient({
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Mon profil</h2>
         <p className="text-sm text-muted-foreground mt-1">
@@ -1339,28 +1339,33 @@ export function ProfilClient({
         </p>
       </div>
 
+      {/* Sections principales pleine largeur */}
       <SectionIdentite profile={profile} onSaved={handleSaved} />
       <SectionProgression
         profile={profile}
         activeEvaluation={activeEvaluation}
       />
-      <SectionStarCitizen profile={profile} onSaved={handleSaved} />
-      <Section icon={<CalendarDays className="h-5 w-5" />} title="Disponibilités">
-        <p className="text-sm text-muted-foreground mb-4">
-          Indiquez vos créneaux habituels pour que l&apos;Ordre sache quand vous êtes disponible.
-        </p>
-        <AvailabilityEditor initial={availability} />
-      </Section>
-      <SectionSecurite email={email} />
-      <Section icon={<Bell className="h-4 w-4" />} title="Notifications">
-        <PushToggle />
-      </Section>
-      <SectionMFA />
-      <SectionComptes />
-      {icsParams && (
-        <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />
-      )}
-      <SectionDonnees />
+
+      {/* Sections secondaires en grille 2 colonnes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SectionStarCitizen profile={profile} onSaved={handleSaved} />
+        <Section icon={<CalendarDays className="h-5 w-5" />} title="Disponibilités">
+          <p className="text-sm text-muted-foreground mb-4">
+            Indiquez vos créneaux habituels pour que l&apos;Ordre sache quand vous êtes disponible.
+          </p>
+          <AvailabilityEditor initial={availability} />
+        </Section>
+        <SectionSecurite email={email} />
+        <Section icon={<Bell className="h-4 w-4" />} title="Notifications">
+          <PushToggle />
+        </Section>
+        <SectionMFA />
+        <SectionComptes />
+        {icsParams && (
+          <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />
+        )}
+        <SectionDonnees />
+      </div>
     </div>
   );
 }

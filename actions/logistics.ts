@@ -210,6 +210,7 @@ export async function processTransaction(
     p_approved_by:    user.id,
   })
   if (rpcErr) return { success: false, error: rpcErr.message }
+  if (!result) return { success: false, error: 'Réponse vide du serveur' }
 
   const approval = result as { success: boolean; error?: string | null }
   if (!approval.success) return { success: false, error: approval.error ?? 'Erreur inconnue' }

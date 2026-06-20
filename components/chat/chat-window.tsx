@@ -14,6 +14,8 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 const sanitizeSchema = { ...defaultSchema, tagNames: [...(defaultSchema.tagNames ?? []), 'u'] }
 const rehypePlugins = [rehypeRaw, [rehypeSanitize, sanitizeSchema]] as Parameters<typeof ReactMarkdown>[0]['rehypePlugins']
 import type { ChatMessageWithAuthor } from '@/types'
+import type { Role } from '@/lib/constants'
+import { ROLE_DOT_COLORS } from '@/lib/constants'
 
 interface ChatWindowProps {
   messages: ChatMessageWithAuthor[]
@@ -63,10 +65,20 @@ export function ChatWindow({
 
         return (
           <div key={msg.id} className={cn('flex gap-2.5', isMine && 'flex-row-reverse')}>
-            <Avatar className="h-7 w-7 shrink-0 mt-0.5">
-              <AvatarImage src={msg.author.avatar_url ?? undefined} />
-              <AvatarFallback className="text-[10px] bg-muted">{initials}</AvatarFallback>
-            </Avatar>
+            <div className="relative shrink-0 mt-0.5">
+              <Avatar className="h-7 w-7">
+                <AvatarImage src={msg.author.avatar_url ?? undefined} />
+                <AvatarFallback className="text-[10px] bg-muted">{initials}</AvatarFallback>
+              </Avatar>
+              {msg.author.role && (
+                <span
+                  className={cn(
+                    'absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background',
+                    ROLE_DOT_COLORS[msg.author.role as Role] ?? 'bg-slate-400'
+                  )}
+                />
+              )}
+            </div>
 
             <div className={cn('max-w-[70%] min-w-0', isMine && 'items-end flex flex-col')}>
               <div className={cn('flex items-baseline gap-2 mb-0.5', isMine && 'flex-row-reverse')}>

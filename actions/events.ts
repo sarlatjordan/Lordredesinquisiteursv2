@@ -14,7 +14,7 @@ import {
 import type { Event } from '@/types'
 import { PRIVILEGE } from '@/lib/constants'
 import { checkAndAwardEventBadges, awardBadge } from '@/lib/award-badge'
-import { createDiscordScheduledEvent } from '@/lib/discord'
+import { createDiscordScheduledEvent, postToDiscordChannel } from '@/lib/discord'
 
 interface CreateEventOptions {
   sendToDiscord?: boolean
@@ -56,6 +56,15 @@ export async function createEvent(
     .single()
 
   if (error) return { success: false, error: error.message }
+
+  // Notification Discord canal #INFORMATION
+  const infoChannelId = process.env.DISCORD_INFORMATION_CHANNEL_ID
+  if (infoChannelId) {
+    await postToDiscordChannel(
+      infoChannelId,
+      `@everyone Un événement vient d'être programmé : **${parsed.data.title}** — Rendez-vous sur le site pour plus d'informations.`,
+    )
+  }
 
   // Création de l'opération liée (MI+ requis)
   if (options.createOperation && parsed.data.type === 'operation' && privilege >= PRIVILEGE.CREATE_OPS) {

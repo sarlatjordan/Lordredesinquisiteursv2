@@ -5,8 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LogOut, Shield, ChevronDown, ClipboardList, ImageIcon,
-  Activity, Zap, BookOpen, TrendingUp, Globe, Settings,
+  LogOut, Shield, ChevronDown, Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getRolePrivilege } from '@/lib/constants'
@@ -97,9 +96,9 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
 
   return (
     <aside className="hidden lg:flex flex-col w-64 min-h-screen border-r border-sidebar-border bg-sidebar fixed left-0 top-0 bottom-0 z-30">
-      {/* Logo */}
+      {/* Logo — homepage ↔ QG toggle */}
       <Link
-        href="/"
+        href={pathname === '/dashboard' ? '/' : '/dashboard'}
         className="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border hover:bg-primary/5 transition-colors group"
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg overflow-hidden border border-primary/30 group-hover:border-primary/60 transition-colors bg-background">
@@ -180,52 +179,20 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
         })}
       </nav>
 
-      {/* Commandement — MI+ */}
+      {/* Administration — MI+ */}
       {getRolePrivilege(profile?.role ?? '') >= 600 && (
-        <>
-          <Separator className="bg-sidebar-border mx-3" />
-          <div className="px-3 py-2">
-            <p className="px-3 mb-1 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest">
-              Commandement
-            </p>
-            <NavItem
-              href="/admin/promotions"
-              label="Promotions"
-              icon={TrendingUp}
-              isActive={pathname.startsWith('/admin/promotions')}
-            />
-          </div>
-        </>
-      )}
-
-      {/* Admin — Sage */}
-      {profile?.role === 'sage' && (
         <>
           <Separator className="bg-sidebar-border mx-3" />
           <div className="px-3 py-2">
             <p className="px-3 mb-1 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest">
               Administration
             </p>
-            {[
-              { href: '/admin/candidatures', label: 'Candidatures',     Icon: ClipboardList },
-              { href: '/admin/galerie',      label: 'Galerie',          Icon: ImageIcon },
-              { href: '/admin/avatars',      label: 'Avatars',          Icon: ImageIcon },
-              { href: '/admin/activite',     label: 'Activité',         Icon: Activity },
-              { href: '/admin/points',       label: 'Points',           Icon: Zap },
-              { href: '/admin/journal',      label: 'Journal de guerre', Icon: BookOpen },
-            ].map(({ href, label, Icon }) => (
-              <NavItem key={href} href={href} label={label} icon={Icon} isActive={pathname.startsWith(href)} />
-            ))}
-            <a href="/backlog.html" target="_blank" rel="noopener noreferrer">
-              <motion.div
-                whileHover={{ x: 2 }}
-                transition={{ duration: 0.15 }}
-                className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-150 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              >
-                <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-sidebar-accent-foreground transition-colors" />
-                <span className="truncate">Backlog</span>
-              </motion.div>
-            </a>
+            <NavItem
+              href="/admin"
+              label="Panneau admin"
+              icon={Settings}
+              isActive={pathname.startsWith('/admin')}
+            />
           </div>
         </>
       )}

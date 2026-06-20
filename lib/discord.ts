@@ -2,6 +2,21 @@ export function isDiscordConfigured(): boolean {
   return !!(process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID)
 }
 
+export async function postToDiscordChannel(channelId: string, content: string): Promise<boolean> {
+  const token = process.env.DISCORD_BOT_TOKEN
+  if (!token || !channelId) return false
+  try {
+    const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+      method: 'POST',
+      headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
 interface DiscordEventPayload {
   name: string
   description?: string | null

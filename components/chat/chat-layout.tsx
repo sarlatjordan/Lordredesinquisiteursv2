@@ -102,7 +102,7 @@ export function ChatLayout({
         async (payload) => {
           const { data } = await supabase
             .from('chat_messages')
-            .select('*, author:profiles(id, username, display_name, avatar_url)')
+            .select('*, author:profiles(id, username, display_name, avatar_url, role)')
             .eq('id', (payload.new as { id: string }).id)
             .single()
 
