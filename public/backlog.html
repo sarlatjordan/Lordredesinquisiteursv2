@@ -348,7 +348,7 @@
     <div class="site-header">
       <h1>INQFR — Historique & Backlog</h1>
       <p>
-        Suivi de toutes les évolutions depuis le lancement · Mis à jour le 19
+        Suivi de toutes les évolutions depuis le lancement · Mis à jour le 20
         juin 2026
       </p>
     </div>
@@ -889,15 +889,92 @@
           </div>
         </div>
       </div>
+
+      <!-- Sprint 7 - 20 juin -->
+      <div class="release">
+        <div class="release-dot dot-recent"></div>
+        <div class="release-header">
+          <div class="release-version">Sprint 7 — Conseil des Sages 20 juin</div>
+          <div class="release-date">20 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Couleurs de rang unifiées</strong> — Palette cohérente sur tout le site : Sage=orange, MI=jaune, Inquisiteur=rose, Gardien=violet, Consacré=cyan, Aspirant=vert. Noms joueurs colorés dans le chat (FEAT-40/41)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Logo toggle homepage ↔ QG</strong> — Cliquer le logo depuis /dashboard renvoie à la landing, et inversement quand on est connecté (FEAT-42)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Widget Présence fusionné</strong> — Statut "en jeu" et membres en vocal Discord regroupés en un seul widget sur le dashboard (FEAT-43)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Notifications Discord à la création d'événement</strong> — Message automatique dans #INFORMATION avec mention des rangs concernés (<code>@aspirant</code>, <code>@gardien</code>… selon le rang minimum requis) (FEAT-44)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Gestion Membres fusionnée</strong> — Candidatures et promotions dans la même page /admin/gestion-membres avec toggle, badge de candidatures en attente (FEAT-45)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Panneau admin hub</strong> — Page /admin avec cards par fonctionnalité (Gestion membres, Galerie, Avatars, Activité, Points, Journal, Backlog), accès différencié MI+ / Sage (FEAT-46)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Page profil pleine largeur</strong> — Layout 2 colonnes sur grand écran au lieu d'une colonne centrée étroite (FEAT-48)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Postes opérations illisibles</strong> — Noms de joueurs et de vaisseaux tronqués dans la colonne POSTES (380px) — boutons action réduits à des icônes (BUG-03)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Consacrés — vaisseaux invisibles</strong> — La vue lecture seule des postes n'affichait pas le vaisseau assigné (BUG-05)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Logistique — solde UEC bloqué</strong> — Null-check manquant sur la réponse RPC d'approbation de transaction (BUG-04)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Création d'événement impossible</strong> — Contrainte DB <code>events_status_check</code> : DEFAULT français incompatible avec CHECK anglais — migration 047 + insert explicite (BUG-06)
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- /changelog -->
 
     <!-- ══════════════ BACKLOG ══════════════ -->
     <div id="backlog" class="section">
       <div class="pills">
-        <span class="pill pill-g">✓ 49 terminés</span>
-        <span class="pill pill-a">↑ 3 priorité haute</span>
-        <span class="pill pill-b">· 4 planifiés</span>
+        <span class="pill pill-g">✓ 61 terminés</span>
+        <span class="pill pill-a">↑ 4 priorité haute</span>
+        <span class="pill pill-b">· 5 planifiés</span>
       </div>
 
       <div class="bl-section">
@@ -926,6 +1003,14 @@
               <div class="bl-desc">Page compacte pendant une op : slots confirmés, membres en jeu (in_game_since), briefing affiché. Piloter une op sans quitter INQFR.</div>
             </div>
             <div class="bl-id">FEAT-38 · P1</div>
+          </div>
+          <div class="bl-card card-p1">
+            <div class="bl-icon">🏖️</div>
+            <div class="bl-body">
+              <div class="bl-name">Système d'absences</div>
+              <div class="bl-desc">Déclaration d'absence sur le profil (dates + motif), notification automatique aux Sages, vue récapitulative dans l'admin. Nécessite migration 048.</div>
+            </div>
+            <div class="bl-id">FEAT-47 · P1</div>
           </div>
           <div class="bl-card card-p2">
             <div class="bl-icon">📱</div>
@@ -1012,6 +1097,12 @@
             <div class="done-desc">
               Server Actions Zod, auth-helpers, React.cache metadata, erreurs
               corrigées
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🎨 Conseil 20 juin</div>
+            <div class="done-desc">
+              Couleurs rang unifiées, noms chat colorés, logo toggle, widget présence fusionné, notif Discord avec mentions par rang, admin hub, gestion membres fusionnée, profil 2 colonnes — 4 bugs corrigés (postes ops, UEC, vaisseaux consacrés, création événement)
             </div>
           </div>
         </div>

@@ -24,6 +24,7 @@
 | FEAT-36 | Commentaires contextuels sur ops & événements — fil de discussion minimal par item, remplace le retour Discord pour les échanges liés à une op/event spécifique | P1 |
 | FEAT-37 | Sondages / votes — question + options + deadline + rang minimum pour voter, couvre promotions par vote Sage et décisions d'org | P1 |
 | FEAT-38 | Vue "cockpit" chef d'op live — page compacte : slots confirmés, membres en jeu (`in_game_since`), briefing affiché, pour piloter une op sans quitter INQFR | P1 |
+| FEAT-47 | Système d'absences — déclaration d'absence sur le profil (dates + motif), notification Sage, vue récapitulative admin — nécessite migration 048 | P1 |
 | FEAT-39 | PWA installable + notifications granulaires — manifeste + icône installation bureau/mobile, filtrage des push par type (op urgente, événement, message direct) | P2 |
 
 ---
@@ -59,6 +60,10 @@
 |---|---|---|
 | BUG-01 | Page `/flotte` blanche intermittente — `<Suspense>` autour de `RsiBookmarkletImport` | 2026-06-04 |
 | BUG-02 | `cached-org-settings.ts` — `cookies()` interdit dans `unstable_cache()` → `createAdminClient()` | 2026-06-04 |
+| BUG-03 | Ops — noms joueurs tronqués + nom vaisseau illisible dans la colonne POSTES (380px) — boutons icon-only, role label `w-20` | 2026-06-20 |
+| BUG-04 | Logistique — total UEC ne se met pas à jour après approbation — null-check manquant sur le retour RPC `approve_inventory_transaction` | 2026-06-20 |
+| BUG-05 | Ops — Consacrés ne voient pas les vaisseaux assignés aux postes (vue lecture seule) — lookup ship absent dans `operation-detail.tsx` | 2026-06-20 |
+| BUG-06 | Création d'événement impossible — contrainte `events_status_check` : DEFAULT `'planifie'` (FR) incompatible avec CHECK EN — migration 047 + `status: 'planned'` explicite | 2026-06-20 |
 
 ---
 
@@ -93,6 +98,14 @@
 | FEAT-34 | Mode "en opération" — `in_game_since` sur profiles (migration 044), widget dashboard toggle + liste membres en jeu | 2026-06-19 |
 | FEAT-25 | Planificateur composition de flotte — sélecteur vaisseau par slot de rôle dans les opérations | 2026-06-19 |
 | FEAT-32 | Notifications push web — VAPID, service worker, toggle /profil, hook `createNotification` → push (migration 045, `web-push`) | 2026-06-19 |
+| FEAT-40 | Couleurs de rang unifiées — `ROLE_COLORS` / `ROLE_DOT_COLORS` / `ROLE_TEXT_COLORS` dans `lib/constants.ts`, `@source` Tailwind v4, propagation sur tout le site | 2026-06-20 |
+| FEAT-41 | Noms joueurs colorés dans les messages (rang) — `ROLE_TEXT_COLORS` appliqué sur le nom d'auteur dans `chat-window.tsx` | 2026-06-20 |
+| FEAT-42 | Logo toggle homepage ↔ QG — sidebar + public-nav : logo → `/dashboard` si connecté, `/` sinon | 2026-06-20 |
+| FEAT-43 | Widget Présence fusionné — IG + Discord vocal en un seul composant `PresenceWidget`, polling 30s côté client | 2026-06-20 |
+| FEAT-44 | Notification Discord sur création d'événement — `postToDiscordChannel` + `buildEventMention(minPrivilege)` → mentions `<@&ROLE_ID>` par rang | 2026-06-20 |
+| FEAT-45 | Gestion Membres fusionnée — toggle Promotions / Candidatures sur `/admin/gestion-membres`, badge compteur candidatures pending | 2026-06-20 |
+| FEAT-46 | Panneau admin hub `/admin` — cards par fonctionnalité, accès MI+ avec filtre Sage pour les outils avancés | 2026-06-20 |
+| FEAT-48 | Page profil pleine largeur — layout 2 colonnes `lg:grid-cols-2` au lieu de `max-w-2xl` colonne unique | 2026-06-20 |
 
 ---
 
