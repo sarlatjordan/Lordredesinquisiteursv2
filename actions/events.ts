@@ -64,7 +64,7 @@ export async function createEvent(
     const mention = buildEventMention(parsed.data.min_privilege ?? 0)
     await postToDiscordChannel(
       infoChannelId,
-      `${mention} Un nouvel événement vient d'être programmé : **${parsed.data.title}** — Rendez-vous sur le site pour plus d'informations.`,
+      `${mention} Un nouvel événement vient d'être programmé : **${parsed.data.title}** — https://inqfr.vercel.app/evenements`,
     )
   }
 
