@@ -124,6 +124,16 @@ export const ROLE_DOT_COLORS: Record<Role, string> = {
   sage:               'bg-orange-400',
 }
 
+export const ROLE_TEXT_COLORS: Record<Role, string> = {
+  visiteur:           'text-slate-400',
+  aspirant:           'text-green-400',
+  consacre:           'text-cyan-400',
+  gardien:            'text-violet-400',
+  inquisiteur:        'text-pink-400',
+  maitre_inquisiteur: 'text-yellow-400',
+  sage:               'text-orange-400',
+}
+
 export const EVENT_TYPES = {
   operation: 'Opération',
   reunion: 'Réunion',

@@ -2,7 +2,7 @@
 
 import { useTransition, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Trash2, User, UserCheck, Rocket } from 'lucide-react'
+import { Plus, Trash2, User, UserCheck, Rocket, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -80,7 +80,7 @@ export function OpRoleManager({ operationId, slots, confirmedRegistrations, ship
                 transition={{ delay: i * 0.04 }}
                 className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2"
               >
-                <span className="text-xs font-medium w-28 shrink-0 text-foreground">
+                <span className="text-xs font-medium w-20 shrink-0 text-foreground truncate">
                   {OP_ROLES[slotRole]}
                 </span>
 
@@ -179,9 +179,8 @@ function ShipCombobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" className="h-7 px-2 text-[11px] gap-1" disabled={disabled}>
+        <Button size="icon" variant="outline" className="h-7 w-7 shrink-0" disabled={disabled} title={slot.ship_id ? 'Changer le vaisseau' : 'Assigner un vaisseau'}>
           <Rocket className="h-3 w-3" />
-          {slot.ship_id ? 'Changer' : 'Vaisseau'}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-0" align="end">
@@ -242,8 +241,8 @@ function AssignCombobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" className="h-7 px-2 text-[11px]" disabled={disabled}>
-          Assigner
+        <Button size="icon" variant="outline" className="h-7 w-7 shrink-0" disabled={disabled} title="Assigner un membre">
+          <UserPlus className="h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-0" align="end">

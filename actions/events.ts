@@ -49,6 +49,7 @@ export async function createEvent(
     .from('events')
     .insert({
       ...parsed.data,
+      status: 'planned' as const,
       created_by: user.id,
       ...(discordEventId ? { discord_event_id: discordEventId } : {}),
     })

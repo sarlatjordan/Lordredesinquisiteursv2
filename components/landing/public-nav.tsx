@@ -41,7 +41,7 @@ export function PublicNav({ isLoggedIn }: PublicNavProps) {
 
       <div className="relative flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href={isLoggedIn ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg overflow-hidden border border-primary/30 group-hover:border-primary/60 transition-colors bg-background">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.png" alt="INQFR" className="w-full h-full object-contain p-0.5" />

@@ -15,7 +15,7 @@ const sanitizeSchema = { ...defaultSchema, tagNames: [...(defaultSchema.tagNames
 const rehypePlugins = [rehypeRaw, [rehypeSanitize, sanitizeSchema]] as Parameters<typeof ReactMarkdown>[0]['rehypePlugins']
 import type { ChatMessageWithAuthor } from '@/types'
 import type { Role } from '@/lib/constants'
-import { ROLE_DOT_COLORS } from '@/lib/constants'
+import { ROLE_DOT_COLORS, ROLE_TEXT_COLORS } from '@/lib/constants'
 
 interface ChatWindowProps {
   messages: ChatMessageWithAuthor[]
@@ -82,7 +82,10 @@ export function ChatWindow({
 
             <div className={cn('max-w-[70%] min-w-0', isMine && 'items-end flex flex-col')}>
               <div className={cn('flex items-baseline gap-2 mb-0.5', isMine && 'flex-row-reverse')}>
-                <span className="text-xs font-medium text-foreground truncate">{name}</span>
+                <span className={cn(
+                  'text-xs font-medium truncate',
+                  msg.author.role ? (ROLE_TEXT_COLORS[msg.author.role as Role] ?? 'text-foreground') : 'text-foreground'
+                )}>{name}</span>
                 <span className="text-[10px] text-muted-foreground shrink-0">
                   {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true, locale: fr })}
                 </span>
