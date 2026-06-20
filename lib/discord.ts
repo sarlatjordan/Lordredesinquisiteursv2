@@ -2,6 +2,28 @@ export function isDiscordConfigured(): boolean {
   return !!(process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID)
 }
 
+// Construit la mention Discord adaptée au rang minimum requis pour un événement.
+// Les rôles Discord avec privilege >= minPrivilege sont mentionnés.
+// Si aucun ID de rôle n'est configuré, retourne @everyone.
+export function buildEventMention(minPrivilege: number): string {
+  const roleMap: { privilege: number; envKey: string }[] = [
+    { privilege: 100,  envKey: 'DISCORD_ROLE_ID_ASPIRANT' },
+    { privilege: 150,  envKey: 'DISCORD_ROLE_ID_CONSACRE' },
+    { privilege: 300,  envKey: 'DISCORD_ROLE_ID_GARDIEN' },
+    { privilege: 400,  envKey: 'DISCORD_ROLE_ID_INQUISITEUR' },
+    { privilege: 600,  envKey: 'DISCORD_ROLE_ID_MAITRE_INQUISITEUR' },
+    { privilege: 1000, envKey: 'DISCORD_ROLE_ID_SAGE' },
+  ]
+
+  if (minPrivilege <= 50) return '@everyone'
+
+  const mentions = roleMap
+    .filter(({ privilege, envKey }) => privilege >= minPrivilege && process.env[envKey])
+    .map(({ envKey }) => `<@&${process.env[envKey]}>`)
+
+  return mentions.length > 0 ? mentions.join(' ') : '@everyone'
+}
+
 export async function postToDiscordChannel(channelId: string, content: string): Promise<boolean> {
   const token = process.env.DISCORD_BOT_TOKEN
   if (!token || !channelId) return false

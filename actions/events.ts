@@ -14,7 +14,7 @@ import {
 import type { Event } from '@/types'
 import { PRIVILEGE } from '@/lib/constants'
 import { checkAndAwardEventBadges, awardBadge } from '@/lib/award-badge'
-import { createDiscordScheduledEvent, postToDiscordChannel } from '@/lib/discord'
+import { createDiscordScheduledEvent, postToDiscordChannel, buildEventMention } from '@/lib/discord'
 
 interface CreateEventOptions {
   sendToDiscord?: boolean
@@ -58,12 +58,13 @@ export async function createEvent(
 
   if (error) return { success: false, error: error.message }
 
-  // Notification Discord canal #INFORMATION
+  // Notification Discord canal #INFORMATION avec mention des rangs concernés
   const infoChannelId = process.env.DISCORD_INFORMATION_CHANNEL_ID
   if (infoChannelId) {
+    const mention = buildEventMention(parsed.data.min_privilege ?? 0)
     await postToDiscordChannel(
       infoChannelId,
-      `@everyone Un événement vient d'être programmé : **${parsed.data.title}** — Rendez-vous sur le site pour plus d'informations.`,
+      `${mention} Un nouvel événement vient d'être programmé : **${parsed.data.title}** — Rendez-vous sur le site pour plus d'informations.`,
     )
   }
 
