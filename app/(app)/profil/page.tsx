@@ -5,7 +5,7 @@ import { ProfilClient } from './profil-client'
 import { redirect } from 'next/navigation'
 import { generateIcsToken } from '@/lib/ics-token'
 import { getMyAvailability } from '@/actions/availability'
-import type { AvailabilityGrid } from '@/types'
+import type { AvailabilityGrid, Absence } from '@/types'
 
 export const metadata: Metadata = { title: 'Mon profil' }
 export const dynamic = 'force-dynamic'
@@ -22,7 +22,7 @@ export default async function ProfilPage() {
     created_at: string
   }
 
-  const [{ data: profile }, evalResult, availability] = await Promise.all([
+  const [{ data: profile }, evalResult, availability, absencesResult] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase
       .from('rank_evaluations')
@@ -31,8 +31,15 @@ export default async function ProfilPage() {
       .in('status', ['pending', 'in_progress'])
       .maybeSingle(),
     getMyAvailability(),
+    supabase
+      .from('absences')
+      .select('*')
+      .eq('profile_id', user.id)
+      .gte('end_date', new Date().toISOString().split('T')[0])
+      .order('start_date', { ascending: true }),
   ])
   const activeEval = evalResult.data as ActiveEval | null
+  const absences = (absencesResult.data ?? []) as Absence[]
 
   // Génération du token ICS pour l'abonnement calendrier
   let icsParams: { uid: string; token: string } | null = null
@@ -55,6 +62,7 @@ export default async function ProfilPage() {
       icsParams={icsParams}
       appOrigin={appOrigin}
       availability={availability as AvailabilityGrid}
+      absences={absences}
     />
   )
 }

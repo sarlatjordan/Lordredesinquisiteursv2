@@ -14,6 +14,30 @@ type TableRelationship = {
 export interface Database {
   public: {
     Tables: {
+      absences: {
+        Row: {
+          id:         string
+          profile_id: string
+          start_date: string
+          end_date:   string
+          reason:     string | null
+          created_at: string
+        }
+        Insert: {
+          id?:        string
+          profile_id: string
+          start_date: string
+          end_date:   string
+          reason?:    string | null
+          created_at?: string
+        }
+        Update: {
+          start_date?: string
+          end_date?:   string
+          reason?:     string | null
+        }
+        Relationships: TableRelationship[]
+      }
       profiles: {
         Row: {
           id: string

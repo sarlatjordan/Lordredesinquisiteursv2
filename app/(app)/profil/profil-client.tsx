@@ -25,6 +25,9 @@ import {
   Check as CheckIcon,
   Link2,
   Upload,
+  Palmtree,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,13 +38,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { updateProfile, submitAvatarForApproval, uploadAvatarFile } from "@/actions/members";
+import { createAbsence, deleteAbsence } from "@/actions/absences";
 import { AvailabilityEditor } from "@/components/profil/availability-editor";
 import { PushToggle } from "@/components/profil/push-toggle";
 import { requestDataExport } from "@/actions/rgpd";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES, ROLE_COLORS, type Role } from "@/lib/constants";
 import { getInitials, formatDate } from "@/lib/utils";
-import type { Profile } from "@/types";
+import type { Profile, Absence } from "@/types";
 
 interface ProfilClientProps {
   profile: Profile | null;
@@ -55,6 +59,7 @@ interface ProfilClientProps {
   icsParams: { uid: string; token: string } | null;
   appOrigin: string;
   availability: import('@/types').AvailabilityGrid;
+  absences: Absence[];
 }
 
 type SaveStatus = "idle" | "saving" | "success" | "error";
@@ -866,6 +871,91 @@ function SectionCalendrier({
   );
 }
 
+// ─── Section absences ─────────────────────────────────────────────────────────
+
+function SectionAbsences({ absences }: { absences: Absence[] }) {
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const today = new Date().toISOString().split("T")[0];
+
+  function handleAdd(formData: FormData) {
+    setError("");
+    startTransition(async () => {
+      const res = await createAbsence(formData);
+      if (!res.success) { setError(res.error ?? "Erreur"); return; }
+      router.refresh();
+    });
+  }
+
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      await deleteAbsence(id);
+      router.refresh();
+    });
+  }
+
+  const upcoming = absences
+    .filter((a) => a.end_date >= today)
+    .sort((a, b) => a.start_date.localeCompare(b.start_date));
+
+  return (
+    <Section icon={<Palmtree className="h-4 w-4" />} title="Absences planifiées">
+      <form action={handleAdd} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label htmlFor="start_date" className="text-xs">Début</Label>
+            <Input id="start_date" name="start_date" type="date" min={today} required className="h-8 text-sm" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="end_date" className="text-xs">Fin</Label>
+            <Input id="end_date" name="end_date" type="date" min={today} required className="h-8 text-sm" />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="reason" className="text-xs">Raison <span className="text-muted-foreground">(optionnel)</span></Label>
+          <Input id="reason" name="reason" type="text" maxLength={500} placeholder="Vacances, déplacement…" className="h-8 text-sm" />
+        </div>
+        {error && (
+          <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        <Button type="submit" size="sm" disabled={isPending} className="w-full">
+          <Plus className="h-3.5 w-3.5 mr-1.5" />
+          Déclarer une absence
+        </Button>
+      </form>
+
+      {upcoming.length > 0 && (
+        <div className="space-y-2 mt-1">
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">À venir</p>
+          {upcoming.map((a) => (
+            <div key={a.id} className="flex items-start justify-between gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-foreground">
+                  {a.start_date} → {a.end_date}
+                </p>
+                {a.reason && <p className="text-xs text-muted-foreground truncate">{a.reason}</p>}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+                disabled={isPending}
+                onClick={() => handleDelete(a.id)}
+                type="button"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
+  );
+}
+
 // ─── Section données personnelles (RGPD) ─────────────────────────────────────
 
 function SectionDonnees() {
@@ -1323,6 +1413,7 @@ export function ProfilClient({
   icsParams,
   appOrigin,
   availability,
+  absences,
 }: ProfilClientProps) {
   const router = useRouter();
 
@@ -1361,6 +1452,7 @@ export function ProfilClient({
         </Section>
         <SectionMFA />
         <SectionComptes />
+        <SectionAbsences absences={absences} />
         {icsParams && (
           <SectionCalendrier icsParams={icsParams} appOrigin={appOrigin} />
         )}

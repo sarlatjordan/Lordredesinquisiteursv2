@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getRolePrivilege } from '@/lib/constants'
 import { GestionMembresClient } from './gestion-membres-client'
-import type { Application, RankEvaluationWithProfiles, PromotionHistoryItem, Profile } from '@/types'
+import type { Application, RankEvaluationWithProfiles, PromotionHistoryItem, Profile, AbsenceWithProfile } from '@/types'
 
 export const metadata: Metadata = { title: 'Gestion Membres' }
 export const dynamic = 'force-dynamic'
@@ -44,13 +44,20 @@ export default async function GestionMembresPage() {
   const history = (historyResult.data as unknown as PromotionHistoryItem[]) ?? []
 
   let applications: Application[] = []
+  let absences: AbsenceWithProfile[] = []
   if (isSage) {
     const admin = createAdminClient()
-    const { data } = await admin
-      .from('applications')
-      .select('*')
-      .order('submitted_at', { ascending: false })
-    applications = (data as Application[]) ?? []
+    const today = new Date().toISOString().split('T')[0]
+    const [appsResult, absencesResult] = await Promise.all([
+      admin.from('applications').select('*').order('submitted_at', { ascending: false }),
+      admin
+        .from('absences')
+        .select('*, profile:profiles!profile_id(id,username,display_name,avatar_url,role)')
+        .gte('end_date', today)
+        .order('start_date', { ascending: true }),
+    ])
+    applications = (appsResult.data as Application[]) ?? []
+    absences = (absencesResult.data as unknown as AbsenceWithProfile[]) ?? []
   }
 
   return (
@@ -59,6 +66,7 @@ export default async function GestionMembresPage() {
       members={members}
       history={history}
       applications={applications}
+      absences={absences}
       isSage={isSage}
     />
   )

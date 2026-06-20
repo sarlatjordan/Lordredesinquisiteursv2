@@ -319,6 +319,27 @@ export type WarJournalWithAuthor = WarJournal & {
   operation?: Pick<Operation, 'id' | 'title'> | null
 }
 
+// ─── FEAT-47 : Absences ──────────────────────────────────────────────────────
+export const AbsenceCreateSchema = z.object({
+  start_date: z.string().min(1, 'Date de début requise'),
+  end_date:   z.string().min(1, 'Date de fin requise'),
+  reason:     z.string().max(500).optional(),
+})
+export type AbsenceCreateInput = z.infer<typeof AbsenceCreateSchema>
+
+export type Absence = {
+  id:         string
+  profile_id: string
+  start_date: string
+  end_date:   string
+  reason:     string | null
+  created_at: string
+}
+
+export type AbsenceWithProfile = Absence & {
+  profile: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url' | 'role'>
+}
+
 // ─── FEAT-27 : Loot ──────────────────────────────────────────────────────────
 export const LootSchema = z.object({
   total_auec: z.preprocess(
