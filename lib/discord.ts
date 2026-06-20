@@ -15,13 +15,14 @@ export function buildEventMention(minPrivilege: number): string {
     { privilege: 1000, envKey: 'DISCORD_ROLE_ID_SAGE' },
   ]
 
-  if (minPrivilege <= 50) return '@everyone'
+  // Si ouvert à tous (aucun rang requis), on cible les membres à partir d'Aspirant
+  const effectivePrivilege = minPrivilege <= 50 ? 100 : minPrivilege
 
   const mentions = roleMap
-    .filter(({ privilege, envKey }) => privilege >= minPrivilege && process.env[envKey])
+    .filter(({ privilege, envKey }) => privilege >= effectivePrivilege && process.env[envKey])
     .map(({ envKey }) => `<@&${process.env[envKey]}>`)
 
-  return mentions.length > 0 ? mentions.join(' ') : '@everyone'
+  return mentions.join(' ')
 }
 
 export async function postToDiscordChannel(channelId: string, content: string): Promise<boolean> {
