@@ -15,7 +15,7 @@ import { CalendarMonthView } from '@/components/evenements/calendar-month-view'
 import { CalendarWeekView } from '@/components/evenements/calendar-week-view'
 import { createEvent, registerForEvent, unregisterFromEvent } from '@/actions/events'
 import { AvailabilityTips } from '@/components/ui/availability-tips'
-import type { EventWithDetails } from '@/types'
+import type { EventWithDetails, AbsenceWithProfile } from '@/types'
 import { useRouter } from 'next/navigation'
 
 type ViewMode = 'mois' | 'semaine' | 'liste'
@@ -28,9 +28,10 @@ interface EventsClientProps {
   canManage?: boolean
   canDiscordSync?: boolean
   canCreateOp?: boolean
+  absences?: AbsenceWithProfile[]
 }
 
-export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false, canDiscordSync = false, canCreateOp = false }: EventsClientProps) {
+export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCreate = false, canManage = false, canDiscordSync = false, canCreateOp = false, absences = [] }: EventsClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('mois')
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [managedEvent, setManagedEvent] = useState<EventWithDetails | null>(null)
@@ -163,6 +164,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
                   serverError={createError}
                   canDiscordSync={canDiscordSync}
                   canCreateOp={canCreateOp}
+                  absences={absences}
                 />
               </DialogContent>
             </Dialog>

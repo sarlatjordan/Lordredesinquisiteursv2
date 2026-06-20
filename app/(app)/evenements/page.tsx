@@ -1,7 +1,8 @@
 ﻿import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { EventsClient } from './events-client'
-import type { EventWithDetails, EventAttendee } from '@/types'
+import type { EventWithDetails, EventAttendee, AbsenceWithProfile } from '@/types'
 import { getRolePrivilege, PRIVILEGE } from '@/lib/constants'
 import { isDiscordConfigured } from '@/lib/discord'
 
@@ -91,6 +92,18 @@ export default async function EvenementsPage() {
     }))
   }
 
+  let absences: AbsenceWithProfile[] = []
+  if (canCreate) {
+    const admin = createAdminClient()
+    const today = new Date().toISOString().split('T')[0]
+    const { data } = await admin
+      .from('absences')
+      .select('*, profile:profiles!profile_id(id,username,display_name,avatar_url,role)')
+      .gte('end_date', today)
+      .order('start_date', { ascending: true })
+    absences = (data as unknown as AbsenceWithProfile[]) ?? []
+  }
+
   return (
     <EventsClient
       upcomingEvents={enrichEvents(upcomingRaw)}
@@ -100,6 +113,7 @@ export default async function EvenementsPage() {
       canManage={canManage}
       canDiscordSync={discordConfigured}
       canCreateOp={canCreateOp}
+      absences={absences}
     />
   )
 }
