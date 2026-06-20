@@ -165,6 +165,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
                   canDiscordSync={canDiscordSync}
                   canCreateOp={canCreateOp}
                   absences={absences}
+                  open={isCreateOpen}
                 />
               </DialogContent>
             </Dialog>

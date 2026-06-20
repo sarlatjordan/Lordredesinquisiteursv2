@@ -1,13 +1,14 @@
 'use client'
 
 import { useForm, Controller, useWatch } from 'react-hook-form'
-import { Loader2, Send, Swords, Palmtree } from 'lucide-react'
+import { Loader2, Send, Swords } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { AbsenceTips } from '@/components/ui/absence-tips'
 import { EVENT_TYPES, EVENT_STATUS, ROLES, ROLE_PRIVILEGES, type Role } from '@/lib/constants'
 import type { AbsenceWithProfile } from '@/types'
 
@@ -50,6 +51,7 @@ interface EventFormProps {
   canDiscordSync?: boolean
   canCreateOp?: boolean
   absences?: AbsenceWithProfile[]
+  open?: boolean
 }
 
 export function EventForm({
@@ -63,6 +65,7 @@ export function EventForm({
   canDiscordSync = false,
   canCreateOp = false,
   absences = [],
+  open = false,
 }: EventFormProps) {
   const {
     register,
@@ -81,16 +84,9 @@ export function EventForm({
     },
   })
 
-  const watchedType   = useWatch({ control, name: 'type' })
-  const watchedStart  = useWatch({ control, name: 'start_at' })
-  const watchedEnd    = useWatch({ control, name: 'end_at' })
-
-  const absentMembers = absences.filter((a) => {
-    if (!watchedStart) return false
-    const eventStart = watchedStart.slice(0, 10)
-    const eventEnd   = watchedEnd ? watchedEnd.slice(0, 10) : eventStart
-    return a.start_date <= eventEnd && a.end_date >= eventStart
-  })
+  const watchedType  = useWatch({ control, name: 'type' })
+  const watchedStart = useWatch({ control, name: 'start_at' })
+  const watchedEnd   = useWatch({ control, name: 'end_at' })
 
   function handleValidSubmit(raw: EventFormValues) {
     if (!raw.title || raw.title.length < 3) {
@@ -211,24 +207,12 @@ export function EventForm({
         </div>
       </div>
 
-      {absentMembers.length > 0 && (
-        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <Palmtree className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-            <p className="text-xs font-medium text-amber-400">
-              {absentMembers.length === 1 ? '1 membre absent' : `${absentMembers.length} membres absents`} sur cette période
-            </p>
-          </div>
-          <ul className="space-y-0.5">
-            {absentMembers.map((a) => (
-              <li key={a.id} className="text-xs text-amber-300/80">
-                {a.profile.display_name ?? a.profile.username}
-                <span className="text-amber-400/50 ml-1">— {a.start_date} → {a.end_date}{a.reason ? ` (${a.reason})` : ''}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <AbsenceTips
+        absences={absences}
+        startDate={watchedStart ? watchedStart.slice(0, 10) : ''}
+        endDate={watchedEnd ? watchedEnd.slice(0, 10) : ''}
+        open={open}
+      />
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
