@@ -774,6 +774,26 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      map_system_positions: {
+        Row: {
+          system_name: string
+          x:           number
+          y:           number
+          updated_at:  string
+        }
+        Insert: {
+          system_name: string
+          x:           number
+          y:           number
+          updated_at?: string
+        }
+        Update: {
+          x?:          number
+          y?:          number
+          updated_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
       map_jump_lanes: {
         Row: {
           id: string

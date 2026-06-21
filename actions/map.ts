@@ -98,3 +98,41 @@ export async function deleteJumpLane(id: string): Promise<ActionResult> {
   revalidatePath('/carte')
   return { success: true, data: undefined }
 }
+
+// ─── Positions systèmes (Sage) ────────────────────────────────────────────────
+
+export async function upsertSystemPosition(
+  systemName: string,
+  x: number,
+  y: number,
+): Promise<ActionResult> {
+  const { supabase, user, privilege } = await getAuthWithPrivilege()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  if (privilege < 1000) return { success: false, error: 'Sage requis' }
+
+  const trimmed = systemName.trim()
+  if (!trimmed) return { success: false, error: 'Nom requis' }
+
+  const { error } = await supabase
+    .from('map_system_positions')
+    .upsert({ system_name: trimmed, x, y, updated_at: new Date().toISOString() }, { onConflict: 'system_name' })
+
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/carte')
+  return { success: true, data: undefined }
+}
+
+export async function deleteSystemPosition(systemName: string): Promise<ActionResult> {
+  const { supabase, user, privilege } = await getAuthWithPrivilege()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  if (privilege < 1000) return { success: false, error: 'Sage requis' }
+
+  const { error } = await supabase
+    .from('map_system_positions')
+    .delete()
+    .eq('system_name', systemName)
+
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/carte')
+  return { success: true, data: undefined }
+}
