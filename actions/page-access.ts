@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { getAuthWithPrivilege } from '@/lib/auth-helpers'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult } from '@/types'
 
 const Schema = z.object({
@@ -16,11 +17,12 @@ export async function updatePageAccessRule(
   const parsed = Schema.safeParse({ path, min_privilege })
   if (!parsed.success) return { success: false, error: parsed.error.issues[0].message }
 
-  const { supabase, user, privilege } = await getAuthWithPrivilege()
+  const { user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }
   if (privilege < 1000) return { success: false, error: 'Sage requis' }
 
-  const { error } = await supabase
+  const admin = createAdminClient()
+  const { error } = await admin
     .from('page_access_rules')
     .update({ min_privilege: parsed.data.min_privilege, updated_at: new Date().toISOString() })
     .eq('path', parsed.data.path)
