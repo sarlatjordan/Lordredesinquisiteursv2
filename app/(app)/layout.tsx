@@ -14,9 +14,7 @@ import type { Notification, ProfileSummary } from '@/types'
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const headersList = await headers()
   const pathname = headersList.get('x-pathname') ?? ''
-  const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
   const isMFAPage = pathname === '/mfa'
-  const isProfilPage = pathname === '/profil'
 
   const supabase = await createClient()
 
@@ -82,9 +80,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 relative">
           <PageBackground />
           <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">
-            {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile && !isProfilPage
-              ? <RedactedContent />
-              : <PageTransition>{children}</PageTransition>}
+            <RedactedContent privilege={getRolePrivilege(profile?.role ?? '')}>
+                <PageTransition>{children}</PageTransition>
+              </RedactedContent>
           </div>
         </main>
       </div>

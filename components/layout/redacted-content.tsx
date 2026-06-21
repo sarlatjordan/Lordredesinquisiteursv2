@@ -2,6 +2,10 @@
 
 import { motion } from 'framer-motion'
 import { ShieldOff, MessageSquare } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
+
+const VISITOR_ALLOWED_PATHS = ['/profil']
 
 const REDACTED_LINES = [
   { w: 'w-4/5',  opacity: 1 },
@@ -25,7 +29,7 @@ function RedactedBar({ w, opacity, delay }: { w: string; opacity: number; delay:
   )
 }
 
-export function RedactedContent() {
+function RedactedUI() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -34,7 +38,6 @@ export function RedactedContent() {
       className="flex flex-col items-center justify-center min-h-[60vh] py-12 px-4"
     >
       <div className="w-full max-w-lg space-y-8">
-        {/* Header classifié */}
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-destructive/30 bg-destructive/10">
             <ShieldOff className="h-8 w-8 text-destructive" />
@@ -49,9 +52,7 @@ export function RedactedContent() {
           </div>
         </div>
 
-        {/* Faux document redacted */}
         <div className="rounded-xl border border-border bg-card/50 p-6 space-y-6 relative overflow-hidden">
-          {/* Tampon CLASSIFIÉ */}
           <div className="absolute top-4 right-4 rotate-[-15deg]">
             <div className="border-2 border-destructive/40 rounded px-2 py-0.5">
               <p className="text-[10px] font-black tracking-[0.3em] text-destructive/50 uppercase">
@@ -60,17 +61,14 @@ export function RedactedContent() {
             </div>
           </div>
 
-          {/* Lignes redacted bloc 1 */}
           <div className="space-y-2.5">
             {REDACTED_LINES.slice(0, 4).map((line, i) => (
               <RedactedBar key={i} w={line.w} opacity={line.opacity} delay={i * 0.3} />
             ))}
           </div>
 
-          {/* Séparateur */}
           <div className="h-px bg-border" />
 
-          {/* Lignes redacted bloc 2 */}
           <div className="space-y-2.5">
             {REDACTED_LINES.slice(4).map((line, i) => (
               <RedactedBar key={i} w={line.w} opacity={line.opacity} delay={1.5 + i * 0.3} />
@@ -78,7 +76,6 @@ export function RedactedContent() {
           </div>
         </div>
 
-        {/* Message */}
         <div className="rounded-xl border border-border bg-card/50 p-5 space-y-4 text-center">
           <div className="space-y-1.5">
             <p className="text-sm font-medium text-foreground">
@@ -105,4 +102,21 @@ export function RedactedContent() {
       </div>
     </motion.div>
   )
+}
+
+interface RedactedGateProps {
+  privilege: number
+  children: ReactNode
+}
+
+export function RedactedContent({ privilege, children }: RedactedGateProps) {
+  const pathname = usePathname()
+  const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
+  const isAllowed = VISITOR_ALLOWED_PATHS.includes(pathname) || isMembreProfile
+
+  if (privilege <= 50 && !isAllowed) {
+    return <RedactedUI />
+  }
+
+  return <>{children}</>
 }
