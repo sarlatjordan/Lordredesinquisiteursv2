@@ -46,7 +46,7 @@ export default async function MembresPage({ searchParams }: MembresPageProps) {
   if (user && meResult.data) {
     userPrivilege = getRolePrivilege(meResult.data.role ?? '')
     isAdmin = userPrivilege >= PRIVILEGE.MANAGE_MEMBERS
-    canAwardPoints = userPrivilege >= 300
+    canAwardPoints = userPrivilege >= 400
   }
 
   const pointsMap = (pointsResult.data ?? []).reduce<Record<string, number>>((acc, row) => {

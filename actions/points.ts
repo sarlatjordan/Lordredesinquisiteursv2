@@ -12,8 +12,8 @@ export async function awardPoints(input: AwardPointsInput): Promise<ActionResult
   if (!user) return { success: false, error: 'Non authentifié' }
 
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(me?.role ?? '') < 300) {
-    return { success: false, error: 'Privilege insuffisant (Gardien requis)' }
+  if (getRolePrivilege(me?.role ?? '') < 400) {
+    return { success: false, error: 'Privilege insuffisant (Inquisiteur requis)' }
   }
 
   const parsed = AwardPointsSchema.safeParse(input)

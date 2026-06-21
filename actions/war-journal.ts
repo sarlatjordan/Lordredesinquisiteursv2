@@ -13,7 +13,7 @@ export async function createJournalEntry(input: WarJournalInput): Promise<Action
 
   const { supabase, user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }
-  if (privilege < 600) return { success: false, error: 'Accès refusé — Maître Inquisiteur requis' }
+  if (privilege < 400) return { success: false, error: 'Accès refusé — Inquisiteur requis' }
 
   const { data, error } = await supabase
     .from('war_journal')
@@ -34,7 +34,7 @@ export async function updateJournalEntry(id: string, input: WarJournalInput): Pr
   if (!parsed.success) return { success: false, error: parsed.error.issues[0].message }
 
   const { supabase, privilege } = await getAuthWithPrivilege()
-  if (privilege < 600) return { success: false, error: 'Accès refusé' }
+  if (privilege < 400) return { success: false, error: 'Accès refusé' }
 
   const { error } = await supabase
     .from('war_journal')
@@ -51,7 +51,7 @@ export async function deleteJournalEntry(id: string): Promise<ActionResult> {
   if (!isUUID(id)) return { success: false, error: 'ID invalide' }
 
   const { supabase, privilege } = await getAuthWithPrivilege()
-  if (privilege < 600) return { success: false, error: 'Accès refusé' }
+  if (privilege < 400) return { success: false, error: 'Accès refusé' }
 
   const { error } = await supabase.from('war_journal').delete().eq('id', id)
   if (error) return { success: false, error: error.message }

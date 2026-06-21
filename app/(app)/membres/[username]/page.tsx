@@ -53,7 +53,7 @@ export default async function MembrePage({ params }: { params: Promise<{ usernam
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   const myPrivilege = getRolePrivilege(me?.role ?? '')
   const isSage = myPrivilege >= 1000
-  const canAwardPoints = myPrivilege >= 300
+  const canAwardPoints = myPrivilege >= 400
   const isOwnProfile = profile.id === user.id
   const canSeePoints = isSage || canAwardPoints || isOwnProfile
 

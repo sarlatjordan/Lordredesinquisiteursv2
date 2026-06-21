@@ -19,7 +19,7 @@ export default async function JournalPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || getRolePrivilege(profile.role) < 600) redirect('/dashboard')
+  if (!profile || getRolePrivilege(profile.role) < 400) redirect('/dashboard')
 
   const entries = await getAllJournalEntries()
 

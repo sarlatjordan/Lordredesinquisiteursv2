@@ -22,7 +22,7 @@ export async function setRecruitmentOpen(open: boolean): Promise<ActionResult> {
 
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   const privilege = getRolePrivilege(me?.role ?? '')
-  if (privilege < 600) return { success: false, error: 'Maître Inquisiteur requis' }
+  if (privilege < 400) return { success: false, error: 'Inquisiteur requis' }
 
   const { error } = await supabase
     .from('org_settings')

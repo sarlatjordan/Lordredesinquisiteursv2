@@ -204,7 +204,7 @@ export default async function DashboardPage() {
         <StatsCard title="Membres actifs" value={memberCount ?? 0} icon={<Users className="h-5 w-5" />}        description="Voir la liste →"         variant="cyan"    index={0} href="/membres" />
         <StatsCard title="Événements"     value={activeEventCount ?? 0} icon={<CalendarDays className="h-5 w-5" />} description="Voir le calendrier →" variant="amber"   index={1} href="/evenements" />
         <StatsCard title="Vaisseaux"      value={shipCount ?? 0} icon={<Rocket className="h-5 w-5" />}         description="Voir la flotte →"        variant="green"   index={2} href="/flotte" />
-        <RecruitmentStatusCard open={orgSettings?.recruitment_open ?? true} canToggle={privilege >= 600} index={3} />
+        <RecruitmentStatusCard open={orgSettings?.recruitment_open ?? true} canToggle={privilege >= 400} index={3} />
       </div>
 
       {onboardingConfig && (

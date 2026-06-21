@@ -13,8 +13,8 @@ export async function initiateEvaluation(formData: FormData): Promise<ActionResu
   if (!user) return { success: false, error: 'Non authentifié' }
 
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(me?.role ?? '') < 600) {
-    return { success: false, error: 'Maître Inquisiteur requis' }
+  if (getRolePrivilege(me?.role ?? '') < 400) {
+    return { success: false, error: 'Inquisiteur requis' }
   }
 
   const parsed = InitiateEvaluationSchema.safeParse({
@@ -66,8 +66,8 @@ export async function updateEvaluationStatus(
   if (!user) return { success: false, error: 'Non authentifié' }
 
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (getRolePrivilege(me?.role ?? '') < 600) {
-    return { success: false, error: 'Maître Inquisiteur requis' }
+  if (getRolePrivilege(me?.role ?? '') < 400) {
+    return { success: false, error: 'Inquisiteur requis' }
   }
 
   const { error } = await supabase

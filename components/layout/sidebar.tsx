@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LogOut, Shield, ChevronDown, Settings,
+  LogOut, Shield, ChevronDown, Settings, BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getRolePrivilege } from '@/lib/constants'
@@ -178,6 +178,24 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
           )
         })}
       </nav>
+
+      {/* Journal de guerre — Inquisiteur+ */}
+      {getRolePrivilege(profile?.role ?? '') >= 400 && getRolePrivilege(profile?.role ?? '') < 600 && (
+        <>
+          <Separator className="bg-sidebar-border mx-3" />
+          <div className="px-3 py-2">
+            <p className="px-3 mb-1 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-widest">
+              Administration
+            </p>
+            <NavItem
+              href="/admin/journal"
+              label="Journal de guerre"
+              icon={BookOpen}
+              isActive={pathname.startsWith('/admin/journal')}
+            />
+          </div>
+        </>
+      )}
 
       {/* Administration — MI+ */}
       {getRolePrivilege(profile?.role ?? '') >= 600 && (
