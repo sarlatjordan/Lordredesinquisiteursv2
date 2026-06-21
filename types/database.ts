@@ -14,6 +14,42 @@ type TableRelationship = {
 export interface Database {
   public: {
     Tables: {
+      bug_reports: {
+        Row: {
+          id:          string
+          profile_id:  string
+          title:       string
+          description: string
+          page_url:    string | null
+          severity:    'faible' | 'moyen' | 'eleve' | 'critique'
+          status:      'ouvert' | 'en_cours' | 'resolu' | 'ferme'
+          admin_note:  string | null
+          created_at:  string
+          updated_at:  string
+        }
+        Insert: {
+          id?:         string
+          profile_id:  string
+          title:       string
+          description: string
+          page_url?:   string | null
+          severity?:   'faible' | 'moyen' | 'eleve' | 'critique'
+          status?:     'ouvert' | 'en_cours' | 'resolu' | 'ferme'
+          admin_note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?:      string
+          description?: string
+          page_url?:   string | null
+          severity?:   'faible' | 'moyen' | 'eleve' | 'critique'
+          status?:     'ouvert' | 'en_cours' | 'resolu' | 'ferme'
+          admin_note?: string | null
+          updated_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
       op_chat_messages: {
         Row: {
           id:           string

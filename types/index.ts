@@ -26,6 +26,7 @@ export type Operation = Database['public']['Tables']['operations']['Row']
 export type OpRoleSlot = Database['public']['Tables']['op_role_slots']['Row']
 export type OpRegistration = Database['public']['Tables']['op_registrations']['Row']
 export type OpResource = Database['public']['Tables']['op_resources']['Row']
+export type BugReport = Database['public']['Tables']['bug_reports']['Row']
 export type OpChatMessage = Database['public']['Tables']['op_chat_messages']['Row']
 
 export type OpChatMessageWithProfile = OpChatMessage & {

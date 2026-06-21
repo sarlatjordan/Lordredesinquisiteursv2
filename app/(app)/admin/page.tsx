@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
 import {
-  Users, ImageIcon, Activity, Zap, BookOpen, TrendingUp, ExternalLink, ShieldCheck,
+  Users, ImageIcon, Activity, Zap, BookOpen, TrendingUp, ExternalLink, ShieldCheck, Bug,
 } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Administration' }
@@ -91,6 +91,16 @@ export default async function AdminPage() {
       border:    'border-emerald-400/20 hover:border-emerald-400/50',
       bg:        'bg-emerald-400/5',
       available: isSage,
+    },
+    {
+      href:      '/admin/bugs',
+      label:     'Rapports de bug',
+      desc:      'Bugs signalés par les membres',
+      icon:      Bug,
+      color:     'text-red-400',
+      border:    'border-red-400/20 hover:border-red-400/50',
+      bg:        'bg-red-400/5',
+      available: true,
     },
   ].filter((c) => c.available)
 
