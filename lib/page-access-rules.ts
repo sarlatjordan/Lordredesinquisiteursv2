@@ -9,9 +9,3 @@ export async function getPageAccessRules(): Promise<PageAccessRule[]> {
     .order('path')
   return (data ?? []) as PageAccessRule[]
 }
-
-export function getMinPrivilegeForPath(rules: PageAccessRule[], pathname: string): number {
-  const sorted = [...rules].sort((a, b) => b.path.length - a.path.length)
-  const match = sorted.find(r => pathname === r.path || pathname.startsWith(r.path + '/'))
-  return match?.min_privilege ?? 100
-}

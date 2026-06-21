@@ -4,12 +4,12 @@ import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { MobileNav } from '@/components/layout/mobile-nav'
 import { TopBar } from '@/components/layout/top-bar'
-import { RedactedContent } from '@/components/layout/redacted-content'
 import { PageTransition } from '@/components/layout/page-transition'
 import { PageBackground } from '@/components/layout/page-background'
+import { AccessGate } from '@/components/layout/access-gate'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
-import { getPageAccessRules, getMinPrivilegeForPath } from '@/lib/page-access-rules'
+import { getPageAccessRules } from '@/lib/page-access-rules'
 import type { Notification, ProfileSummary } from '@/types'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -71,8 +71,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   const userPrivilege = getRolePrivilege(profile?.role ?? '')
   const accessRules = await getPageAccessRules()
-  const minPrivilege = getMinPrivilegeForPath(accessRules, pathname)
-  const hasAccess = userPrivilege >= minPrivilege
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,10 +81,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 relative">
           <PageBackground />
           <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">
-            {hasAccess
-              ? <PageTransition>{children}</PageTransition>
-              : <RedactedContent />
-            }
+            <AccessGate privilege={userPrivilege} rules={accessRules}>
+              <PageTransition>{children}</PageTransition>
+            </AccessGate>
           </div>
         </main>
       </div>
