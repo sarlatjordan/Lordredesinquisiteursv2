@@ -35,12 +35,12 @@ export function DiscordVoiceWidget() {
     <div className="rounded-xl border border-border bg-card p-4 space-y-3">
       <div className="flex items-center gap-2">
         <Volume2 className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold">En vocal Discord</h3>
+        <h3 className="text-sm font-semibold">En jeu</h3>
         {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground ml-auto" />}
       </div>
 
       {!loading && channels.length === 0 && (
-        <p className="text-xs text-muted-foreground">Personne en vocal pour le moment.</p>
+        <p className="text-xs text-muted-foreground">Personne en jeu pour le moment.</p>
       )}
 
       {channels.map((ch) => (
