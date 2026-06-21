@@ -348,7 +348,7 @@
     <div class="site-header">
       <h1>INQFR — Historique & Backlog</h1>
       <p>
-        Suivi de toutes les évolutions depuis le lancement · Mis à jour le 20
+        Suivi de toutes les évolutions depuis le lancement · Mis à jour le 21
         juin 2026
       </p>
     </div>
@@ -972,15 +972,61 @@
           </div>
         </div>
       </div>
+      <!-- Sprint 8 - 21 juin -->
+      <div class="release">
+        <div class="release-dot dot-recent"></div>
+        <div class="release-header">
+          <div class="release-version">Sprint 8 — Accès, Ops, Bugs & Docs</div>
+          <div class="release-date">21 juin 2026</div>
+        </div>
+        <div class="entries">
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Système d'accès dynamique par rang</strong> — Table <code>page_access_rules</code>, matrix admin /admin/acces (Sage), composant <code>AccessGate</code> client côté navigation (FEAT-49)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Chat temporaire par opération</strong> — Messages Realtime isolés par opération, visibles uniquement aux participants, bulles style messenger (FEAT-50)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Rapport de bug</strong> — Formulaire /rapport-bug avec sévérité, historique personnel, vue admin /admin/bugs avec filtre statut + note, notification Sages à chaque soumission (FEAT-51)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-feat">Feature</span>
+            <div class="entry-text">
+              <strong>Guide joueur &amp; Guide admin</strong> — Pages HTML statiques (rangs, parcours initiatique, ops, logistique, sécurité pour les membres ; gestion membres, candidatures, bugs, Discord, rotation clés pour les admins), accessibles depuis la sidebar et le panneau admin (FEAT-53)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Débrief opération bloqué pour Inquisiteurs</strong> — Seuil corrigé de MI+ (600) à Inquisiteur+ (400) dans l'action et le composant (BUG-07)
+            </div>
+          </div>
+          <div class="entry">
+            <span class="tag tag-fix">Fix</span>
+            <div class="entry-text">
+              <strong>Wiki — markdown affiché en texte brut</strong> — Même config <code>react-markdown</code> + <code>remark-gfm</code> + <code>rehype-raw/sanitize</code> que les messages et les bios (BUG-08)
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- /changelog -->
 
     <!-- ══════════════ BACKLOG ══════════════ -->
     <div id="backlog" class="section">
       <div class="pills">
-        <span class="pill pill-g">✓ 62 terminés</span>
-        <span class="pill pill-a">↑ 3 priorité haute</span>
-        <span class="pill pill-b">· 4 planifiés</span>
+        <span class="pill pill-g">✓ 68 terminés</span>
+        <span class="pill pill-a">↑ 4 priorité haute</span>
+        <span class="pill pill-b">· 5 planifiés</span>
       </div>
 
       <div class="bl-section">
@@ -1017,6 +1063,14 @@
               <div class="bl-desc">Manifeste + icône pour installation bureau/mobile. Filtrage des push par type (op urgente, événement, message direct) pour éviter la désactivation en masse.</div>
             </div>
             <div class="bl-id">FEAT-39 · P2</div>
+          </div>
+          <div class="bl-card card-p1">
+            <div class="bl-icon">🗺️</div>
+            <div class="bl-body">
+              <div class="bl-name">Inventaire Blueprints</div>
+              <div class="bl-desc">Scanner les BP RSI (bookmarklet ou import JSON) — grille filtrable par type/tier/fabricant, marquage « en prod » pour suivre la fabrication en cours.</div>
+            </div>
+            <div class="bl-id">FEAT-52 · P1</div>
           </div>
         </div>
       </div>
@@ -1101,6 +1155,12 @@
             <div class="done-cat">🎨 Conseil 20 juin</div>
             <div class="done-desc">
               Couleurs rang unifiées, noms chat colorés, logo toggle, widget présence fusionné, notif Discord avec mentions par rang, admin hub, gestion membres fusionnée, profil 2 colonnes, système d'absences — 4 bugs corrigés (postes ops, UEC, vaisseaux consacrés, création événement)
+            </div>
+          </div>
+          <div class="done-item">
+            <div class="done-cat">🛠 Sprint 21 juin</div>
+            <div class="done-desc">
+              Accès dynamique par rang (FEAT-49), chat op Realtime (FEAT-50), rapport de bug + admin (FEAT-51), guide joueur &amp; admin HTML (FEAT-53) — 2 bugs corrigés (débrief Inquisiteur, wiki markdown)
             </div>
           </div>
         </div>
