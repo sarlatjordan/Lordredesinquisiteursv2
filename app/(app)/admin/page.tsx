@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
 import {
-  Users, ImageIcon, Activity, Zap, BookOpen, TrendingUp, ExternalLink,
+  Users, ImageIcon, Activity, Zap, BookOpen, TrendingUp, ExternalLink, ShieldCheck,
 } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Administration' }
@@ -80,6 +80,16 @@ export default async function AdminPage() {
       color:     'text-orange-400',
       border:    'border-orange-400/20 hover:border-orange-400/50',
       bg:        'bg-orange-400/5',
+      available: isSage,
+    },
+    {
+      href:      '/admin/acces',
+      label:     'Gestion des accès',
+      desc:      'Contrôler l\'accès aux sections par rang',
+      icon:      ShieldCheck,
+      color:     'text-emerald-400',
+      border:    'border-emerald-400/20 hover:border-emerald-400/50',
+      bg:        'bg-emerald-400/5',
       available: isSage,
     },
   ].filter((c) => c.available)

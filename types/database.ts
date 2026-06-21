@@ -14,6 +14,26 @@ type TableRelationship = {
 export interface Database {
   public: {
     Tables: {
+      page_access_rules: {
+        Row: {
+          path:          string
+          label:         string
+          min_privilege: number
+          updated_at:    string
+        }
+        Insert: {
+          path:          string
+          label:         string
+          min_privilege?: number
+          updated_at?:   string
+        }
+        Update: {
+          label?:        string
+          min_privilege?: number
+          updated_at?:   string
+        }
+        Relationships: TableRelationship[]
+      }
       absences: {
         Row: {
           id:         string

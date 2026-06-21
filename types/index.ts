@@ -3,6 +3,7 @@ import type { Database } from './database'
 
 // ─── Types DB de base ─────────────────────────────────────────────────────────
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type PageAccessRule = Database['public']['Tables']['page_access_rules']['Row']
 export type Event = Database['public']['Tables']['events']['Row']
 export type EventAttendee = Database['public']['Tables']['event_attendees']['Row']
 export type Ship = Database['public']['Tables']['ships']['Row']

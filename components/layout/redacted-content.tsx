@@ -2,10 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { ShieldOff, MessageSquare } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-import type { ReactNode } from 'react'
-
-const VISITOR_ALLOWED_PATHS = ['/profil']
 
 const REDACTED_LINES = [
   { w: 'w-4/5',  opacity: 1 },
@@ -29,7 +25,7 @@ function RedactedBar({ w, opacity, delay }: { w: string; opacity: number; delay:
   )
 }
 
-function RedactedUI() {
+export function RedactedContent() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -102,21 +98,4 @@ function RedactedUI() {
       </div>
     </motion.div>
   )
-}
-
-interface RedactedGateProps {
-  privilege: number
-  children: ReactNode
-}
-
-export function RedactedContent({ privilege, children }: RedactedGateProps) {
-  const pathname = usePathname()
-  const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
-  const isAllowed = VISITOR_ALLOWED_PATHS.includes(pathname) || isMembreProfile
-
-  if (privilege <= 50 && !isAllowed) {
-    return <RedactedUI />
-  }
-
-  return <>{children}</>
 }

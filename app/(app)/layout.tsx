@@ -9,6 +9,7 @@ import { PageTransition } from '@/components/layout/page-transition'
 import { PageBackground } from '@/components/layout/page-background'
 import { createClient } from '@/lib/supabase/server'
 import { getRolePrivilege } from '@/lib/constants'
+import { getPageAccessRules, getMinPrivilegeForPath } from '@/lib/page-access-rules'
 import type { Notification, ProfileSummary } from '@/types'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -62,32 +63,34 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     notifications = (notifData ?? []) as Notification[]
   }
 
-  // Badge chat non-lu — une seule requête SQL via RPC (voir migration 022)
   let chatUnreadCount = 0
   if (user) {
     const { data } = await supabase.rpc('get_chat_unread_count')
     chatUnreadCount = Number(data ?? 0)
   }
 
+  const userPrivilege = getRolePrivilege(profile?.role ?? '')
+  const accessRules = await getPageAccessRules()
+  const minPrivilege = getMinPrivilegeForPath(accessRules, pathname)
+  const hasAccess = userPrivilege >= minPrivilege
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar desktop */}
       <Sidebar profile={profile} badges={{ '/messages': chatUnreadCount }} />
 
-      {/* Contenu principal */}
       <div className="lg:pl-64 flex flex-col min-h-screen">
         <TopBar unreadCount={unreadCount} notifications={notifications} profile={profile} />
         <main className="flex-1 relative">
           <PageBackground />
           <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">
-            <RedactedContent privilege={getRolePrivilege(profile?.role ?? '')}>
-                <PageTransition>{children}</PageTransition>
-              </RedactedContent>
+            {hasAccess
+              ? <PageTransition>{children}</PageTransition>
+              : <RedactedContent />
+            }
           </div>
         </main>
       </div>
 
-      {/* Navigation mobile en bas */}
       <MobileNav />
     </div>
   )
