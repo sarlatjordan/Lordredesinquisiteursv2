@@ -38,7 +38,8 @@ interface CarteClientProps {
 }
 
 export function CarteClient({ points, jumpLanes, systemPositions, canManage, canDelete }: CarteClientProps) {
-  const svgRef = useRef<SVGSVGElement>(null)
+  const svgRef      = useRef<SVGSVGElement>(null)
+  const dragPosRef  = useRef<{ x: number; y: number } | null>(null)
 
   // Positions locales (source de vérité pour le rendu SVG)
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(systemPositions)
@@ -66,26 +67,27 @@ export function CarteClient({ points, jumpLanes, systemPositions, canManage, can
 
     function onMove(e: MouseEvent) {
       if (!svg) return
+      const ctm = svg.getScreenCTM()
+      if (!ctm) return
       const pt = svg.createSVGPoint()
       pt.x = e.clientX
       pt.y = e.clientY
-      const p = pt.matrixTransform(svg.getScreenCTM()!.inverse())
+      const p = pt.matrixTransform(ctm.inverse())
       const x = Math.round(Math.max(15, Math.min(985, p.x)))
       const y = Math.round(Math.max(15, Math.min(565, p.y)))
+      dragPosRef.current = { x, y }
       setPositions(prev => ({ ...prev, [name]: { x, y } }))
     }
 
     function onUp() {
-      setPositions(prev => {
-        const pos = prev[name]
-        if (pos) {
-          startSave(async () => {
-            await upsertSystemPosition(name, pos.x, pos.y)
-          })
-        }
-        return prev
-      })
+      const pos = dragPosRef.current
+      dragPosRef.current = null
       setDragging(null)
+      if (pos) {
+        startSave(async () => {
+          await upsertSystemPosition(name, pos.x, pos.y)
+        })
+      }
     }
 
     window.addEventListener('mousemove', onMove)

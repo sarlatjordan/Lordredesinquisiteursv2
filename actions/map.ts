@@ -118,7 +118,6 @@ export async function upsertSystemPosition(
     .upsert({ system_name: trimmed, x, y, updated_at: new Date().toISOString() }, { onConflict: 'system_name' })
 
   if (error) return { success: false, error: error.message }
-  revalidatePath('/carte')
   return { success: true, data: undefined }
 }
 
