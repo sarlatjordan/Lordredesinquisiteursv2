@@ -14,6 +14,26 @@ type TableRelationship = {
 export interface Database {
   public: {
     Tables: {
+      op_chat_messages: {
+        Row: {
+          id:           string
+          operation_id: string
+          profile_id:   string
+          content:      string
+          created_at:   string
+        }
+        Insert: {
+          id?:          string
+          operation_id: string
+          profile_id:   string
+          content:      string
+          created_at?:  string
+        }
+        Update: {
+          content?: string
+        }
+        Relationships: TableRelationship[]
+      }
       page_access_rules: {
         Row: {
           path:          string

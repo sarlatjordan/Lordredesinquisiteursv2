@@ -11,7 +11,7 @@ import type {
   OperationWithDetails, OpRoleSlotWithProfile,
   OpRegistrationWithProfile, Profile, Ship,
   InventoryItem, InventoryStock, InventoryItemWithStock, OpResource,
-  OperationLootWithShares,
+  OperationLootWithShares, OpChatMessageWithProfile,
 } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -45,6 +45,7 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
   const { data: profileMe } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   const userPrivilege = getRolePrivilege(profileMe?.role ?? '')
   const canManage = userPrivilege >= 600
+  const canDebrief = userPrivilege >= 400 || opRaw.commander_id === user.id
   if (userPrivilege < opRaw.min_privilege) redirect('/operations')
 
   const op = opRaw as unknown as typeof opRaw & {
@@ -125,6 +126,20 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
 
   const loots = await getOperationLoot(id)
 
+  const myReg = registrations.find((r) => r.profile_id === user.id)
+  const canChat = canManage || opRaw.commander_id === user.id || myReg?.status === 'confirmed'
+
+  let initialChatMessages: OpChatMessageWithProfile[] = []
+  if (canChat) {
+    const { data: chatRaw } = await supabase
+      .from('op_chat_messages')
+      .select('*, author:profiles(id, username, display_name, avatar_url)')
+      .eq('operation_id', id)
+      .order('created_at', { ascending: true })
+      .limit(100)
+    initialChatMessages = (chatRaw ?? []) as unknown as OpChatMessageWithProfile[]
+  }
+
   const stockMap = (stocksRaw ?? []).reduce<Record<string, InventoryStock>>((acc, s) => {
     acc[s.item_id] = s as InventoryStock
     return acc
@@ -161,6 +176,9 @@ export default async function OperationPage({ params }: { params: Promise<{ id: 
         operation={operation}
         currentUserId={user.id}
         canManage={canManage}
+        canDebrief={canDebrief}
+        canChat={canChat}
+        initialChatMessages={initialChatMessages}
         members={members ?? []}
         inventoryItems={inventoryItems}
         loots={loots as unknown as OperationLootWithShares[]}

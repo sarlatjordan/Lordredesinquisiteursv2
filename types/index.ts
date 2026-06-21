@@ -26,6 +26,11 @@ export type Operation = Database['public']['Tables']['operations']['Row']
 export type OpRoleSlot = Database['public']['Tables']['op_role_slots']['Row']
 export type OpRegistration = Database['public']['Tables']['op_registrations']['Row']
 export type OpResource = Database['public']['Tables']['op_resources']['Row']
+export type OpChatMessage = Database['public']['Tables']['op_chat_messages']['Row']
+
+export type OpChatMessageWithProfile = OpChatMessage & {
+  author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+}
 export type ChatChannel = Database['public']['Tables']['chat_channels']['Row']
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 export type ChatMemberSeen = Database['public']['Tables']['chat_member_seen']['Row']

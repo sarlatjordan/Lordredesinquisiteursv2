@@ -23,24 +23,28 @@ import { OpRoleManager } from '@/components/operations/op-role-manager'
 import { OpRegistrationsPanel } from '@/components/operations/op-registrations-panel'
 import { OpResourcesPanel } from '@/components/operations/op-resources-panel'
 import { deleteOperation, saveOperationDebrief, updateOperation } from '@/actions/operations'
-import type { OperationWithDetails, Profile, Ship, InventoryItemWithStock } from '@/types'
-import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react'
+import type { OperationWithDetails, Profile, Ship, InventoryItemWithStock, OpChatMessageWithProfile } from '@/types'
+import { Clock, MapPin, Shield, Timer, Edit, Trash2, Users, Loader2, PlayCircle, CheckCircle2, XCircle, FileText } from 'lucide-react'
 import { MarkdownEditor } from '@/components/ui/markdown-editor'
 import { MarkdownContent } from '@/components/ui/markdown-content'
 import { LootPanel } from '@/components/operations/loot-panel'
 import { Label } from '@/components/ui/label'
+import { OpChat } from '@/components/operations/op-chat'
 
 interface OperationDetailProps {
   operation: OperationWithDetails
   currentUserId: string
   canManage: boolean
+  canDebrief: boolean
+  canChat: boolean
+  initialChatMessages: OpChatMessageWithProfile[]
   members: Pick<Profile, 'id' | 'username' | 'display_name'>[]
   inventoryItems: InventoryItemWithStock[]
   loots: import('@/types').OperationLootWithShares[]
   ships: Pick<Ship, 'id' | 'name' | 'model' | 'ship_type' | 'is_org_ship' | 'status'>[]
 }
 
-export function OperationDetail({ operation: initialOp, currentUserId, canManage, members, inventoryItems, loots, ships }: OperationDetailProps) {
+export function OperationDetail({ operation: initialOp, currentUserId, canManage, canDebrief, canChat, initialChatMessages, members, inventoryItems, loots, ships }: OperationDetailProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null)
@@ -371,51 +375,74 @@ export function OperationDetail({ operation: initialOp, currentUserId, canManage
       </div>
 
       {/* Section débrief */}
-      {(isCommanderOrManager || op.debrief) && (
+      {(canDebrief || op.debrief) && (
         <motion.section
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
+          className="space-y-4"
         >
-          <Separator className="mb-6" />
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Débrief
-          </h3>
+          <Separator />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+              <FileText className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">Rapport de débrief</h3>
+              <p className="text-xs text-muted-foreground">Bilan post-opération — Inquisiteur+ ou commandant</p>
+            </div>
+          </div>
 
-          {isCommanderOrManager ? (
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="debrief" className="sr-only">Débrief</Label>
-                <MarkdownEditor
-                  id="debrief"
-                  value={debrief}
-                  onChange={(v) => { setDebrief(v); setDebriefSaved(false) }}
-                  placeholder="Résumé de l'opération, résultats, points d'amélioration…"
-                  rows={8}
-                />
-              </div>
+          {canDebrief ? (
+            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+              <Label htmlFor="debrief" className="sr-only">Débrief</Label>
+              <MarkdownEditor
+                id="debrief"
+                value={debrief}
+                onChange={(v) => { setDebrief(v); setDebriefSaved(false) }}
+                placeholder={`# Bilan\n\nRésumé de l'opération…\n\n## Points positifs\n\n## Points d'amélioration`}
+                rows={10}
+              />
               {debriefError && (
-                <div className="rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2">
-                  <p className="text-xs text-destructive">{debriefError}</p>
-                </div>
+                <p className="rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2 text-xs text-destructive">
+                  {debriefError}
+                </p>
               )}
               <div className="flex items-center justify-between">
-                {debriefSaved ? (
-                  <p className="text-xs text-green-400">Débrief enregistré</p>
-                ) : <span />}
+                {debriefSaved
+                  ? <p className="text-xs text-green-400">Rapport enregistré ✓</p>
+                  : <span />
+                }
                 <Button size="sm" onClick={handleSaveDebrief} disabled={isPending}>
-                  {isPending && <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />}
-                  Enregistrer le débrief
+                  {isPending && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+                  Enregistrer le rapport
                 </Button>
               </div>
             </div>
-          ) : (
-            op.debrief && (
-              <div className="rounded-lg border border-border bg-muted/20 p-4">
-                <div className="text-sm text-foreground leading-relaxed"><MarkdownContent>{op.debrief}</MarkdownContent></div>
+          ) : op.debrief ? (
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="prose prose-sm prose-invert max-w-none text-sm text-foreground leading-relaxed">
+                <MarkdownContent>{op.debrief}</MarkdownContent>
               </div>
-            )
-          )}
+            </div>
+          ) : null}
+        </motion.section>
+      )}
+
+      {/* Chat opération */}
+      {canChat && (
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="space-y-4"
+        >
+          <Separator />
+          <OpChat
+            operationId={op.id}
+            initialMessages={initialChatMessages}
+            currentUserId={currentUserId}
+          />
         </motion.section>
       )}
 

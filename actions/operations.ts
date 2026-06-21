@@ -518,7 +518,7 @@ export async function getPendingOpResources(): Promise<ActionResult<OpResourceWi
 export async function saveOperationDebrief(id: string, debrief: string): Promise<ActionResult> {
   const { supabase, user, privilege } = await getAuthWithPrivilege()
   if (!user) return { success: false, error: 'Non authentifié' }
-  if (privilege < 300) return { success: false, error: 'Privilege insuffisant (Gardien requis)' }
+  if (privilege < 400) return { success: false, error: 'Inquisiteur requis' }
 
   const { error } = await supabase
     .from('operations')
@@ -531,6 +531,25 @@ export async function saveOperationDebrief(id: string, debrief: string): Promise
   revalidatePath(`/operations/${id}`)
   revalidatePath('/operations')
   return { success: true, data: undefined }
+}
+
+export async function sendOpChatMessage(
+  operationId: string,
+  content: string,
+): Promise<ActionResult<{ id: string }>> {
+  if (!content.trim() || content.length > 2000) return { success: false, error: 'Message invalide' }
+
+  const { supabase, user } = await getAuthWithPrivilege()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data, error } = await supabase
+    .from('op_chat_messages')
+    .insert({ operation_id: operationId, profile_id: user.id, content: content.trim() })
+    .select('id')
+    .single()
+
+  if (error) return { success: false, error: error.message }
+  return { success: true, data: data as { id: string } }
 }
 
 export async function updateRegistrationStatus(
