@@ -10,6 +10,7 @@ import {
   Map,
   MessagesSquare,
   Bug,
+  FileText,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -17,6 +18,7 @@ export interface NavLink {
   href: string
   label: string
   icon: LucideIcon
+  external?: boolean
 }
 
 export interface NavGroup {
@@ -60,8 +62,9 @@ export const NAV_GROUPS: NavGroup[] = [
     id: 'references',
     label: 'Références',
     links: [
-      { href: '/ressources',   label: 'Wiki',            icon: BookOpen },
-      { href: '/rapport-bug',  label: 'Rapport de bug',  icon: Bug },
+      { href: '/ressources',       label: 'Wiki',            icon: BookOpen },
+      { href: '/rapport-bug',      label: 'Rapport de bug',  icon: Bug },
+      { href: '/guide-joueur.html', label: 'Guide du membre', icon: FileText, external: true },
     ],
   },
 ]

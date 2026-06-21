@@ -84,21 +84,21 @@
 <body>
 
 <h1>INQFR — Backlog</h1>
-<p class="subtitle">Mise à jour 2026-06-06 · Next.js 16 · Supabase · TypeScript strict · Tailwind v4</p>
+<p class="subtitle">Mise à jour 2026-06-21 · Next.js 16 · Supabase · TypeScript strict · Tailwind v4</p>
 
 <!-- Stats globales -->
 <div class="global">
   <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P0 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P1 ouverts</div></div>
+  <div class="stat"><div class="stat-value c-p1">1</div><div class="stat-label">P1 ouverts</div></div>
   <div class="stat"><div class="stat-value c-done">0</div><div class="stat-label">P2 ouverts</div></div>
-  <div class="stat"><div class="stat-value c-done">92</div><div class="stat-label">Terminés</div></div>
-  <div class="stat"><div class="stat-value c-done">100%</div><div class="stat-label">Complétion</div></div>
+  <div class="stat"><div class="stat-value c-done">96</div><div class="stat-label">Terminés</div></div>
+  <div class="stat"><div class="stat-value c-warn">99%</div><div class="stat-label">Complétion</div></div>
 </div>
 
 <!-- Progression -->
 <div class="progress-wrap">
-  <div class="progress-label"><span>Progression globale (92 / 92 items)</span><span style="color:#4ade80">100% 🎉</span></div>
-  <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
+  <div class="progress-label"><span>Progression globale (96 / 97 items)</span><span style="color:#fbbf24">99% — 1 P1 en cours</span></div>
+  <div class="bar-bg"><div class="bar-fill" style="width:99%"></div></div>
   <div style="margin-top:10px">
     <div class="bar-row">
       <span class="bar-label" style="color:#4ade80">P0</span>
@@ -106,9 +106,9 @@
       <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
     </div>
     <div class="bar-row">
-      <span class="bar-label" style="color:#4ade80">P1</span>
-      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:0%"></div></div>
-      <span class="bar-count" style="color:#4ade80">0 ouvert ✓</span>
+      <span class="bar-label" style="color:#818cf8">P1</span>
+      <div class="bar-bg-sm"><div class="bar-fill-p1" style="width:15%"></div></div>
+      <span class="bar-count" style="color:#818cf8">1 ouvert</span>
     </div>
     <div class="bar-row">
       <span class="bar-label" style="color:#4ade80">P2</span>
@@ -120,14 +120,68 @@
 
 <div class="grid">
 
-<!-- ✅ Tous terminés -->
-<div class="section full" style="border-color:rgba(74,222,128,.2);background:rgba(74,222,128,.03)">
+<!-- 🚧 En cours -->
+<div class="section full" style="border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.04)">
   <div class="section-header">
-    <span class="section-icon">🎉</span>
-    <span class="section-title t-done">Backlog entièrement terminé — 92 / 92 items</span>
-    <span class="section-count" style="color:#4ade80">100%</span>
+    <span class="section-icon">🚧</span>
+    <span class="section-title t-feat">Planifié — 1 item P1</span>
+    <span class="section-count" style="color:#818cf8">1 ouvert</span>
   </div>
-  <p style="font-size:12px;color:#475569">Aucun item ouvert. Tous les P0, P1 et P2 sont fermés.</p>
+  <div class="items">
+    <div class="item" style="background:rgba(129,140,248,.05);border-color:rgba(129,140,248,.2)">
+      <div class="badge" style="background:rgba(129,140,248,.2);color:#818cf8">⚡</div>
+      <div class="item-body">
+        <div class="item-label">FEAT-52 · Inventaire Blueprints</div>
+        <div class="item-sub">Scanner les BP RSI (bookmarklet ou import JSON) — grille filtrable par type/tier/fabricant, marquage « en prod » pour suivre la fabrication en cours</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- ✅ Sprint 2026-06-21 -->
+<div class="section full">
+  <div class="section-header">
+    <span class="section-icon">🚀</span>
+    <span class="section-title t-feat">Sprint 2026-06-21 — Accès, Opérations, Bugs</span>
+    <span class="section-count" style="color:#4ade80">4 terminés ✓</span>
+  </div>
+  <div class="items-grid">
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-49 · Système d'accès dynamique par rang</div>
+        <div class="item-sub">Table page_access_rules · matrix admin /admin/acces (Sage) · AccessGate client usePathname() · migration 049</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-50 · Chat temporaire par opération</div>
+        <div class="item-sub">op_chat_messages · Realtime Supabase · bulles messenger · is_op_participant() SECURITY DEFINER · migration 050</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">FEAT-51 · Rapport de bug</div>
+        <div class="item-sub">/rapport-bug formulaire + historique · /admin/bugs filtre statut + note admin · notif Sages à chaque soumission · migration 051</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+    <div class="item item-done">
+      <div class="badge b-done">✓</div>
+      <div class="item-body">
+        <div class="item-label crossed">BUG-07 · Débrief opération bloqué pour Inquisiteurs</div>
+        <div class="item-sub">Seuil UI corrigé de MI+ (600) à Inquisiteur+ (400) dans saveOperationDebrief et operation-detail.tsx</div>
+      </div>
+      <div class="item-meta"><span class="tag tag-p1">P1</span></div>
+    </div>
+  </div>
 </div>
 
 <hr class="divider" />

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LogOut, Shield, ChevronDown, Settings, BookOpen,
+  LogOut, Shield, ChevronDown, Settings, BookOpen, ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getRolePrivilege } from '@/lib/constants'
@@ -30,40 +30,47 @@ function NavItem({
   icon: Icon,
   badge,
   isActive,
+  external,
 }: {
   href: string
   label: string
   icon: React.ElementType
   badge?: number
   isActive: boolean
+  external?: boolean
 }) {
-  return (
-    <Link href={href}>
-      <motion.div
-        whileHover={{ x: 2 }}
-        transition={{ duration: 0.15 }}
-        className={cn(
-          'group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-150',
-          isActive
-            ? 'bg-primary/10 text-primary border border-primary/20'
-            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-        )}
-      >
-        <Icon className={cn(
-          'h-4 w-4 shrink-0 transition-colors',
-          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-sidebar-accent-foreground'
-        )} />
-        <span className="truncate">{label}</span>
-        {badge && badge > 0 && !isActive ? (
-          <span className="ml-auto shrink-0 min-w-[1.1rem] h-[1.1rem] rounded-full bg-destructive text-[9px] text-white flex items-center justify-center px-1">
-            {badge > 99 ? '99+' : badge}
-          </span>
-        ) : isActive ? (
-          <motion.div layoutId="sidebar-active-indicator" className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-        ) : null}
-      </motion.div>
-    </Link>
+  const inner = (
+    <motion.div
+      whileHover={{ x: 2 }}
+      transition={{ duration: 0.15 }}
+      className={cn(
+        'group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-150',
+        isActive
+          ? 'bg-primary/10 text-primary border border-primary/20'
+          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+      )}
+    >
+      <Icon className={cn(
+        'h-4 w-4 shrink-0 transition-colors',
+        isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-sidebar-accent-foreground'
+      )} />
+      <span className="truncate">{label}</span>
+      {external ? (
+        <ExternalLink className="ml-auto h-3 w-3 text-muted-foreground/40 shrink-0" />
+      ) : badge && badge > 0 && !isActive ? (
+        <span className="ml-auto shrink-0 min-w-[1.1rem] h-[1.1rem] rounded-full bg-destructive text-[9px] text-white flex items-center justify-center px-1">
+          {badge > 99 ? '99+' : badge}
+        </span>
+      ) : isActive ? (
+        <motion.div layoutId="sidebar-active-indicator" className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+      ) : null}
+    </motion.div>
   )
+
+  if (external) {
+    return <a href={href} target="_blank" rel="noopener noreferrer">{inner}</a>
+  }
+  return <Link href={href}>{inner}</Link>
 }
 
 export function Sidebar({ profile, badges = {} }: SidebarProps) {
@@ -167,7 +174,8 @@ export function Sidebar({ profile, badges = {} }: SidebarProps) {
                           label={link.label}
                           icon={link.icon}
                           badge={badges[link.href]}
-                          isActive={pathname === link.href || pathname.startsWith(link.href + '/')}
+                          isActive={!link.external && (pathname === link.href || pathname.startsWith(link.href + '/'))}
+                          external={link.external}
                         />
                       ))}
                     </div>

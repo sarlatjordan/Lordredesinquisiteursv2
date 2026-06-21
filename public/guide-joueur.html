@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>INQFR — Guide du membre</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; padding: 0; min-height: 100vh; }
+
+  /* Layout */
+  .shell { display: flex; min-height: 100vh; }
+  .toc { width: 240px; min-width: 240px; background: #0f0f1a; border-right: 1px solid #1e1e2e; padding: 28px 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+  .content { flex: 1; padding: 40px 48px; max-width: 900px; }
+  @media (max-width: 780px) { .toc { display: none; } .content { padding: 24px 20px; } }
+
+  /* TOC */
+  .toc-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: #4b5563; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e1e2e; }
+  .toc a { display: block; font-size: 12px; color: #64748b; text-decoration: none; padding: 4px 8px; border-radius: 5px; margin-bottom: 1px; transition: color .15s, background .15s; }
+  .toc a:hover { color: #e2e8f0; background: #1e1e2e; }
+  .toc a.sub { padding-left: 20px; font-size: 11px; color: #475569; }
+  .toc-section { margin-top: 14px; }
+
+  /* Header */
+  .header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid #1e1e2e; }
+  .badge-org { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #818cf8; background: rgba(129,140,248,.1); border: 1px solid rgba(129,140,248,.2); border-radius: 6px; padding: 3px 10px; margin-bottom: 14px; }
+  h1 { font-size: 28px; font-weight: 900; color: #f1f5f9; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+  /* Sections */
+  .section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1e1e2e; }
+  .section-icon { font-size: 20px; }
+  h2 { font-size: 18px; font-weight: 800; color: #f1f5f9; }
+  h3 { font-size: 14px; font-weight: 700; color: #cbd5e1; margin: 20px 0 10px; }
+
+  p { font-size: 13px; color: #94a3b8; line-height: 1.7; margin-bottom: 12px; }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px 16px; }
+  .card-title { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #64748b; line-height: 1.5; }
+  .card-icon { font-size: 18px; margin-bottom: 8px; }
+
+  /* Rang table */
+  .rang-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .rang-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #475569; padding: 8px 12px; text-align: left; border-bottom: 1px solid #1e1e2e; }
+  .rang-table td { font-size: 12px; padding: 9px 12px; border-bottom: 1px solid #0f0f1a; vertical-align: middle; }
+  .rang-table tr:hover td { background: rgba(255,255,255,.02); }
+  .rang-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+  /* Badges rang */
+  .r-visiteur    { color: #94a3b8; }
+  .r-aspirant    { color: #60a5fa; }
+  .r-consacre    { color: #a78bfa; }
+  .r-gardien     { color: #34d399; }
+  .r-inquisiteur { color: #fb923c; }
+  .r-mi          { color: #f43f5e; }
+  .r-sage        { color: #fbbf24; }
+
+  .d-visiteur    { background: #94a3b8; }
+  .d-aspirant    { background: #60a5fa; }
+  .d-consacre    { background: #a78bfa; }
+  .d-gardien     { background: #34d399; }
+  .d-inquisiteur { background: #fb923c; }
+  .d-mi          { background: #f43f5e; }
+  .d-sage        { background: #fbbf24; }
+
+  /* Steps */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px; }
+  .step-num { counter-increment: step; content: counter(step); width: 24px; height: 24px; min-width: 24px; background: rgba(129,140,248,.15); border: 1px solid rgba(129,140,248,.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #818cf8; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+
+  /* Tips */
+  .tip { display: flex; gap: 10px; background: rgba(129,140,248,.06); border: 1px solid rgba(129,140,248,.15); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .tip-icon { font-size: 14px; flex-shrink: 0; }
+  .tip-text { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+  .tip-text strong { color: #cbd5e1; }
+
+  .warn { background: rgba(251,191,36,.06); border-color: rgba(251,191,36,.2); }
+  .warn .tip-text { color: #92400e; color: #d97706; }
+
+  /* Tag pill */
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-right: 4px; }
+  .pill-blue   { background: rgba(96,165,250,.1);  color: #60a5fa;  border: 1px solid rgba(96,165,250,.2); }
+  .pill-green  { background: rgba(52,211,153,.1);  color: #34d399;  border: 1px solid rgba(52,211,153,.2); }
+  .pill-purple { background: rgba(167,139,250,.1); color: #a78bfa;  border: 1px solid rgba(167,139,250,.2); }
+  .pill-orange { background: rgba(251,146,60,.1);  color: #fb923c;  border: 1px solid rgba(251,146,60,.2); }
+  .pill-red    { background: rgba(244,63,94,.1);   color: #f43f5e;  border: 1px solid rgba(244,63,94,.2); }
+
+  /* Onboarding list */
+  .onboard-rank { margin-bottom: 20px; }
+  .onboard-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; padding: 4px 10px; border-radius: 6px; display: inline-block; }
+  .onboard-steps { display: flex; flex-direction: column; gap: 5px; }
+  .onboard-step { font-size: 12px; color: #94a3b8; padding: 6px 10px; background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+  .onboard-step::before { content: '○'; color: #374151; flex-shrink: 0; }
+  .pts { font-size: 10px; color: #4b5563; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Table des matières -->
+<nav class="toc">
+  <div class="toc-title">Guide du membre</div>
+  <div class="toc-section">
+    <a href="#rangs">Système de rangs</a>
+    <a href="#rangs-acces" class="sub">Accès par rang</a>
+  </div>
+  <div class="toc-section">
+    <a href="#premiers-pas">Premiers pas</a>
+    <a href="#premiers-pas-profil" class="sub">Profil & identité</a>
+    <a href="#premiers-pas-sc" class="sub">Lier ton compte RSI</a>
+  </div>
+  <div class="toc-section">
+    <a href="#dashboard">Tableau de bord</a>
+  </div>
+  <div class="toc-section">
+    <a href="#evenements">Événements</a>
+  </div>
+  <div class="toc-section">
+    <a href="#operations">Opérations</a>
+    <a href="#ops-chat" class="sub">Chat d'opération</a>
+    <a href="#ops-debrief" class="sub">Débrief</a>
+    <a href="#ops-loot" class="sub">Loot panel</a>
+  </div>
+  <div class="toc-section">
+    <a href="#flotte">Flotte</a>
+  </div>
+  <div class="toc-section">
+    <a href="#logistique">Logistique</a>
+  </div>
+  <div class="toc-section">
+    <a href="#messages">Messages</a>
+  </div>
+  <div class="toc-section">
+    <a href="#onboarding">Parcours initiatique</a>
+  </div>
+  <div class="toc-section">
+    <a href="#securite">Sécurité & MFA</a>
+  </div>
+  <div class="toc-section">
+    <a href="#rapport-bug">Signaler un bug</a>
+  </div>
+</nav>
+
+<!-- Contenu -->
+<main class="content">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge-org">⚔ L'Ordre des Inquisiteurs — INQFR</div>
+    <h1>Guide du membre</h1>
+    <p class="subtitle">Tout ce qu'il faut savoir pour naviguer dans le QG numérique de l'Ordre. Ce guide est mis à jour à chaque évolution majeure de la plateforme.</p>
+  </div>
+
+  <!-- Rangs -->
+  <div class="section" id="rangs">
+    <div class="section-header">
+      <span class="section-icon">⚔</span>
+      <h2>Système de rangs</h2>
+    </div>
+    <p>L'Ordre est structuré en 7 rangs hiérarchiques. Ton rang détermine ce que tu peux voir et faire sur INQFR.</p>
+
+    <table class="rang-table">
+      <thead>
+        <tr>
+          <th>Rang</th>
+          <th>Accès clé</th>
+          <th>Obtention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="rang-dot d-visiteur"></span><span class="r-visiteur">Visiteur</span></td>
+          <td>Profil public uniquement</td>
+          <td>Invitation en attente</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-aspirant"></span><span class="r-aspirant">Aspirant</span></td>
+          <td>Dashboard, flotte, messages, ressources</td>
+          <td>Candidature acceptée</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-consacre"></span><span class="r-consacre">Consacré</span></td>
+          <td>+ Logistique complète, carte stratégique</td>
+          <td>Parcours aspirant + vote Gardiens</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-gardien"></span><span class="r-gardien">Gardien</span></td>
+          <td>+ Créer des événements, toggle recrutement</td>
+          <td>Parcours consacré + vote MI</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-inquisiteur"></span><span class="r-inquisiteur">Inquisiteur</span></td>
+          <td>+ Rédiger les débriefs d'opérations, évaluations</td>
+          <td>Parcours gardien + vote MI</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-mi"></span><span class="r-mi">Maître Inquisiteur</span></td>
+          <td>+ Commander des opérations, panel admin complet</td>
+          <td>Vote du Conseil</td>
+        </tr>
+        <tr>
+          <td><span class="rang-dot d-sage"></span><span class="r-sage">Sage</span></td>
+          <td>+ Gestion des accès, audit global, galerie</td>
+          <td>Vote unanime Conseil</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="rangs-acces"></div>
+    <div class="tip">
+      <span class="tip-icon">ℹ️</span>
+      <div class="tip-text"><strong>Les valeurs numériques de rang ne s'affichent jamais.</strong> L'accès aux sections est géré automatiquement — si une page est grisée, c'est que ton rang actuel n'y donne pas encore accès.</div>
+    </div>
+  </div>
+
+  <!-- Premiers pas -->
+  <div class="section" id="premiers-pas">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <h2>Premiers pas</h2>
+    </div>
+    <p>Après ton invitation par un Sage, tu reçois un email avec un magic link. Clique dessus pour accéder directement au QG — aucun mot de passe requis au premier accès.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Accède au QG</div>
+          <div class="step-desc">Via le magic link email, Google OAuth, ou Discord OAuth sur <strong>inqfr.vercel.app/login</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title" id="premiers-pas-profil">Configure ton profil</div>
+          <div class="step-desc">Va sur <strong>/profil</strong> : photo de profil, nom affiché, biographie. Ton pseudo RSI et ton handle SC sont importants pour la flotte.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title" id="premiers-pas-sc">Lie ton compte Star Citizen</div>
+          <div class="step-desc">Section <strong>Star Citizen</strong> dans /profil : renseigne ton pseudo RSI. C'est utilisé pour importer tes vaisseaux dans la flotte org.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Active le MFA (recommandé)</div>
+          <div class="step-desc">Section <strong>Sécurité</strong> dans /profil : active l'authentification TOTP (Google Authenticator, Authy). Obligatoire pour les comptes MI+.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Rejoins Discord</div>
+          <div class="step-desc">Le serveur Discord de l'Ordre reste le canal de communication vocal principal. Les événements créés sur INQFR y sont synchronisés automatiquement.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <h2>Tableau de bord</h2>
+    </div>
+    <p>Le dashboard est ta page d'accueil. Il concentre les informations importantes de l'Ordre en temps réel.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-title">Statistiques org</div>
+        <div class="card-desc">Membres actifs, vaisseaux org, opérations en cours, ressources logistiques totales.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Feed d'activité</div>
+        <div class="card-desc">Dernières actions de l'Ordre : nouvelles ops, événements, promotions, dépôts en logistique.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎮</div>
+        <div class="card-title">Présence en jeu</div>
+        <div class="card-desc">Membres actuellement en jeu (toggle manuel) et membres en vocal Discord. Mis à jour toutes les 30s.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✅</div>
+        <div class="card-title">Parcours initiatique</div>
+        <div class="card-desc">Tes étapes de progression vers le rang suivant. Clique "Réclamer" pour valider les étapes manuelles.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎮</span>
+      <div class="tip-text">Le widget <strong>En jeu</strong> est un toggle manuel. Active-le quand tu joues à SC pour que tes camarades sachent que tu es dispo pour une op improvisée.</div>
+    </div>
+  </div>
+
+  <!-- Événements -->
+  <div class="section" id="evenements">
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <h2>Événements</h2>
+    </div>
+    <p>Les événements sont les rendez-vous planifiés de l'Ordre : ops organisées, sessions de farm, tournois internes, soirées RP.</p>
+
+    <h3>Consulter et s'inscrire</h3>
+    <p>Clique sur n'importe quelle carte d'événement pour voir le détail (description, date, lieu, liste des inscrits). Le bouton <strong>S'inscrire</strong> confirme ta participation.</p>
+
+    <h3>Disponibilités hebdomadaires</h3>
+    <p>Dans <strong>/profil → Disponibilités</strong>, tu peux indiquer tes créneaux libres semaine par semaine (4 créneaux/jour × 7 jours). Les organisateurs d'événements voient ces infos lors de la création.</p>
+
+    <h3>Calendrier ICS</h3>
+    <p>Dans <strong>/profil → Calendrier ICS</strong>, génère un lien d'abonnement pour synchroniser les événements INQFR directement dans Google Agenda, Apple Calendar, etc.</p>
+
+    <div class="tip warn">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-text"><strong>Les Gardiens+ peuvent créer des événements.</strong> Si tu veux organiser quelque chose, atteins le rang Gardien ou demande à un Gardien de le créer pour toi.</div>
+    </div>
+  </div>
+
+  <!-- Opérations -->
+  <div class="section" id="operations">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <h2>Opérations</h2>
+    </div>
+    <p>Les opérations sont les missions coordonnées de l'Ordre. Chaque op a un commandant, des slots de rôles, un briefing, et un débrief post-mission.</p>
+
+    <h3>Rejoindre une opération</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Consulte les ops disponibles</div>
+          <div class="step-desc">Sur <strong>/operations</strong>, les ops avec statut <span class="pill pill-blue">Planifié</span> ou <span class="pill pill-orange">En recrutement</span> cherchent des participants.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Postule à un slot</div>
+          <div class="step-desc">Ouvre la fiche op, consulte le briefing, et postule au rôle qui correspond à tes compétences. Le commandant confirme les participants.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Utilise le chat d'op</div>
+          <div class="step-desc">Une fois confirmé, tu accèdes au chat temporaire de l'opération pour coordonner avec l'équipe avant le départ.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 id="ops-chat">Chat d'opération</h3>
+    <p>Chaque opération dispose d'un <strong>chat temps réel</strong> accessible aux participants confirmés, au commandant, et aux Maîtres Inquisiteurs+. Les messages sont persistés tant que l'op existe — ils sont supprimés avec l'opération.</p>
+
+    <h3 id="ops-debrief">Débrief</h3>
+    <p>Après la mission, le commandant ou tout Inquisiteur+ rédige le débrief : bilan, pertes, butin, leçons apprises. C'est le compte-rendu officiel de l'op, visible par tous les membres.</p>
+
+    <h3 id="ops-loot">Loot panel</h3>
+    <p>Si de l'aUEC a été récupéré en op, le commandant peut distribuer le butin entre les participants depuis le <strong>Loot panel</strong>. Chaque distribution est logguée et attribue le badge <em>Butinneur</em>.</p>
+  </div>
+
+  <!-- Flotte -->
+  <div class="section" id="flotte">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <h2>Flotte</h2>
+    </div>
+    <p>La page <strong>/flotte</strong> affiche tous les vaisseaux de l'Ordre : la flotte org et les vaisseaux personnels des membres.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🏢</div>
+        <div class="card-title">Flotte org</div>
+        <div class="card-desc">Vaisseaux appartenant à l'organisation, disponibles pour les opérations collectives. Marqués d'un badge "Corpo".</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <div class="card-title">Flotte perso</div>
+        <div class="card-desc">Vaisseaux personnels des membres, importés depuis RSI. Filtrables par pilote.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Filtres</div>
+        <div class="card-desc">Filtre par type de vaisseau, par pilote, ou affiche uniquement la flotte corpo.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-text">Pour ajouter tes vaisseaux, renseigne ton <strong>pseudo RSI</strong> dans /profil → Star Citizen. L'import se fait automatiquement depuis ton hangar RSI public.</div>
+    </div>
+  </div>
+
+  <!-- Logistique -->
+  <div class="section" id="logistique">
+    <div class="section-header">
+      <span class="section-icon">📦</span>
+      <h2>Logistique</h2>
+    </div>
+    <p>L'inventaire org centralise les ressources matérielles de l'Ordre : minerais, composants, carburant, munitions. Tout dépôt et retrait est tracé.</p>
+
+    <h3>Déposer des ressources</h3>
+    <p>Sélectionne un article dans l'inventaire, clique <strong>Déposer</strong>, indique la quantité et l'emplacement. Ta demande est soumise à un Gardien+ pour approbation.</p>
+
+    <h3>Retirer des ressources</h3>
+    <p>Même principe que le dépôt. Pour une opération spécifique, la réservation est atomique : les ressources sont bloquées dès la demande validée.</p>
+
+    <div class="tip">
+      <span class="tip-icon">ℹ️</span>
+      <div class="tip-text">Le solde en <strong>aUEC org</strong> visible en haut de la page est la valeur estimée de l'inventaire total. Il se met à jour automatiquement après chaque transaction approuvée.</div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="section" id="messages">
+    <div class="section-header">
+      <span class="section-icon">💬</span>
+      <h2>Messages</h2>
+    </div>
+    <p>La messagerie <strong>/messages</strong> est un système de canaux temps réel (Supabase Realtime). Les messages apparaissent instantanément sans rechargement de page.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">📢</div>
+        <div class="card-title">Canaux publics</div>
+        <div class="card-desc">Accessibles à tous les membres selon leur rang. General, opérations, etc.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <div class="card-title">Canaux privés</div>
+        <div class="card-desc">Canaux restreints créés par les MI+ pour les discussions sensibles.</div>
+      </div>
+    </div>
+
+    <p>Les noms des membres dans les messages sont colorés selon leur rang, pour identifier rapidement qui parle.</p>
+  </div>
+
+  <!-- Onboarding -->
+  <div class="section" id="onboarding">
+    <div class="section-header">
+      <span class="section-icon">🎯</span>
+      <h2>Parcours initiatique</h2>
+    </div>
+    <p>Chaque rang dispose d'un parcours de 5 étapes qui valide ton intégration. Compléter toutes les étapes débloque un bonus de points et accélère ton évaluation pour le rang suivant.</p>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-text">Le parcours est visible sur ton <strong>dashboard</strong>. Les étapes automatiques (participer à une op, rejoindre Discord…) se valident seules. Les étapes manuelles ont un bouton <strong>Réclamer</strong>.</div>
+    </div>
+
+    <div class="onboard-rank">
+      <div class="onboard-title" style="background:rgba(96,165,250,.1);color:#60a5fa;">Aspirant (5 étapes · bonus +25 pts)</div>
+      <div class="onboard-steps">
+        <div class="onboard-step">Compléter son profil (photo + pseudo RSI)<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Ajouter un vaisseau à la flotte<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Participer à une opération<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Participer à une op de +2h<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Assister à un premier événement<span class="pts">+10 pts</span></div>
+      </div>
+    </div>
+
+    <div class="onboard-rank">
+      <div class="onboard-title" style="background:rgba(167,139,250,.1);color:#a78bfa;">Consacré (5 étapes · bonus +40 pts)</div>
+      <div class="onboard-steps">
+        <div class="onboard-step">Participer à 5 événements<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Participer à 5 opérations<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Effectuer une transaction logistique<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Contribuer aux ressources (wiki)<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Participer au recrutement (manuel)<span class="pts">+10 pts</span></div>
+      </div>
+    </div>
+
+    <div class="onboard-rank">
+      <div class="onboard-title" style="background:rgba(52,211,153,.1);color:#34d399;">Gardien (5 étapes · bonus +60 pts)</div>
+      <div class="onboard-steps">
+        <div class="onboard-step">Mener une opération en tant que commandant<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Organiser ou co-organiser 10 événements<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Superviser la logistique org<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Créer une ressource wiki<span class="pts">+10 pts</span></div>
+        <div class="onboard-step">Former un aspirant au recrutement (manuel)<span class="pts">+10 pts</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sécurité -->
+  <div class="section" id="securite">
+    <div class="section-header">
+      <span class="section-icon">🔒</span>
+      <h2>Sécurité & MFA</h2>
+    </div>
+    <p>La sécurité du compte est disponible dans <strong>/profil → Sécurité</strong>.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔑</div>
+        <div class="card-title">Mot de passe</div>
+        <div class="card-desc">Changement sécurisé : l'ancien mot de passe est toujours demandé en premier.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <div class="card-title">MFA TOTP</div>
+        <div class="card-desc">Authentification à deux facteurs via Google Authenticator ou Authy. Obligatoire pour MI+, recommandé pour tous.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💻</div>
+        <div class="card-title">Appareils de confiance</div>
+        <div class="card-desc">Après validation MFA, tu peux marquer un appareil comme "de confiance" pour 1h/1j/1s/1m/1an.</div>
+      </div>
+    </div>
+
+    <div class="tip warn">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-text"><strong>Si tu es Maître Inquisiteur ou Sage</strong>, le MFA est obligatoire. Sans MFA activé, tu seras redirigé vers la page de vérification à chaque connexion.</div>
+    </div>
+  </div>
+
+  <!-- Rapport de bug -->
+  <div class="section" id="rapport-bug">
+    <div class="section-header">
+      <span class="section-icon">🐛</span>
+      <h2>Signaler un bug</h2>
+    </div>
+    <p>Tu as repéré un comportement anormal, une page cassée, ou une fonctionnalité qui ne marche pas comme prévu ? Utilise <strong>/rapport-bug</strong> dans la sidebar.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Donne un titre clair</div>
+          <div class="step-desc">Ex : "Bouton S'inscrire ne fonctionne pas sur les événements passés" plutôt que "Bug sur les events".</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Choisis la sévérité</div>
+          <div class="step-desc"><span class="pill pill-green">Faible</span> gêne mineure · <span class="pill pill-orange">Élevé</span> fonctionnalité bloquée · <span class="pill pill-red">Critique</span> sécurité ou données perdues.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Décris les étapes pour reproduire</div>
+          <div class="step-desc">Plus c'est précis, plus vite le bug est corrigé. Indique la page URL si pertinent.</div>
+        </div>
+      </div>
+    </div>
+
+    <p>Tes rapports sont visibles dans ton historique sur /rapport-bug. Un Sage les traite et peut ajouter une note de suivi.</p>
+  </div>
+
+</main>
+</div>
+</body>
+</html>

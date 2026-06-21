@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>INQFR — Guide administrateur</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; padding: 0; min-height: 100vh; }
+
+  .shell { display: flex; min-height: 100vh; }
+  .toc { width: 240px; min-width: 240px; background: #0f0f1a; border-right: 1px solid #1e1e2e; padding: 28px 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+  .content { flex: 1; padding: 40px 48px; max-width: 900px; }
+  @media (max-width: 780px) { .toc { display: none; } .content { padding: 24px 20px; } }
+
+  .toc-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: #4b5563; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e1e2e; }
+  .toc a { display: block; font-size: 12px; color: #64748b; text-decoration: none; padding: 4px 8px; border-radius: 5px; margin-bottom: 1px; transition: color .15s, background .15s; }
+  .toc a:hover { color: #e2e8f0; background: #1e1e2e; }
+  .toc a.sub { padding-left: 20px; font-size: 11px; color: #475569; }
+  .toc-section { margin-top: 14px; }
+  .toc-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 4px; background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+
+  .header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid #1e1e2e; }
+  .badge-org { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #f43f5e; background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.2); border-radius: 6px; padding: 3px 10px; margin-bottom: 14px; }
+  h1 { font-size: 28px; font-weight: 900; color: #f1f5f9; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+  .section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1e1e2e; }
+  .section-icon { font-size: 20px; }
+  h2 { font-size: 18px; font-weight: 800; color: #f1f5f9; }
+  h3 { font-size: 14px; font-weight: 700; color: #cbd5e1; margin: 20px 0 10px; }
+  p { font-size: 13px; color: #94a3b8; line-height: 1.7; margin-bottom: 12px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 10px; padding: 14px 16px; }
+  .card-title { font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #64748b; line-height: 1.5; }
+  .card-icon { font-size: 18px; margin-bottom: 8px; }
+
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 10px; padding: 13px; }
+  .step-num { width: 24px; height: 24px; min-width: 24px; background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #f43f5e; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+  .step-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+
+  .tip { display: flex; gap: 10px; background: rgba(244,63,94,.05); border: 1px solid rgba(244,63,94,.15); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .tip-icon { font-size: 14px; flex-shrink: 0; }
+  .tip-text { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+  .tip-text strong { color: #cbd5e1; }
+  .tip-blue { background: rgba(129,140,248,.05); border-color: rgba(129,140,248,.15); }
+  .tip-gold  { background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.15); }
+
+  .pill { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-right: 4px; }
+  .pill-sage  { background: rgba(251,191,36,.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+  .pill-mi    { background: rgba(244,63,94,.1);   color: #f43f5e; border: 1px solid rgba(244,63,94,.2); }
+  .pill-inq   { background: rgba(251,146,60,.1);  color: #fb923c; border: 1px solid rgba(251,146,60,.2); }
+  .pill-gard  { background: rgba(52,211,153,.1);  color: #34d399; border: 1px solid rgba(52,211,153,.2); }
+
+  .access-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e1e2e; }
+  .access-row:last-child { border-bottom: none; }
+  .access-label { font-size: 12px; color: #94a3b8; flex: 1; }
+  .access-who { font-size: 11px; display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .code { font-family: 'Consolas', monospace; font-size: 11px; background: #1e1e2e; border: 1px solid #2d2d3e; border-radius: 4px; padding: 1px 6px; color: #a5b4fc; }
+
+  .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #475569; padding: 8px 12px; text-align: left; border-bottom: 1px solid #1e1e2e; }
+  .table td { font-size: 12px; padding: 9px 12px; border-bottom: 1px solid #0f0f1a; color: #94a3b8; vertical-align: middle; }
+  .table tr:hover td { background: rgba(255,255,255,.02); }
+
+  .status-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .s-ouvert   { background: rgba(96,165,250,.1);  color: #60a5fa; }
+  .s-en_cours { background: rgba(167,139,250,.1); color: #a78bfa; }
+  .s-resolu   { background: rgba(52,211,153,.1);  color: #34d399; }
+  .s-ferme    { background: rgba(100,116,139,.1); color: #64748b; }
+
+  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .kanban-col { background: #0f0f1a; border: 1px solid #1e1e2e; border-radius: 8px; padding: 12px; }
+  .kanban-col-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .kanban-card { background: #0a0a0f; border: 1px solid #1e1e2e; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 11px; color: #94a3b8; }
+  @media (max-width: 600px) { .kanban { grid-template-columns: 1fr 1fr; } }
+
+  .matrix-demo { display: grid; grid-template-columns: 1fr repeat(7,32px); gap: 4px; align-items: center; margin-bottom: 16px; }
+  .matrix-head { font-size: 9px; font-weight: 700; color: #475569; text-align: center; text-transform: uppercase; }
+  .matrix-page { font-size: 11px; color: #94a3b8; padding: 4px 0; }
+  .matrix-cell { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid transparent; }
+  .m-active { background: rgba(129,140,248,.2); border-color: rgba(129,140,248,.3); color: #818cf8; }
+  .m-min    { background: rgba(129,140,248,.35); border-color: rgba(129,140,248,.6); color: #fff; }
+  .m-off    { background: #1e1e2e; color: #1e1e2e; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-title">Guide admin · MI+ / Sage</div>
+  <div class="toc-section">
+    <a href="#acces">Accès & niveaux</a>
+  </div>
+  <div class="toc-section">
+    <a href="#membres">Gestion des membres</a>
+    <a href="#membres-promos" class="sub">Promotions</a>
+    <a href="#membres-evals" class="sub">Évaluations de rang</a>
+    <a href="#membres-absences" class="sub">Absences</a>
+  </div>
+  <div class="toc-section">
+    <a href="#candidatures">Candidatures</a>
+  </div>
+  <div class="toc-section">
+    <a href="#points">Points & récompenses</a>
+  </div>
+  <div class="toc-section">
+    <a href="#bugs">Rapports de bug</a>
+  </div>
+  <div class="toc-section">
+    <a href="#discord">Sync Discord</a>
+  </div>
+  <div class="toc-section">
+    <a href="#journal">Journal de guerre</a>
+    <span class="toc-badge">Sage</span>
+  </div>
+  <div class="toc-section">
+    <a href="#galerie">Galerie</a>
+    <span class="toc-badge">Sage</span>
+  </div>
+  <div class="toc-section">
+    <a href="#acces-matrix">Gestion des accès</a>
+    <span class="toc-badge">Sage</span>
+  </div>
+  <div class="toc-section">
+    <a href="#activite">Activité globale</a>
+    <span class="toc-badge">Sage</span>
+  </div>
+  <div class="toc-section">
+    <a href="#rotations">Rotations de clés</a>
+    <span class="toc-badge">Sage</span>
+  </div>
+</nav>
+
+<!-- Contenu -->
+<main class="content">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge-org">⚔ Administration — Accès restreint MI+</div>
+    <h1>Guide administrateur</h1>
+    <p class="subtitle">Référence complète des outils d'administration INQFR. Ce guide couvre toutes les fonctionnalités du panneau admin, accessibles depuis <strong>/admin</strong> pour les Maîtres Inquisiteurs et Sages.</p>
+  </div>
+
+  <!-- Accès & niveaux -->
+  <div class="section" id="acces">
+    <div class="section-header">
+      <span class="section-icon">🛡</span>
+      <h2>Accès & niveaux d'administration</h2>
+    </div>
+    <p>Le panneau admin est accessible à partir du rang <span class="pill pill-mi">Maître Inquisiteur</span>. Certaines sections sont réservées aux <span class="pill pill-sage">Sages</span>.</p>
+
+    <div class="access-row">
+      <div class="access-label">Gestion des membres (évaluations)</div>
+      <div class="access-who"><span class="pill pill-mi">MI+</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Candidatures pipeline</div>
+      <div class="access-who"><span class="pill pill-mi">MI+</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Points — attribution</div>
+      <div class="access-who"><span class="pill pill-inq">Inquisiteur+</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Rapports de bug</div>
+      <div class="access-who"><span class="pill pill-mi">MI+</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Journal de guerre (CRUD)</div>
+      <div class="access-who"><span class="pill pill-inq">Inquisiteur+</span> <em style="font-size:10px;color:#4b5563">section admin: MI+</em></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Galerie — upload médias</div>
+      <div class="access-who"><span class="pill pill-sage">Sage</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Gestion des accès (matrix rangs)</div>
+      <div class="access-who"><span class="pill pill-sage">Sage</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Audit activité globale</div>
+      <div class="access-who"><span class="pill pill-sage">Sage</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Audit attributions de points</div>
+      <div class="access-who"><span class="pill pill-sage">Sage</span></div>
+    </div>
+    <div class="access-row">
+      <div class="access-label">Promotions membres</div>
+      <div class="access-who"><span class="pill pill-sage">Sage</span></div>
+    </div>
+
+    <div class="tip tip-gold" style="margin-top:16px">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-text"><strong>Principe du moindre privilège.</strong> N'utilisez les outils admin que pour ce qui est nécessaire. Toutes les actions sont loguées dans le feed d'activité visible des Sages.</div>
+    </div>
+  </div>
+
+  <!-- Gestion membres -->
+  <div class="section" id="membres">
+    <div class="section-header">
+      <span class="section-icon">👥</span>
+      <h2>Gestion des membres</h2>
+    </div>
+    <p>Accessible via <strong>/admin/gestion-membres</strong>. La page contient deux onglets : <strong>Promotions</strong> (Sage) et <strong>Évaluations de rang</strong> (MI+).</p>
+
+    <h3 id="membres-promos">Promotions <span class="pill pill-sage">Sage</span></h3>
+    <p>Pour promouvoir un membre, ouvre sa fiche dans l'onglet Promotions, sélectionne le nouveau rang, et valide. La promotion déclenche automatiquement :</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">→</div>
+        <div class="step-body">
+          <div class="step-title">Mise à jour du rang en base</div>
+          <div class="step-desc">Le profil passe au nouveau rang, les droits RLS sont immédiatement actifs.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">→</div>
+        <div class="step-body">
+          <div class="step-title">Notification au membre</div>
+          <div class="step-desc">Le membre reçoit une notification in-app et une push notification si activées.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">→</div>
+        <div class="step-body">
+          <div class="step-title">Entrée dans l'historique</div>
+          <div class="step-desc">La promotion apparaît dans le feed d'activité global et dans l'historique de la fiche membre.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 id="membres-evals">Évaluations de rang <span class="pill pill-mi">MI+</span></h3>
+    <p>Les évaluations formalisent la validation des étapes de rang. Chaque évaluation est associée à un type d'épreuve (combat, logistique, leadership, etc.) et à un résultat (réussi / en attente / échoué).</p>
+    <p>Pour créer une évaluation : ouvre la fiche d'un membre → section <strong>Évaluations</strong> → bouton <strong>+ Nouvelle évaluation</strong>. Remplis le type, la date, et tes observations.</p>
+
+    <h3 id="membres-absences">Absences <span class="pill pill-mi">MI+</span></h3>
+    <p>Les absences déclarées par les membres apparaissent dans l'onglet <strong>Absences</strong> de /admin/gestion-membres. Tu peux voir qui est absent, pour quelle durée, et le motif.</p>
+    <div class="tip tip-blue">
+      <span class="tip-icon">ℹ️</span>
+      <div class="tip-text">Les Sages reçoivent une notification à chaque nouvelle déclaration d'absence. Aucune action admin n'est requise — c'est informatif.</div>
+    </div>
+  </div>
+
+  <!-- Candidatures -->
+  <div class="section" id="candidatures">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Candidatures <span style="font-size:13px;font-weight:400;color:#64748b;margin-left:6px">— pipeline Kanban</span></h2>
+    </div>
+    <p>Le pipeline de candidatures (<strong>/admin/gestion-membres → onglet Candidatures</strong>) suit les postulants de la réception à la décision finale via 4 colonnes.</p>
+
+    <div class="kanban">
+      <div class="kanban-col">
+        <div class="kanban-col-title">📥 Reçues</div>
+        <div class="kanban-card">Formulaire /recrutement soumis. Pas encore examiné.</div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-title">🔍 En discussion</div>
+        <div class="kanban-card">Candidature vue, en cours d'évaluation par le Conseil.</div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-title">✅ Acceptées</div>
+        <div class="kanban-card">Invitation envoyée. Devient Aspirant.</div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-col-title">❌ Refusées</div>
+        <div class="kanban-card">Candidature rejetée. Archivée.</div>
+      </div>
+    </div>
+
+    <h3>Traiter une candidature</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ouvrir la fiche candidature</div>
+          <div class="step-desc">Clique sur une carte pour voir : pseudo RSI, message de motivation, date de soumission, profil SC (si renseigné).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Déplacer dans le pipeline</div>
+          <div class="step-desc">Utilise les boutons de statut pour faire avancer la candidature. Ajoute un commentaire interne si besoin.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Accepter → Invitation</div>
+          <div class="step-desc">Passer en "Accepté" ne crée pas automatiquement le compte — envoie manuellement l'invitation Supabase Auth depuis le dashboard Supabase ou via email.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip tip-gold">
+      <span class="tip-icon">💡</span>
+      <div class="tip-text">Le badge compteur sur la carte "Candidatures" dans /admin indique le nombre de candidatures en statut <strong>reçu</strong> non traitées.</div>
+    </div>
+  </div>
+
+  <!-- Points -->
+  <div class="section" id="points">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <h2>Points & récompenses</h2>
+    </div>
+    <p>Le système de points récompense la participation des membres. Les points s'accumulent et contribuent à l'éligibilité pour les promotions.</p>
+
+    <h3>Attribuer des points <span class="pill pill-inq">Inquisiteur+</span></h3>
+    <p>Sur la fiche d'un membre (<strong>/membres/[username]</strong>), section <strong>Points</strong> → bouton <strong>Attribuer des points</strong>. Sélectionne la raison (participation op, événement, contribution wiki, etc.) et la valeur.</p>
+
+    <table class="table">
+      <thead><tr><th>Raison</th><th>Points typiques</th></tr></thead>
+      <tbody>
+        <tr><td>Participation opération</td><td>+10 à +25</td></tr>
+        <tr><td>Organisation événement</td><td>+15 à +30</td></tr>
+        <tr><td>Contribution wiki</td><td>+5 à +15</td></tr>
+        <tr><td>Recrutement validé</td><td>+20</td></tr>
+        <tr><td>Étape onboarding</td><td>+10 (automatique)</td></tr>
+        <tr><td>Bonus complétion rang</td><td>+25 à +80 (automatique)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Audit des attributions <span class="pill pill-sage">Sage</span></h3>
+    <p>Accessible via <strong>/admin/points</strong> — liste les 200 dernières attributions avec l'auteur, le membre récompensé, la raison et la date. Permet de détecter les attributions anormales.</p>
+  </div>
+
+  <!-- Rapports de bug -->
+  <div class="section" id="bugs">
+    <div class="section-header">
+      <span class="section-icon">🐛</span>
+      <h2>Rapports de bug <span style="font-size:13px;font-weight:400;color:#64748b;margin-left:6px">— /admin/bugs</span></h2>
+    </div>
+    <p>Les Maîtres Inquisiteurs+ voient tous les rapports de bug soumis par les membres. Les Sages reçoivent une notification à chaque nouveau rapport.</p>
+
+    <h3>Gérer un rapport</h3>
+    <p>Clique sur une ligne pour l'ouvrir. Tu peux :</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Changer le statut</div>
+        <div class="card-desc">
+          <span class="status-badge s-ouvert">Ouvert</span> →
+          <span class="status-badge s-en_cours">En cours</span> →
+          <span class="status-badge s-resolu">Résolu</span> →
+          <span class="status-badge s-ferme">Fermé</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <div class="card-title">Ajouter une note</div>
+        <div class="card-desc">La note est visible par le membre qui a soumis le rapport. Explique le fix, le workaround, ou pourquoi c'est fermé.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🔥</span>
+      <div class="tip-text">Les rapports <strong style="color:#f43f5e">Critique</strong> sont identifiés par une icône flamme. Traite-les en priorité — ils signalent généralement un problème de sécurité ou une perte de données.</div>
+    </div>
+  </div>
+
+  <!-- Discord sync -->
+  <div class="section" id="discord">
+    <div class="section-header">
+      <span class="section-icon">💬</span>
+      <h2>Synchronisation Discord</h2>
+    </div>
+    <p>INQFR synchronise les événements dans les deux sens avec Discord.</p>
+
+    <h3>Site → Discord (création d'événement)</h3>
+    <p>Lors de la création d'un événement sur INQFR, coche <strong>"Publier sur Discord"</strong> pour créer automatiquement un Scheduled Event Discord. L'événement apparaît dans l'onglet Événements du serveur.</p>
+    <div class="tip tip-blue">
+      <span class="tip-icon">ℹ️</span>
+      <div class="tip-text">Le bot doit avoir la permission <code class="code">MANAGE_EVENTS</code> sur le serveur. Vérifie les rôles du bot si la publication échoue.</div>
+    </div>
+
+    <h3>Discord → Site (Make.com polling)</h3>
+    <p>Make.com scrute les événements Discord toutes les 15 minutes et envoie un POST à <code class="code">/api/discord/events</code>. Les événements Discord sont upsertés sur INQFR par leur <code class="code">discord_event_id</code>. Les statuts sont mappés automatiquement :</p>
+    <table class="table">
+      <thead><tr><th>Statut Discord</th><th>Statut INQFR</th></tr></thead>
+      <tbody>
+        <tr><td>1 — SCHEDULED</td><td>planifie</td></tr>
+        <tr><td>2 — ACTIVE</td><td>en_cours</td></tr>
+        <tr><td>3 — COMPLETED</td><td>termine</td></tr>
+        <tr><td>4 — CANCELED</td><td>annule</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Notifications Discord sur les événements</h3>
+    <p>Lors de la création d'un événement, INQFR poste automatiquement un message dans le canal configuré avec des mentions de rang (<code class="code">@Gardien</code>, <code class="code">@Inquisiteur</code>…) selon le rang minimum de l'événement.</p>
+  </div>
+
+  <!-- Journal de guerre -->
+  <div class="section" id="journal">
+    <div class="section-header">
+      <span class="section-icon">📖</span>
+      <h2>Journal de guerre <span class="pill pill-sage" style="margin-left:4px">Sage</span></h2>
+    </div>
+    <p>Le journal de guerre (<strong>/admin/journal</strong>) est le registre officiel des opérations et batailles marquantes de l'Ordre. Il alimente aussi la section "Journal" de la landing page publique.</p>
+
+    <h3>Créer une entrée</h3>
+    <p>Chaque entrée contient : titre, date de l'opération, résultat (victoire / défaite / neutre), description markdown complète, et une image optionnelle. Le contenu supporte les éditeurs markdown avec toolbar (H1/H2, gras, italique, listes).</p>
+
+    <div class="tip tip-blue">
+      <span class="tip-icon">ℹ️</span>
+      <div class="tip-text">Les Inquisiteurs peuvent accéder à <strong>/admin/journal</strong> directement depuis la sidebar (section "Administration") même sans accès au panneau admin complet.</div>
+    </div>
+  </div>
+
+  <!-- Galerie -->
+  <div class="section" id="galerie">
+    <div class="section-header">
+      <span class="section-icon">🖼</span>
+      <h2>Galerie <span class="pill pill-sage" style="margin-left:4px">Sage</span></h2>
+    </div>
+    <p>La galerie (<strong>/admin/galerie</strong>) permet d'uploader des captures d'écran et médias Star Citizen dans le Storage Supabase. Ils apparaissent sur la galerie publique <strong>/galerie</strong>.</p>
+
+    <h3>Upload</h3>
+    <p>Glisse-dépose ou sélectionne les fichiers (JPG, PNG, WebP). Chaque upload peut avoir un titre et une description. Les fichiers sont stockés dans le bucket Supabase <code class="code">gallery</code>.</p>
+
+    <div class="tip tip-gold">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-text">La galerie est <strong>publique</strong> — ne pas uploader de contenu interne sensible (plans d'ops, positions, composition de flotte stratégique).</div>
+    </div>
+  </div>
+
+  <!-- Gestion des accès -->
+  <div class="section" id="acces-matrix">
+    <div class="section-header">
+      <span class="section-icon">🔐</span>
+      <h2>Gestion des accès <span class="pill pill-sage" style="margin-left:4px">Sage</span></h2>
+    </div>
+    <p>Accessible via <strong>/admin/acces</strong>. Cette matrice permet de définir le rang minimum requis pour accéder à chaque section du QG, sans toucher au code.</p>
+
+    <!-- Demo matrix -->
+    <div class="matrix-demo" style="margin-bottom:20px">
+      <div></div>
+      <div class="matrix-head">V</div>
+      <div class="matrix-head">A</div>
+      <div class="matrix-head">C</div>
+      <div class="matrix-head">G</div>
+      <div class="matrix-head">I</div>
+      <div class="matrix-head">MI</div>
+      <div class="matrix-head">S</div>
+
+      <div class="matrix-page">Dashboard</div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-min">✓</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+
+      <div class="matrix-page">Logistique</div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-min">✓</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+
+      <div class="matrix-page">Carte</div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-off"></div>
+      <div class="matrix-cell m-min">✓</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+      <div class="matrix-cell m-active">•</div>
+    </div>
+
+    <p>Clique sur un rang dans une ligne pour le définir comme rang minimum. Les membres en dessous de ce rang voient une page "Contenu classifié" à la place.</p>
+
+    <div class="tip tip-gold">
+      <span class="tip-icon">⚠️</span>
+      <div class="tip-text"><strong>Attention :</strong> Si tu hausses le rang minimum d'une page très utilisée (ex. Dashboard à Gardien), tous les Aspirants et Consacrés n'y auront plus accès instantanément. Les changements sont effectifs en temps réel.</div>
+    </div>
+  </div>
+
+  <!-- Activité globale -->
+  <div class="section" id="activite">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <h2>Activité globale <span class="pill pill-sage" style="margin-left:4px">Sage</span></h2>
+    </div>
+    <p>La page <strong>/admin/activite</strong> affiche un journal complet de toutes les actions enregistrées dans l'Ordre : connexions, promotions, attributions de points, créations d'op, transactions logistiques…</p>
+    <p>Utile pour détecter des comportements anormaux (attributions de points excessives, connexions inhabituelles) et auditer l'activité en cas de litige.</p>
+  </div>
+
+  <!-- Rotations de clés -->
+  <div class="section" id="rotations">
+    <div class="section-header">
+      <span class="section-icon">🔑</span>
+      <h2>Rotation des clés <span class="pill pill-sage" style="margin-left:4px">Sage</span></h2>
+    </div>
+    <p>En cas de fuite suspectée ou de départ d'un membre privilégié, procéder à la rotation des clés Supabase immédiatement.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Révoquer dans Supabase Dashboard</div>
+          <div class="step-desc">Settings → API → <strong>Regenerate</strong>. L'ancienne clé est invalidée instantanément.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Mettre à jour Vercel</div>
+          <div class="step-desc">Settings → Environment Variables → mettre à jour <code class="code">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> et <code class="code">SUPABASE_SERVICE_ROLE_KEY</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Redéployer</div>
+          <div class="step-desc">Vercel Dashboard → Redeploy (without cache). Le déploiement prend 1 à 3 minutes.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Vérifier</div>
+          <div class="step-desc">Login, magic link, aucun <code class="code">401</code>/<code class="code">403</code> dans les logs Vercel. Auditer Supabase Logs → API sur les 24h précédentes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip" style="background:rgba(244,63,94,.06);border-color:rgba(244,63,94,.2)">
+      <span class="tip-icon">🚨</span>
+      <div class="tip-text"><strong>Urgence service_role compromise :</strong> régénérer immédiatement → redéployer → auditer les logs Supabase sur 24h. La clé <code class="code">service_role</code> bypass toutes les RLS — une fuite est critique.</div>
+    </div>
+
+    <h3>Variables d'environnement</h3>
+    <table class="table">
+      <thead><tr><th>Variable</th><th>Usage</th><th>Rotation</th></tr></thead>
+      <tbody>
+        <tr><td><code class="code">NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Client navigateur</td><td>Avec service_role</td></tr>
+        <tr><td><code class="code">SUPABASE_SERVICE_ROLE_KEY</code></td><td>Bypass RLS serveur</td><td>Prioritaire en cas de fuite</td></tr>
+        <tr><td><code class="code">ICS_HMAC_SECRET</code></td><td>Auth flux calendrier ICS</td><td>Si flux compromis</td></tr>
+        <tr><td><code class="code">MFA_DEVICE_SECRET</code></td><td>Cookie trusted devices</td><td>Invalide tous les appareils</td></tr>
+        <tr><td><code class="code">DISCORD_BOT_TOKEN</code></td><td>Création events Discord</td><td>Si bot compromis</td></tr>
+        <tr><td><code class="code">DISCORD_WEBHOOK_SECRET</code></td><td>Auth Make.com → site</td><td>Si webhook intercepté</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+</div>
+</body>
+</html>
