@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { motion } from 'framer-motion'
 import { Edit, Save, X, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,21 +13,6 @@ import { Input } from '@/components/ui/input'
 import { formatDate } from '@/lib/utils'
 import { updateResource, deleteResource } from '@/actions/resources'
 import type { OrgResource } from '@/types'
-
-const MDPreview = dynamic(
-  async () => {
-    const mod = await import('@uiw/react-md-editor')
-    return mod.default.Markdown
-  },
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-24">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    ),
-  }
-)
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), {
   ssr: false,
@@ -204,8 +191,8 @@ export function ResourceViewer({ resource, isAdmin }: Props) {
             />
           </div>
         ) : content ? (
-          <div className="p-6 prose prose-invert prose-sm max-w-none" data-color-mode="dark">
-            <MDPreview source={content} />
+          <div className="p-6 prose prose-invert prose-sm max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-16 text-center">
