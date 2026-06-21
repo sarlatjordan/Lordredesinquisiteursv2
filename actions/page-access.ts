@@ -1,7 +1,6 @@
 'use server'
 
 import { z } from 'zod'
-import { revalidateTag } from 'next/cache'
 import { getAuthWithPrivilege } from '@/lib/auth-helpers'
 import type { ActionResult } from '@/types'
 
@@ -28,6 +27,5 @@ export async function updatePageAccessRule(
 
   if (error) return { success: false, error: error.message }
 
-  revalidateTag('page-access-rules', { expire: 0 })
   return { success: true, data: undefined as void }
 }
