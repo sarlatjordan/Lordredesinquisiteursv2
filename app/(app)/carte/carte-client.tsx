@@ -26,6 +26,7 @@ import type { MapPoint, MapJumpLane, MapPointInput } from '@/types'
 // ─── Positions des systèmes sur la carte ─────────────────────────────────────
 
 const SYSTEM_POSITIONS: Record<string, { x: number; y: number }> = {
+  // ── Systèmes originaux ────────────────────────────────────────────────────
   Terra:    { x: 355, y: 170 },
   Magnus:   { x: 440, y: 235 },
   Ellis:    { x: 275, y: 238 },
@@ -48,6 +49,22 @@ const SYSTEM_POSITIONS: Record<string, { x: number; y: number }> = {
   Tamsa:    { x: 762, y: 508 },
   Hades:    { x: 632, y: 492 },
   Nul:      { x: 508, y: 538 },
+  // ── Ajoutés (données RSI ARK Starmap) ────────────────────────────────────
+  Baker:    { x: 78,  y: 112 },
+  Tanga:    { x: 170, y: 242 },
+  Hadrian:  { x: 258, y: 196 },
+  Kilian:   { x: 308, y: 297 },
+  Min:      { x: 402, y: 212 },
+  Cano:     { x: 415, y: 392 },
+  Cathcart: { x: 545, y: 424 },
+  Sol:      { x: 438, y: 440 },
+  Croshaw:  { x: 492, y: 484 },
+  Kellog:   { x: 758, y: 175 },
+  Ferron:   { x: 690, y: 312 },
+  Garron:   { x: 700, y: 392 },
+  Tiber:    { x: 810, y: 287 },
+  Caliban:  { x: 665, y: 362 },
+  Banshee:  { x: 598, y: 510 },
 }
 
 // ─── Composant principal ─────────────────────────────────────────────────────

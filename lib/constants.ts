@@ -342,6 +342,21 @@ export const SC_SYSTEMS = [
   'Oberon',
   'Ariel',
   'Tamsa',
+  'Baker',
+  'Banshee',
+  'Caliban',
+  'Cano',
+  'Cathcart',
+  'Croshaw',
+  'Ferron',
+  'Garron',
+  'Hadrian',
+  'Kellog',
+  'Kilian',
+  'Min',
+  'Sol',
+  'Tanga',
+  'Tiber',
 ] as const
 export type ScSystem = typeof SC_SYSTEMS[number]
 
