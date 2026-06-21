@@ -108,10 +108,12 @@ export function PresenceWidget({ inGameMembers, myInGameSince }: PresenceWidgetP
         <div className="flex items-center gap-1.5">
           <Gamepad2 className="h-3.5 w-3.5 text-muted-foreground" />
           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
-            En jeu {inGameMembers.length > 0 && `(${inGameMembers.length})`}
+            En jeu {totalOnline > 0 && `(${totalOnline})`}
           </p>
+          {voiceLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
         </div>
-        {inGameMembers.length === 0 ? (
+
+        {totalOnline === 0 && !voiceLoading ? (
           <p className="text-xs text-muted-foreground pl-5">Personne en jeu.</p>
         ) : (
           <div className="flex flex-wrap gap-2 pl-5">
@@ -134,38 +136,16 @@ export function PresenceWidget({ inGameMembers, myInGameSince }: PresenceWidgetP
                 </div>
               </div>
             ))}
-          </div>
-        )}
-      </div>
-
-      {/* Vocal Discord */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5">
-          <Volume2 className="h-3.5 w-3.5 text-muted-foreground" />
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
-            En jeu
-          </p>
-          {voiceLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
-        </div>
-        {!voiceLoading && voiceChannels.length === 0 ? (
-          <p className="text-xs text-muted-foreground pl-5">Personne en jeu.</p>
-        ) : (
-          <div className="space-y-1.5 pl-5">
-            {voiceChannels.map((ch) => (
-              <div key={ch.channelId}>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1"># {ch.channelName}</p>
-                <div className="flex flex-wrap gap-1">
-                  {ch.members.map((name) => (
-                    <span
-                      key={name}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-[11px] text-primary font-medium"
-                    >
-                      {name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {voiceChannels.flatMap((ch) =>
+              ch.members.map((name) => (
+                <span
+                  key={`${ch.channelId}-${name}`}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-[11px] text-primary font-medium"
+                >
+                  {name}
+                </span>
+              ))
+            )}
           </div>
         )}
       </div>
