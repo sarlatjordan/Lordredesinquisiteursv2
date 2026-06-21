@@ -16,6 +16,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const pathname = headersList.get('x-pathname') ?? ''
   const isMembreProfile = /^\/membres\/[^/]+$/.test(pathname)
   const isMFAPage = pathname === '/mfa'
+  const isProfilPage = pathname === '/profil'
 
   const supabase = await createClient()
 
@@ -81,7 +82,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 relative">
           <PageBackground />
           <div className="relative z-10 p-4 lg:p-6 pb-20 lg:pb-6">
-            {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile
+            {getRolePrivilege(profile?.role ?? '') <= 50 && !isMembreProfile && !isProfilPage
               ? <RedactedContent />
               : <PageTransition>{children}</PageTransition>}
           </div>
