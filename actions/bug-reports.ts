@@ -4,7 +4,12 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { getAuthWithPrivilege } from '@/lib/auth-helpers'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createNotification } from '@/lib/notifications'
 import type { ActionResult } from '@/types'
+
+const SEVERITY_LABELS: Record<string, string> = {
+  faible: 'faible', moyen: 'moyen', eleve: 'élevé', critique: 'critique',
+}
 
 const SubmitSchema = z.object({
   title:       z.string().min(3).max(150),
@@ -30,6 +35,27 @@ export async function submitBugReport(formData: FormData): Promise<ActionResult>
   })
 
   if (error) return { success: false, error: error.message }
+
+  // Notifier tous les Sages
+  const admin = createAdminClient()
+  const { data: sages } = await admin
+    .from('profiles')
+    .select('id')
+    .eq('role', 'sage')
+
+  if (sages?.length) {
+    await Promise.all(
+      sages.map((s) =>
+        createNotification(admin, {
+          profile_id: s.id,
+          type:       'bug_report',
+          title:      'Nouveau rapport de bug',
+          message:    `[${SEVERITY_LABELS[parsed.data.severity]}] ${parsed.data.title}`,
+          link:       '/admin/bugs',
+        })
+      )
+    )
+  }
 
   revalidatePath('/rapport-bug')
   return { success: true, data: undefined as void }
