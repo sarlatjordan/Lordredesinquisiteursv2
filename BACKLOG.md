@@ -111,6 +111,7 @@
 | FEAT-50 | Chat temporaire par opération — `op_chat_messages`, Realtime Supabase, bulles messenger, accès participants confirmés + commandant + MI+, `is_op_participant()` SECURITY DEFINER — migration 050 | 2026-06-21 |
 | FEAT-51 | Rapport de bug — `/rapport-bug` (formulaire + historique perso), admin `/admin/bugs` (filtre statut, gestion note admin), notif Sages à chaque soumission — migration 051 | 2026-06-21 |
 | BUG-07 | Inquisiteurs bloqués sur l'écriture de débrief opération — seuil UI corrigé de MI+ (600) à Inquisiteur+ (400) dans `saveOperationDebrief` et `operation-detail.tsx` | 2026-06-21 |
+| BUG-08 | Wiki — contenu markdown affiché en texte brut — `react-markdown` v10 ESM-only plantait au SSR → chargement `dynamic` avec `ssr:false` + `remark-gfm` | 2026-06-21 |
 
 ---
 
