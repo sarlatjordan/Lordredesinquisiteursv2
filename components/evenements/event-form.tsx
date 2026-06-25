@@ -15,7 +15,7 @@ import type { AbsenceWithProfile } from '@/types'
 interface EventFormValues {
   title: string
   description?: string
-  type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
+  type: 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre'
   status?: 'planned' | 'active' | 'completed' | 'cancelled'
   start_at: string
   end_at?: string
@@ -29,7 +29,7 @@ interface EventFormValues {
 export interface EventFormData {
   title: string
   description?: string
-  type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
+  type: 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre'
   status?: 'planned' | 'active' | 'completed' | 'cancelled'
   start_at: string
   end_at?: string

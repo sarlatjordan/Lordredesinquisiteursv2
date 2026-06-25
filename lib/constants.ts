@@ -139,6 +139,7 @@ export const EVENT_TYPES = {
   reunion: 'Réunion',
   formation: 'Formation',
   social: 'Social',
+  sortie: 'Sortie',
   autre: 'Autre',
 } as const
 
@@ -149,6 +150,7 @@ export const EVENT_TYPE_COLORS: Record<EventType, string> = {
   reunion: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
   formation: 'text-green-400 bg-green-400/10 border-green-400/30',
   social: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
+  sortie: 'text-orange-400 bg-orange-400/10 border-orange-400/30',
   autre: 'text-slate-400 bg-slate-400/10 border-slate-400/20',
 }
 

@@ -103,7 +103,7 @@ export type ProfileUpdateInput = z.infer<typeof ProfileUpdateSchema>
 export const EventCreateSchema = z.object({
   title: z.string().min(3, 'Titre requis (min. 3 car.)').max(100),
   description: z.string().max(2000).optional(),
-  type: z.enum(['operation', 'reunion', 'formation', 'social', 'autre']),
+  type: z.enum(['operation', 'reunion', 'formation', 'social', 'sortie', 'autre']),
   start_at: z.string().min(1, 'Date de début requise'),
   end_at: z.string().optional(),
   location: z.string().max(200).optional(),

@@ -144,7 +144,7 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 shrink-0">
-        {Object.entries({ operation: 'Opération', reunion: 'Réunion', formation: 'Formation', social: 'Social', autre: 'Autre' }).map(([type, label]) => (
+        {Object.entries({ operation: 'Opération', reunion: 'Réunion', formation: 'Formation', social: 'Social', sortie: 'Sortie', autre: 'Autre' }).map(([type, label]) => (
           <div key={type} className="flex items-center gap-1.5">
             <span className={`inline-block h-2 w-2 rounded-[1px] ${EVENT_COLORS[type]}`} />
             <span className="text-[10px] text-muted-foreground">{label}</span>

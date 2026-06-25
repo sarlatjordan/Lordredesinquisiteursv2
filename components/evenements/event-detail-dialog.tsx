@@ -153,7 +153,7 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
   const editDefaultValues = {
     title: event.title,
     description: event.description ?? '',
-    type: event.type as 'operation' | 'reunion' | 'formation' | 'social' | 'autre',
+    type: event.type as 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre',
     status: event.status as 'planned' | 'active' | 'completed' | 'cancelled',
     start_at: toDatetimeLocal(event.start_at),
     end_at: toDatetimeLocal(event.end_at),

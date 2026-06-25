@@ -173,7 +173,7 @@ export interface Database {
           id: string
           title: string
           description: string | null
-          type: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
+          type: 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre'
           status: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at: string
           end_at: string | null
@@ -190,7 +190,7 @@ export interface Database {
           id?: string
           title: string
           description?: string | null
-          type?: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
+          type?: 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre'
           status?: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at: string
           end_at?: string | null
@@ -207,7 +207,7 @@ export interface Database {
           id?: string
           title?: string
           description?: string | null
-          type?: 'operation' | 'reunion' | 'formation' | 'social' | 'autre'
+          type?: 'operation' | 'reunion' | 'formation' | 'social' | 'sortie' | 'autre'
           status?: 'planned' | 'active' | 'completed' | 'cancelled'
           start_at?: string
           end_at?: string | null
