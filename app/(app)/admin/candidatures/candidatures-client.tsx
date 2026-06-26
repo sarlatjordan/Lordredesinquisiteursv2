@@ -16,6 +16,7 @@ import {
   acceptApplication,
   rejectApplication,
   moveToDiscussion,
+  regenerateMagicLink,
 } from '@/actions/applications'
 import type { Application } from '@/types'
 import {
@@ -29,6 +30,7 @@ import {
   ExternalLink,
   MessageSquare,
   ArrowRight,
+  RefreshCw,
 } from 'lucide-react'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -153,6 +155,89 @@ function AcceptDialog({
   )
 }
 
+// ─── Dialog Regénérer lien ────────────────────────────────────────────────────
+
+function RegenerateLinkDialog({
+  application,
+  onClose,
+}: {
+  application: Application
+  onClose: () => void
+}) {
+  const [isPending, startTransition] = useTransition()
+  const [magicLink, setMagicLink] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  function handleGenerate() {
+    setError(null)
+    startTransition(async () => {
+      const result = await regenerateMagicLink(application.id)
+      if (result.success) {
+        setMagicLink(result.magicLink)
+      } else {
+        setError(result.error)
+      }
+    })
+  }
+
+  async function handleCopy() {
+    if (!magicLink) return
+    await navigator.clipboard.writeText(magicLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Regénérer le lien de connexion</DialogTitle>
+          <DialogDescription>
+            {magicLink
+              ? 'Lien généré. Envoyez-le à ' + application.rsi_handle + ' via Discord.'
+              : `Générer un nouveau lien de première connexion pour ${application.rsi_handle} (${application.email})`}
+          </DialogDescription>
+        </DialogHeader>
+
+        {magicLink && (
+          <div className="space-y-3 py-2">
+            <div className="flex gap-2">
+              <code className="flex-1 rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground break-all font-mono">
+                {magicLink}
+              </code>
+              <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0">
+                {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Ce lien expire dans 24h.</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
+            <XCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>{magicLink ? 'Fermer' : 'Annuler'}</Button>
+          {!magicLink && (
+            <Button onClick={handleGenerate} disabled={isPending}>
+              {isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Génération…</>
+              ) : (
+                <><RefreshCw className="h-4 w-4 mr-2" />Générer le lien</>
+              )}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── Dialog Refuser ───────────────────────────────────────────────────────────
 
 function RefuseDialog({
@@ -243,7 +328,7 @@ function CandidatureCard({
   onRefused: (id: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
-  const [dialog, setDialog] = useState<'accept' | 'refuse' | null>(null)
+  const [dialog, setDialog] = useState<'accept' | 'refuse' | 'regen' | null>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -349,6 +434,18 @@ function CandidatureCard({
               </Button>
             )}
 
+            {application.status === 'accepted' && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="ml-auto text-xs h-7"
+                onClick={() => setDialog('regen')}
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Regénérer le lien
+              </Button>
+            )}
+
             {application.status === 'en_discussion' && (
               <div className="ml-auto flex gap-1.5">
                 <Button
@@ -386,6 +483,12 @@ function CandidatureCard({
           application={application}
           onClose={() => setDialog(null)}
           onRefused={onRefused}
+        />
+      )}
+      {dialog === 'regen' && (
+        <RegenerateLinkDialog
+          application={application}
+          onClose={() => setDialog(null)}
         />
       )}
     </>

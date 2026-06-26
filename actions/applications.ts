@@ -207,6 +207,52 @@ export async function moveToDiscussion(id: string): Promise<SimpleResult> {
   return { success: true }
 }
 
+// ─── Regénérer un lien de connexion (Sage requis) ────────────────────────────
+
+export async function regenerateMagicLink(id: string): Promise<AcceptResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!myProfile || getRolePrivilege(myProfile.role) < 1000) {
+    return { success: false, error: 'Droits insuffisants — Sage requis' }
+  }
+
+  const admin = createAdminClient()
+
+  const { data: application, error: fetchErr } = await admin
+    .from('applications')
+    .select('email, rsi_handle, status')
+    .eq('id', id)
+    .single()
+
+  if (fetchErr || !application) return { success: false, error: 'Candidature introuvable' }
+  if (application.status !== 'accepted') return { success: false, error: 'Candidature non acceptée' }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
+
+  const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+    type: 'magiclink',
+    email: application.email,
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/register')}`,
+    },
+  })
+
+  if (linkErr || !linkData) {
+    return { success: false, error: linkErr?.message ?? 'Impossible de générer le lien' }
+  }
+
+  return { success: true, magicLink: linkData.properties.action_link }
+}
+
 // ─── Refuser une candidature (Sage requis) ────────────────────────────────────
 
 export async function rejectApplication(
