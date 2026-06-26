@@ -264,6 +264,9 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
         event={managedEvent}
         open={managedEvent !== null}
         onClose={() => setManagedEvent(null)}
+        currentUserId={currentUserId}
+        onRegister={handleRegister}
+        onUnregister={handleUnregister}
       />
       <EventViewDialog
         event={viewedEvent}

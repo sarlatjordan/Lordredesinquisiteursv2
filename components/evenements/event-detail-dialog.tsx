@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus, ExternalLink } from 'lucide-react'
+import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus, ExternalLink, CheckCircle2, HelpCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +27,9 @@ interface EventDetailDialogProps {
   event: EventWithDetails | null
   open: boolean
   onClose: () => void
+  currentUserId?: string
+  onRegister?: (eventId: string, status: 'confirme' | 'peut_etre') => void
+  onUnregister?: (eventId: string) => void
 }
 
 function toDatetimeLocal(iso: string | null | undefined): string {
@@ -36,7 +39,7 @@ function toDatetimeLocal(iso: string | null | undefined): string {
   return new Date(d.getTime() - offset * 60000).toISOString().slice(0, 16)
 }
 
-export function EventDetailDialog({ event, open, onClose }: EventDetailDialogProps) {
+export function EventDetailDialog({ event, open, onClose, currentUserId, onRegister, onUnregister }: EventDetailDialogProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [attendees, setAttendees] = useState<AttendeeWithProfile[]>([])
@@ -189,6 +192,33 @@ export function EventDetailDialog({ event, open, onClose }: EventDetailDialogPro
               <CalendarPlus className="h-3.5 w-3.5" />
               Télécharger .ics
             </a>
+            {currentUserId && (() => {
+              const isAttending = event.attendees?.some(a => a.profile_id === currentUserId && a.status === 'confirme')
+              const isMaybe = event.attendees?.some(a => a.profile_id === currentUserId && a.status === 'peut_etre')
+              if (isAttending) return (
+                <Button variant="outline" size="sm" className="h-8 text-xs text-green-400 border-green-400/30 hover:bg-green-400/10 gap-1.5" onClick={() => onUnregister?.(event.id)}>
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Inscrit — Se désinscrire
+                </Button>
+              )
+              if (isMaybe) return (
+                <Button variant="outline" size="sm" className="h-8 text-xs text-amber-400 border-amber-400/30 hover:bg-amber-400/10 gap-1.5" onClick={() => onUnregister?.(event.id)}>
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  Peut-être — Se désinscrire
+                </Button>
+              )
+              return (
+                <div className="flex gap-1.5">
+                  <Button size="sm" className="h-8 text-xs gap-1.5" onClick={() => onRegister?.(event.id, 'confirme')}>
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Je participe
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => onRegister?.(event.id, 'peut_etre')}>
+                    Peut-être
+                  </Button>
+                </div>
+              )
+            })()}
           </div>
         )}
 
