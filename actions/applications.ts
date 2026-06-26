@@ -135,7 +135,7 @@ export async function acceptApplication(id: string): Promise<AcceptResult> {
     ?? (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
 
   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
-    type: 'magiclink',
+    type: 'invite',
     email: application.email,
     options: {
       data: { username: application.rsi_handle },
