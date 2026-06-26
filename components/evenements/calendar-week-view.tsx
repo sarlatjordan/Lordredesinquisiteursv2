@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { EventWithDetails } from '@/types'
 
@@ -31,11 +31,14 @@ function fmtDate(d: Date) {
 interface Props {
   events: EventWithDetails[]
   canManage: boolean
+  currentUserId?: string
   onViewEvent: (e: EventWithDetails) => void
   onManageEvent: (e: EventWithDetails) => void
+  onRegister?: (eventId: string, status: 'confirme' | 'peut_etre') => void
+  onUnregister?: (eventId: string) => void
 }
 
-export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent }: Props) {
+export function CalendarWeekView({ events, canManage, currentUserId, onViewEvent, onManageEvent, onRegister, onUnregister }: Props) {
   const today = new Date()
   const [weekStart, setWeekStart] = useState(getWeekStart(today))
 
@@ -126,22 +129,46 @@ export function CalendarWeekView({ events, canManage, onViewEvent, onManageEvent
                 {dayEvents.length === 0 ? (
                   <p className="text-[9px] text-muted-foreground/25 font-mono text-center mt-4 select-none">—</p>
                 ) : (
-                  dayEvents.map(ev => (
-                    <button
-                      key={ev.id}
-                      onClick={() => handleEvent(ev)}
-                      title={ev.title}
-                      className={[
-                        'w-full text-left border-l-2 rounded-sm px-1.5 py-1 transition-opacity hover:opacity-80',
-                        EVENT_COLORS[ev.type] ?? 'border-l-primary bg-primary/10 text-foreground',
-                      ].join(' ')}
-                    >
-                      <p className="text-[11px] font-semibold truncate leading-tight">{ev.title}</p>
-                      <p className="text-[10px] font-mono text-muted-foreground leading-tight">
-                        {new Date(ev.start_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </button>
-                  ))
+                  dayEvents.map(ev => {
+                    const isPast = ev.status === 'completed' || ev.status === 'cancelled'
+                    const isAttending = ev.attendees?.some(a => a.profile_id === currentUserId && a.status === 'confirme')
+                    const showRegister = !isPast && currentUserId && (onRegister || onUnregister)
+                    return (
+                      <div
+                        key={ev.id}
+                        className={[
+                          'w-full text-left border-l-2 rounded-sm px-1.5 py-1',
+                          EVENT_COLORS[ev.type] ?? 'border-l-primary bg-primary/10 text-foreground',
+                        ].join(' ')}
+                      >
+                        <button
+                          onClick={() => handleEvent(ev)}
+                          title={ev.title}
+                          className="w-full text-left hover:opacity-80 transition-opacity"
+                        >
+                          <p className="text-[11px] font-semibold truncate leading-tight">{ev.title}</p>
+                          <p className="text-[10px] font-mono text-muted-foreground leading-tight">
+                            {new Date(ev.start_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </button>
+                        {showRegister && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              isAttending ? onUnregister?.(ev.id) : onRegister?.(ev.id, 'confirme')
+                            }}
+                            className={[
+                              'mt-1 flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80',
+                              isAttending ? 'text-green-400' : 'text-muted-foreground',
+                            ].join(' ')}
+                          >
+                            <CheckCircle2 className="h-2.5 w-2.5" />
+                            {isAttending ? 'Inscrit' : 'Participer'}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })
                 )}
               </div>
 

@@ -185,8 +185,11 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
         <CalendarMonthView
           events={allEvents}
           canManage={canManage}
+          currentUserId={currentUserId}
           onViewEvent={setViewedEvent}
           onManageEvent={setManagedEvent}
+          onRegister={handleRegister}
+          onUnregister={handleUnregister}
         />
       )}
 
@@ -194,8 +197,11 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
         <CalendarWeekView
           events={allEvents}
           canManage={canManage}
+          currentUserId={currentUserId}
           onViewEvent={setViewedEvent}
           onManageEvent={setManagedEvent}
+          onRegister={handleRegister}
+          onUnregister={handleUnregister}
         />
       )}
 

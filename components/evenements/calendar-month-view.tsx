@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle2, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { EventWithDetails } from '@/types'
 
@@ -22,11 +22,14 @@ const EVENT_COLORS: Record<string, string> = {
 interface Props {
   events: EventWithDetails[]
   canManage: boolean
+  currentUserId?: string
   onViewEvent: (e: EventWithDetails) => void
   onManageEvent: (e: EventWithDetails) => void
+  onRegister?: (eventId: string, status: 'confirme' | 'peut_etre') => void
+  onUnregister?: (eventId: string) => void
 }
 
-export function CalendarMonthView({ events, canManage, onViewEvent, onManageEvent }: Props) {
+export function CalendarMonthView({ events, canManage, currentUserId, onViewEvent, onManageEvent, onRegister, onUnregister }: Props) {
   const today = new Date()
   const [anchor, setAnchor] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
 
@@ -117,19 +120,43 @@ export function CalendarMonthView({ events, canManage, onViewEvent, onManageEven
                 </p>
 
                 <div className="space-y-1">
-                  {cell.events.slice(0, 3).map(ev => (
-                    <button
-                      key={ev.id}
-                      onClick={() => handleEvent(ev)}
-                      title={ev.title}
-                      className={[
-                        'w-full text-left text-[11px] font-semibold px-1.5 py-1 rounded-sm truncate leading-tight transition-opacity hover:opacity-80',
-                        EVENT_COLORS[ev.type] ?? 'bg-primary/70 text-white',
-                      ].join(' ')}
-                    >
-                      {ev.title}
-                    </button>
-                  ))}
+                  {cell.events.slice(0, 3).map(ev => {
+                    const isPast = ev.status === 'completed' || ev.status === 'cancelled'
+                    const isAttending = ev.attendees?.some(a => a.profile_id === currentUserId && a.status === 'confirme')
+                    const showRegister = !isPast && currentUserId && (onRegister || onUnregister)
+                    return (
+                      <div
+                        key={ev.id}
+                        className={[
+                          'flex items-center gap-0.5 rounded-sm',
+                          EVENT_COLORS[ev.type] ?? 'bg-primary/70 text-white',
+                        ].join(' ')}
+                      >
+                        <button
+                          onClick={() => handleEvent(ev)}
+                          title={ev.title}
+                          className="flex-1 text-left text-[11px] font-semibold px-1.5 py-1 truncate leading-tight transition-opacity hover:opacity-80 min-w-0"
+                        >
+                          {ev.title}
+                        </button>
+                        {showRegister && (
+                          <button
+                            title={isAttending ? 'Se désinscrire' : 'Je participe'}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              isAttending ? onUnregister?.(ev.id) : onRegister?.(ev.id, 'confirme')
+                            }}
+                            className="shrink-0 pr-1 opacity-80 hover:opacity-100 transition-opacity"
+                          >
+                            {isAttending
+                              ? <CheckCircle2 className="h-3 w-3" />
+                              : <PlusCircle className="h-3 w-3" />
+                            }
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })}
                   {cell.events.length > 3 && (
                     <p className="text-[10px] text-muted-foreground/60 font-mono pl-1">
                       +{cell.events.length - 3}
