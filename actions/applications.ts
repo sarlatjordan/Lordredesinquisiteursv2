@@ -125,7 +125,9 @@ export async function acceptApplication(id: string): Promise<AcceptResult> {
     .single()
 
   if (fetchErr || !application) return { success: false, error: 'Candidature introuvable' }
-  if (application.status !== 'pending') return { success: false, error: 'Candidature déjà traitée' }
+  if (application.status === 'accepted' || application.status === 'refused') {
+    return { success: false, error: 'Candidature déjà traitée' }
+  }
 
   // Créer l'utilisateur auth + générer un magic link de première connexion
   // redirectTo pointe vers /register pour que le nouveau membre complète son profil
