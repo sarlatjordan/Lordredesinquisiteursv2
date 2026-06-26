@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { RapportBugClient } from './rapport-bug-client'
 import type { BugReport } from '@/types'
 
-export const metadata: Metadata = { title: 'Rapport de bug' }
+export const metadata: Metadata = { title: 'Signalement & Idées' }
 export const dynamic = 'force-dynamic'
 
 export default async function RapportBugPage() {
@@ -21,9 +21,9 @@ export default async function RapportBugPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Rapport de bug</h2>
+        <h2 className="text-2xl font-bold text-foreground">Signalement & Idées</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Signale un problème ou un comportement inattendu sur le site.
+          Signale un bug ou propose une amélioration pour le site.
         </p>
       </div>
       <RapportBugClient ownReports={(data ?? []) as BugReport[]} />

@@ -18,6 +18,7 @@ export interface Database {
         Row: {
           id:          string
           profile_id:  string
+          type:        'bug' | 'amelioration'
           title:       string
           description: string
           page_url:    string | null
@@ -30,6 +31,7 @@ export interface Database {
         Insert: {
           id?:         string
           profile_id:  string
+          type?:       'bug' | 'amelioration'
           title:       string
           description: string
           page_url?:   string | null
@@ -40,6 +42,7 @@ export interface Database {
           updated_at?: string
         }
         Update: {
+          type?:       'bug' | 'amelioration'
           title?:      string
           description?: string
           page_url?:   string | null

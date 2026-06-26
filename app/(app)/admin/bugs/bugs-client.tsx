@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Flame, Clock, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { Flame, Clock, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2, Bug, Lightbulb } from 'lucide-react'
 import { updateBugReport } from '@/actions/bug-reports'
 import { formatDateTime } from '@/lib/utils'
 import type { BugReport } from '@/types'
@@ -64,6 +64,13 @@ function BugRow({ bug }: { bug: BugReportWithProfile }) {
           <span className="text-sm font-medium text-foreground truncate">{bug.title}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <Badge variant="outline" className={`text-xs ${TYPE_COLORS[bug.type ?? 'bug']}`}>
+            {(bug.type ?? 'bug') === 'bug'
+              ? <Bug className="h-3 w-3 mr-1" />
+              : <Lightbulb className="h-3 w-3 mr-1" />
+            }
+            {TYPE_LABELS[bug.type ?? 'bug']}
+          </Badge>
           <Badge variant="outline" className={`text-xs ${SEVERITY_COLORS[bug.severity]}`}>
             {SEVERITY_LABELS[bug.severity]}
           </Badge>
@@ -131,26 +138,42 @@ function BugRow({ bug }: { bug: BugReportWithProfile }) {
   )
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  bug:          'bg-red-500/10 text-red-400 border-red-500/20',
+  amelioration: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+}
+const TYPE_LABELS: Record<string, string> = {
+  bug:          'Bug',
+  amelioration: 'Idée',
+}
+
 const FILTER_STATUS = ['tous', 'ouvert', 'en_cours', 'resolu', 'ferme'] as const
+const FILTER_TYPE = ['tous', 'bug', 'amelioration'] as const
 type FilterStatus = typeof FILTER_STATUS[number]
+type FilterType = typeof FILTER_TYPE[number]
 
 export function BugsClient({ bugs }: { bugs: BugReportWithProfile[] }) {
-  const [filter, setFilter] = useState<FilterStatus>('ouvert')
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('ouvert')
+  const [filterType, setFilterType] = useState<FilterType>('tous')
 
-  const filtered = filter === 'tous' ? bugs : bugs.filter(b => b.status === filter)
+  const filtered = bugs
+    .filter(b => filterStatus === 'tous' || b.status === filterStatus)
+    .filter(b => filterType === 'tous' || (b.type ?? 'bug') === filterType)
+
   const counts = bugs.reduce((acc, b) => { acc[b.status] = (acc[b.status] ?? 0) + 1; return acc }, {} as Record<string, number>)
+  const typeCounts = bugs.reduce((acc, b) => { const t = b.type ?? 'bug'; acc[t] = (acc[t] ?? 0) + 1; return acc }, {} as Record<string, number>)
 
   return (
     <div className="space-y-4">
-      {/* Filtres */}
+      {/* Filtres statut */}
       <div className="flex gap-2 flex-wrap">
         {FILTER_STATUS.map((s) => (
           <button
             key={s}
             type="button"
-            onClick={() => setFilter(s)}
+            onClick={() => setFilterStatus(s)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              filter === s
+              filterStatus === s
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'bg-muted/30 text-muted-foreground border-border hover:border-border/80 hover:text-foreground'
             }`}
@@ -161,9 +184,29 @@ export function BugsClient({ bugs }: { bugs: BugReportWithProfile[] }) {
           </button>
         ))}
       </div>
+      {/* Filtres type */}
+      <div className="flex gap-2 flex-wrap">
+        {FILTER_TYPE.map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setFilterType(t)}
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+              filterType === t
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-muted/30 text-muted-foreground border-border hover:border-border/80 hover:text-foreground'
+            }`}
+          >
+            {t === 'bug' && <Bug className="h-3 w-3" />}
+            {t === 'amelioration' && <Lightbulb className="h-3 w-3" />}
+            {t === 'tous' ? 'Tous types' : TYPE_LABELS[t]}
+            {t !== 'tous' && typeCounts[t] ? ` (${typeCounts[t]})` : ''}
+          </button>
+        ))}
+      </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-8">Aucun rapport dans cette catégorie.</p>
+        <p className="text-sm text-muted-foreground text-center py-8">Aucun élément dans cette catégorie.</p>
       ) : (
         <div className="space-y-2">
           {filtered.map(bug => <BugRow key={bug.id} bug={bug} />)}

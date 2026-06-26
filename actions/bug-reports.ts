@@ -12,11 +12,17 @@ const SEVERITY_LABELS: Record<string, string> = {
 }
 
 const SubmitSchema = z.object({
+  type:        z.enum(['bug', 'amelioration']).default('bug'),
   title:       z.string().min(3).max(150),
   description: z.string().min(10).max(4000),
   page_url:    z.string().max(500).optional(),
   severity:    z.enum(['faible', 'moyen', 'eleve', 'critique']),
 })
+
+const TYPE_LABELS: Record<string, string> = {
+  bug:          'Bug',
+  amelioration: 'Idée',
+}
 
 export async function submitBugReport(formData: FormData): Promise<ActionResult> {
   const parsed = SubmitSchema.safeParse(Object.fromEntries(formData))
@@ -28,6 +34,7 @@ export async function submitBugReport(formData: FormData): Promise<ActionResult>
 
   const { error } = await supabase.from('bug_reports').insert({
     profile_id:  user.id,
+    type:        parsed.data.type,
     title:       parsed.data.title,
     description: parsed.data.description,
     page_url:    parsed.data.page_url || null,
@@ -49,8 +56,8 @@ export async function submitBugReport(formData: FormData): Promise<ActionResult>
         createNotification(admin, {
           profile_id: s.id,
           type:       'bug_report',
-          title:      'Nouveau rapport de bug',
-          message:    `[${SEVERITY_LABELS[parsed.data.severity]}] ${parsed.data.title}`,
+          title:      parsed.data.type === 'amelioration' ? 'Nouvelle idée d\'amélioration' : 'Nouveau rapport de bug',
+          message:    `[${TYPE_LABELS[parsed.data.type]}] ${parsed.data.title}`,
           link:       '/admin/bugs',
         })
       )
