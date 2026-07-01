@@ -137,7 +137,10 @@ export function CalendarMonthView({ events, canManage, currentUserId, onViewEven
                           title={ev.title}
                           className="flex-1 text-left text-[11px] font-semibold px-1.5 py-1 truncate leading-tight transition-opacity hover:opacity-80 min-w-0"
                         >
-                          {ev.title}
+                          <span className="opacity-80 font-mono font-normal">
+                            {new Date(ev.start_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {' '}{ev.title}
                         </button>
                         {showRegister && (
                           <button
