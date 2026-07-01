@@ -97,8 +97,12 @@ export function EventForm({
       setError('start_at', { message: 'Date de début requise' })
       return
     }
+    // datetime-local values have no timezone — new Date() interprets them as local time,
+    // toISOString() converts to UTC before storing in Supabase (timestamptz column).
     const data: EventFormData = {
       ...raw,
+      start_at: new Date(raw.start_at).toISOString(),
+      end_at: raw.end_at ? new Date(raw.end_at).toISOString() : undefined,
       max_attendees: raw.max_attendees ? parseInt(raw.max_attendees, 10) : undefined,
       min_privilege: parseInt(raw.min_privilege, 10) || 0,
       createOperation: watchedType === 'operation' ? raw.createOperation : false,
