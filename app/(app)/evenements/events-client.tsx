@@ -59,20 +59,45 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
     })
   }
 
+  function patchAttendance(eventId: string, status: 'confirme' | 'peut_etre' | null) {
+    if (!currentUserId) return
+    const patch = (ev: EventWithDetails | null): EventWithDetails | null => {
+      if (!ev || ev.id !== eventId) return ev
+      const filtered = (ev.attendees ?? []).filter(a => a.profile_id !== currentUserId)
+      return {
+        ...ev,
+        attendees: status
+          ? [...filtered, { profile_id: currentUserId, status } as import('@/types').AttendeeWithProfile]
+          : filtered,
+      }
+    }
+    setViewedEvent(patch)
+    setManagedEvent(patch)
+  }
+
   function handleRegister(eventId: string, status: 'confirme' | 'peut_etre') {
     setRegisterError(null)
+    patchAttendance(eventId, status)
     startTransition(async () => {
       const result = await registerForEvent(eventId, status)
-      if (!result.success) { setRegisterError(result.error); return }
+      if (!result.success) {
+        setRegisterError(result.error)
+        patchAttendance(eventId, null)
+        return
+      }
       router.refresh()
     })
   }
 
   function handleUnregister(eventId: string) {
     setRegisterError(null)
+    patchAttendance(eventId, null)
     startTransition(async () => {
       const result = await unregisterFromEvent(eventId)
-      if (!result.success) { setRegisterError(result.error); return }
+      if (!result.success) {
+        setRegisterError(result.error)
+        return
+      }
       router.refresh()
     })
   }
