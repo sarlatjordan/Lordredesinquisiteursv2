@@ -149,7 +149,7 @@ export function CalendarMonthView({ events, canManage, currentUserId, onViewEven
                               e.stopPropagation()
                               isAttending ? onUnregister?.(ev.id) : onRegister?.(ev.id, 'confirme')
                             }}
-                            className="shrink-0 pr-1 opacity-80 hover:opacity-100 transition-opacity"
+                            className="hidden sm:flex shrink-0 pr-1 opacity-80 hover:opacity-100 transition-opacity"
                           >
                             {isAttending
                               ? <CheckCircle2 className="h-3 w-3" />

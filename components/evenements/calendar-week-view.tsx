@@ -158,7 +158,7 @@ export function CalendarWeekView({ events, canManage, currentUserId, onViewEvent
                               isAttending ? onUnregister?.(ev.id) : onRegister?.(ev.id, 'confirme')
                             }}
                             className={[
-                              'mt-1 flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80',
+                              'mt-1 hidden sm:flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80',
                               isAttending ? 'text-green-400' : 'text-muted-foreground',
                             ].join(' ')}
                           >
