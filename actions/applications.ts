@@ -253,6 +253,57 @@ export async function regenerateMagicLink(id: string): Promise<AcceptResult> {
   return { success: true, magicLink: linkData.properties.action_link }
 }
 
+// ─── Générer un lien pour un membre existant sans compte auth (Sage requis) ──
+
+export async function generateMemberLoginLink(email: string): Promise<AcceptResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!myProfile || getRolePrivilege(myProfile.role) < 1000) {
+    return { success: false, error: 'Droits insuffisants — Sage requis' }
+  }
+
+  if (!email || !email.includes('@')) return { success: false, error: 'Email invalide' }
+
+  const admin = createAdminClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
+
+  // Tenter d'abord un magic link (user existant) — sinon envoyer une invitation
+  const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/dashboard')}`,
+    },
+  })
+
+  if (linkErr) {
+    // L'utilisateur n'existe pas — créer le compte via invite
+    const { data: inviteData, error: inviteErr } = await admin.auth.admin.generateLink({
+      type: 'invite',
+      email,
+      options: {
+        redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/register')}`,
+      },
+    })
+    if (inviteErr || !inviteData) {
+      return { success: false, error: inviteErr?.message ?? 'Impossible de générer le lien' }
+    }
+    return { success: true, magicLink: inviteData.properties.action_link }
+  }
+
+  if (!linkData) return { success: false, error: 'Impossible de générer le lien' }
+  return { success: true, magicLink: linkData.properties.action_link }
+}
+
 // ─── Refuser une candidature (Sage requis) ────────────────────────────────────
 
 export async function rejectApplication(

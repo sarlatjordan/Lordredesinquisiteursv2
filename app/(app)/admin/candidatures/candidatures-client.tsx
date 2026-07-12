@@ -17,6 +17,7 @@ import {
   rejectApplication,
   moveToDiscussion,
   regenerateMagicLink,
+  generateMemberLoginLink,
 } from '@/actions/applications'
 import type { Application } from '@/types'
 import {
@@ -31,7 +32,11 @@ import {
   MessageSquare,
   ArrowRight,
   RefreshCw,
+  UserPlus,
+  Mail,
 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -536,6 +541,86 @@ const COLUMNS: ColumnConfig[] = [
   },
 ]
 
+// ─── Panneau accès membre existant ───────────────────────────────────────────
+
+function MemberAccessPanel() {
+  const [email, setEmail] = useState('')
+  const [isPending, startTransition] = useTransition()
+  const [magicLink, setMagicLink] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  function handleGenerate(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setMagicLink(null)
+    startTransition(async () => {
+      const result = await generateMemberLoginLink(email.trim())
+      if (result.success) {
+        setMagicLink(result.magicLink)
+        setEmail('')
+      } else {
+        setError(result.error)
+      }
+    })
+  }
+
+  async function handleCopy() {
+    if (!magicLink) return
+    await navigator.clipboard.writeText(magicLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <UserPlus className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-sm font-semibold text-foreground">Accès membre existant</h3>
+        <span className="text-xs text-muted-foreground ml-auto">Pour les membres sans lien de connexion</span>
+      </div>
+
+      <form onSubmit={handleGenerate} className="flex gap-2">
+        <div className="relative flex-1">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            type="email"
+            placeholder="email@exemple.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="pl-8 h-8 text-sm"
+            required
+          />
+        </div>
+        <Button type="submit" size="sm" className="h-8 text-xs" disabled={isPending || !email}>
+          {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Générer le lien'}
+        </Button>
+      </form>
+
+      {error && (
+        <p className="text-xs text-destructive flex items-center gap-1">
+          <XCircle className="h-3.5 w-3.5 shrink-0" />{error}
+        </p>
+      )}
+
+      {magicLink && (
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground uppercase tracking-wide">Lien de connexion (valable 24h)</Label>
+          <div className="flex gap-2">
+            <code className="flex-1 rounded-md border border-border bg-muted px-3 py-2 text-xs text-foreground break-all font-mono">
+              {magicLink}
+            </code>
+            <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0 h-auto">
+              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">Envoyez ce lien au membre via Discord.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 interface CandidaturesClientProps {
@@ -568,6 +653,8 @@ export function CandidaturesClient({ applications: initial }: CandidaturesClient
   }
 
   return (
+    <div className="space-y-4">
+    <MemberAccessPanel />
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
       {COLUMNS.map((col) => {
         const items = applications.filter((a) => a.status === col.id)
@@ -606,6 +693,7 @@ export function CandidaturesClient({ applications: initial }: CandidaturesClient
           </div>
         )
       })}
+    </div>
     </div>
   )
 }

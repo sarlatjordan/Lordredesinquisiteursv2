@@ -339,7 +339,13 @@ function MagicLinkForm({ onBack, redirectTo }: { onBack: () => void; redirectTo?
     })
     if (error) {
       setState('error')
-      setErrorMsg(error.message)
+      setErrorMsg(
+        error.message.includes('Signups not allowed') || error.message.includes('not authorized')
+          ? 'Aucun compte trouvé pour cet e-mail. Si tu es membre de l\'Ordre, contacte un Sage sur Discord pour recevoir ton lien de connexion.'
+          : error.message.includes('Email rate limit')
+          ? 'Trop de tentatives. Attends quelques minutes avant de réessayer.'
+          : `Erreur : ${error.message}`
+      )
       return
     }
     setState('success')
