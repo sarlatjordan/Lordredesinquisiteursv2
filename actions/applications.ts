@@ -276,7 +276,7 @@ export async function generateMemberLoginLink(email: string): Promise<AcceptResu
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
     ?? (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
 
-  // Tenter d'abord un magic link (user existant) — sinon envoyer une invitation
+  // Tenter un magic link — si l'utilisateur n'existe pas, créer le compte d'abord
   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
     type: 'magiclink',
     email,
@@ -285,23 +285,30 @@ export async function generateMemberLoginLink(email: string): Promise<AcceptResu
     },
   })
 
-  if (linkErr) {
-    // L'utilisateur n'existe pas — créer le compte via invite
-    const { data: inviteData, error: inviteErr } = await admin.auth.admin.generateLink({
-      type: 'invite',
-      email,
-      options: {
-        redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/register')}`,
-      },
-    })
-    if (inviteErr || !inviteData) {
-      return { success: false, error: inviteErr?.message ?? 'Impossible de générer le lien' }
-    }
-    return { success: true, magicLink: inviteData.properties.action_link }
+  if (!linkErr && linkData) {
+    return { success: true, magicLink: linkData.properties.action_link }
   }
 
-  if (!linkData) return { success: false, error: 'Impossible de générer le lien' }
-  return { success: true, magicLink: linkData.properties.action_link }
+  // Utilisateur inexistant — créer le compte (email déjà confirmé) puis magic link
+  const { error: createErr } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+  })
+  if (createErr) {
+    return { success: false, error: createErr.message }
+  }
+
+  const { data: newLinkData, error: newLinkErr } = await admin.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent('/register')}`,
+    },
+  })
+  if (newLinkErr || !newLinkData) {
+    return { success: false, error: newLinkErr?.message ?? 'Impossible de générer le lien' }
+  }
+  return { success: true, magicLink: newLinkData.properties.action_link }
 }
 
 // ─── Refuser une candidature (Sage requis) ────────────────────────────────────
