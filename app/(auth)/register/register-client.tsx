@@ -61,9 +61,9 @@ export function RegisterClient({ email, defaultDisplayName }: RegisterClientProp
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <Card className="p-6 border-border bg-card sc-glow">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground">Bienvenue dans l&apos;Ordre</h2>
+          <h2 className="text-lg font-semibold text-foreground">Finaliser mon accès</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Complétez votre profil pour accéder au QG.
+            Ton compte a été créé par un Sage. Choisis un nom affiché et, si tu le souhaites, un mot de passe.
           </p>
         </div>
 
@@ -164,7 +164,7 @@ export function RegisterClient({ email, defaultDisplayName }: RegisterClientProp
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enregistrement…</>
-              : 'Rejoindre l\'Ordre'}
+              : 'Accéder au QG'}
           </Button>
         </form>
 
