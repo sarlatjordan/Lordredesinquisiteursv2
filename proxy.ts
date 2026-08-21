@@ -8,7 +8,7 @@ function buildCSP(nonce: string): string {
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
     "style-src 'self' 'unsafe-inline'", // nonce non viable : Radix + framer-motion injectent des style="" attrs à l'exécution
-    "img-src 'self' data: blob: https://media.robertsspaceindustries.com https://*.supabase.co https://*.supabase.in",
+    "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in",
     "frame-src https://challenges.cloudflare.com",
