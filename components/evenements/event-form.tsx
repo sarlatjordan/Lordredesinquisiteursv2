@@ -1,7 +1,7 @@
 'use client'
 
 import { useForm, Controller, useWatch } from 'react-hook-form'
-import { Loader2, Send, Swords } from 'lucide-react'
+import { Loader2, Send, Swords, Repeat } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +24,9 @@ interface EventFormValues {
   min_privilege: string
   sendToDiscord: boolean
   createOperation: boolean
+  repeatEvent: boolean
+  repeatEveryDays: string
+  repeatForDays: string
 }
 
 export interface EventFormData {
@@ -38,6 +41,8 @@ export interface EventFormData {
   min_privilege: number
   sendToDiscord?: boolean
   createOperation?: boolean
+  repeatEveryDays?: number
+  repeatForDays?: number
 }
 
 interface EventFormProps {
@@ -52,6 +57,7 @@ interface EventFormProps {
   canCreateOp?: boolean
   absences?: AbsenceWithProfile[]
   open?: boolean
+  allowRecurrence?: boolean
 }
 
 export function EventForm({
@@ -66,6 +72,7 @@ export function EventForm({
   canCreateOp = false,
   absences = [],
   open = false,
+  allowRecurrence = false,
 }: EventFormProps) {
   const {
     register,
@@ -80,13 +87,26 @@ export function EventForm({
       status: 'planned',
       sendToDiscord: false,
       createOperation: false,
+      repeatEvent: false,
+      repeatEveryDays: '7',
+      repeatForDays: '28',
       ...defaultValues,
     },
   })
 
-  const watchedType  = useWatch({ control, name: 'type' })
-  const watchedStart = useWatch({ control, name: 'start_at' })
-  const watchedEnd   = useWatch({ control, name: 'end_at' })
+  const watchedType    = useWatch({ control, name: 'type' })
+  const watchedStart   = useWatch({ control, name: 'start_at' })
+  const watchedEnd     = useWatch({ control, name: 'end_at' })
+  const watchedRepeat  = useWatch({ control, name: 'repeatEvent' })
+  const watchedEvery   = useWatch({ control, name: 'repeatEveryDays' })
+  const watchedForDays = useWatch({ control, name: 'repeatForDays' })
+
+  const occurrenceCount = (() => {
+    const every = parseInt(watchedEvery ?? '', 10)
+    const forDays = parseInt(watchedForDays ?? '', 10)
+    if (!every || every < 1 || !forDays || forDays < every) return null
+    return Math.min(Math.floor(forDays / every) + 1, 20)
+  })()
 
   function handleValidSubmit(raw: EventFormValues) {
     if (!raw.title || raw.title.length < 3) {
@@ -97,6 +117,18 @@ export function EventForm({
       setError('start_at', { message: 'Date de début requise' })
       return
     }
+    if (raw.repeatEvent) {
+      const every = parseInt(raw.repeatEveryDays, 10)
+      const forDays = parseInt(raw.repeatForDays, 10)
+      if (!every || every < 1) {
+        setError('repeatEveryDays', { message: 'Intervalle requis (min. 1 jour)' })
+        return
+      }
+      if (!forDays || forDays < every) {
+        setError('repeatForDays', { message: 'Durée requise (≥ intervalle)' })
+        return
+      }
+    }
     // datetime-local values have no timezone — new Date() interprets them as local time,
     // toISOString() converts to UTC before storing in Supabase (timestamptz column).
     const data: EventFormData = {
@@ -106,6 +138,8 @@ export function EventForm({
       max_attendees: raw.max_attendees ? parseInt(raw.max_attendees, 10) : undefined,
       min_privilege: parseInt(raw.min_privilege, 10) || 0,
       createOperation: watchedType === 'operation' ? raw.createOperation : false,
+      repeatEveryDays: raw.repeatEvent ? parseInt(raw.repeatEveryDays, 10) : undefined,
+      repeatForDays: raw.repeatEvent ? parseInt(raw.repeatForDays, 10) : undefined,
     }
     return onSubmit(data)
   }
@@ -210,6 +244,58 @@ export function EventForm({
           <Input id="end_at" type="datetime-local" {...register('end_at')} />
         </div>
       </div>
+
+      {allowRecurrence && (
+        <div className="rounded-md border border-border bg-muted/30 px-3 py-3 space-y-3">
+          <Controller
+            name="repeatEvent"
+            control={control}
+            render={({ field }) => (
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <Checkbox
+                  id="repeatEvent"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+                <Repeat className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm">Répéter cet événement</span>
+              </label>
+            )}
+          />
+          {watchedRepeat && (
+            <div className="grid grid-cols-2 gap-3 pl-6">
+              <div className="space-y-1.5">
+                <Label htmlFor="repeatEveryDays">Tous les (jours)</Label>
+                <Input
+                  id="repeatEveryDays"
+                  type="number"
+                  min={1}
+                  aria-invalid={!!errors.repeatEveryDays}
+                  {...register('repeatEveryDays')}
+                />
+                {errors.repeatEveryDays && <p className="text-xs text-destructive">{errors.repeatEveryDays.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="repeatForDays">Pendant (jours)</Label>
+                <Input
+                  id="repeatForDays"
+                  type="number"
+                  min={1}
+                  aria-invalid={!!errors.repeatForDays}
+                  {...register('repeatForDays')}
+                />
+                {errors.repeatForDays && <p className="text-xs text-destructive">{errors.repeatForDays.message}</p>}
+              </div>
+              {occurrenceCount && (
+                <p className="col-span-2 text-xs text-muted-foreground">
+                  {occurrenceCount} occurrence{occurrenceCount > 1 ? 's' : ''} seront créées
+                  {occurrenceCount >= 20 && ' (plafond atteint)'}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <AbsenceTips
         absences={absences}

@@ -47,9 +47,9 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
 
   function handleCreateEvent(data: import('@/components/evenements/event-form').EventFormData) {
     setCreateError(null)
-    const { sendToDiscord, createOperation, ...eventInput } = data
+    const { sendToDiscord, createOperation, repeatEveryDays, repeatForDays, ...eventInput } = data
     startTransition(async () => {
-      const result = await createEvent(eventInput, { sendToDiscord, createOperation })
+      const result = await createEvent(eventInput, { sendToDiscord, createOperation, repeatEveryDays, repeatForDays })
       if (result.success) {
         setIsCreateOpen(false)
         router.refresh()
@@ -191,6 +191,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
                   canCreateOp={canCreateOp}
                   absences={absences}
                   open={isCreateOpen}
+                  allowRecurrence
                 />
               </DialogContent>
             </Dialog>

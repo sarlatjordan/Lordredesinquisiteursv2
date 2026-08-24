@@ -19,7 +19,11 @@ import { createDiscordScheduledEvent, postToDiscordChannel, buildEventMention } 
 interface CreateEventOptions {
   sendToDiscord?: boolean
   createOperation?: boolean
+  repeatEveryDays?: number
+  repeatForDays?: number
 }
+
+const MAX_RECURRENCE_OCCURRENCES = 20
 
 export async function createEvent(
   input: EventCreateInput,
@@ -33,60 +37,88 @@ export async function createEvent(
 
   if (privilege < PRIVILEGE.CREATE_EVENTS) return { success: false, error: 'Droits insuffisants — Aspirant requis' }
 
-  // Envoi Discord en premier pour récupérer le discord_event_id
-  let discordEventId: string | null = null
-  if (options.sendToDiscord) {
-    discordEventId = await createDiscordScheduledEvent({
-      name: parsed.data.title,
-      description: parsed.data.description,
-      scheduled_start_time: new Date(parsed.data.start_at).toISOString(),
-      scheduled_end_time: parsed.data.end_at ? new Date(parsed.data.end_at).toISOString() : null,
-      location: parsed.data.location,
-    })
+  // Génère les dates de chaque occurrence si la répétition est demandée
+  const occurrences: { start: string; end: string | null }[] = []
+  const { repeatEveryDays, repeatForDays } = options
+  if (repeatEveryDays && repeatEveryDays >= 1 && repeatForDays && repeatForDays >= repeatEveryDays) {
+    const count = Math.min(Math.floor(repeatForDays / repeatEveryDays) + 1, MAX_RECURRENCE_OCCURRENCES)
+    const baseStart = new Date(parsed.data.start_at)
+    const baseEnd = parsed.data.end_at ? new Date(parsed.data.end_at) : null
+    for (let i = 0; i < count; i++) {
+      const offsetMs = i * repeatEveryDays * 24 * 60 * 60 * 1000
+      occurrences.push({
+        start: new Date(baseStart.getTime() + offsetMs).toISOString(),
+        end: baseEnd ? new Date(baseEnd.getTime() + offsetMs).toISOString() : null,
+      })
+    }
+  } else {
+    occurrences.push({ start: parsed.data.start_at, end: parsed.data.end_at ?? null })
   }
 
-  const { data, error } = await supabase
-    .from('events')
-    .insert({
-      ...parsed.data,
-      status: 'planned' as const,
-      created_by: user.id,
-      ...(discordEventId ? { discord_event_id: discordEventId } : {}),
-    })
-    .select()
-    .single()
+  let firstEvent: Event | null = null
 
-  if (error) return { success: false, error: error.message }
+  for (const occ of occurrences) {
+    // Envoi Discord en premier pour récupérer le discord_event_id
+    let discordEventId: string | null = null
+    if (options.sendToDiscord) {
+      discordEventId = await createDiscordScheduledEvent({
+        name: parsed.data.title,
+        description: parsed.data.description,
+        scheduled_start_time: occ.start,
+        scheduled_end_time: occ.end,
+        location: parsed.data.location,
+      })
+    }
 
-  // Notification Discord canal #INFORMATION avec mention des rangs concernés
+    const { data, error } = await supabase
+      .from('events')
+      .insert({
+        ...parsed.data,
+        start_at: occ.start,
+        end_at: occ.end ?? undefined,
+        status: 'planned' as const,
+        created_by: user.id,
+        ...(discordEventId ? { discord_event_id: discordEventId } : {}),
+      })
+      .select()
+      .single()
+
+    if (error) return { success: false, error: error.message }
+
+    if (!firstEvent) firstEvent = data as Event
+
+    // Création de l'opération liée (MI+ requis)
+    if (options.createOperation && parsed.data.type === 'operation' && privilege >= PRIVILEGE.CREATE_OPS) {
+      await supabase.from('operations').insert({
+        title: parsed.data.title,
+        description: parsed.data.description || null,
+        system_name: parsed.data.location || 'À définir',
+        type: 'combat',
+        status: 'planned',
+        departure_at: occ.start,
+        risk_level: 'medium',
+        min_privilege: parsed.data.min_privilege ?? 100,
+        created_by: user.id,
+      })
+    }
+  }
+
+  if (options.createOperation) revalidatePath('/operations')
+
+  // Notification Discord canal #INFORMATION avec mention des rangs concernés — une seule fois
   const infoChannelId = process.env.DISCORD_INFORMATION_CHANNEL_ID
   if (infoChannelId) {
     const mention = buildEventMention(parsed.data.min_privilege ?? 0)
+    const suffix = occurrences.length > 1 ? ` (${occurrences.length} occurrences)` : ''
     await postToDiscordChannel(
       infoChannelId,
-      `${mention} Un nouvel événement vient d'être programmé : **${parsed.data.title}** — https://inqfr.vercel.app/evenements`,
+      `${mention} Un nouvel événement vient d'être programmé : **${parsed.data.title}**${suffix} — https://inqfr.vercel.app/evenements`,
     )
-  }
-
-  // Création de l'opération liée (MI+ requis)
-  if (options.createOperation && parsed.data.type === 'operation' && privilege >= PRIVILEGE.CREATE_OPS) {
-    await supabase.from('operations').insert({
-      title: parsed.data.title,
-      description: parsed.data.description || null,
-      system_name: parsed.data.location || 'À définir',
-      type: 'combat',
-      status: 'planned',
-      departure_at: parsed.data.start_at,
-      risk_level: 'medium',
-      min_privilege: parsed.data.min_privilege ?? 100,
-      created_by: user.id,
-    })
-    revalidatePath('/operations')
   }
 
   revalidatePath('/evenements')
   revalidatePath('/dashboard')
-  return { success: true, data: data as Event }
+  return { success: true, data: firstEvent as Event }
 }
 
 export async function updateEvent(id: string, input: EventUpdateInput): Promise<ActionResult<Event>> {
