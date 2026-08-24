@@ -188,3 +188,17 @@
 ::-webkit-scrollbar-track { background: oklch(0.07 0.012 264); }
 ::-webkit-scrollbar-thumb { background: oklch(0.87 0.18 196 / 25%); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: oklch(0.87 0.18 196 / 40%); }
+
+/* Icône du picker datetime-local visible en thème sombre */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) sepia(1) saturate(3) hue-rotate(155deg);
+  opacity: 0.6;
+  cursor: pointer;
+}
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
