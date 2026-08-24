@@ -21,7 +21,6 @@
 
 | ID | Item | Priorité |
 |---|---|---|
-| FEAT-36 | Commentaires contextuels sur ops & événements — fil de discussion minimal par item, remplace le retour Discord pour les échanges liés à une op/event spécifique | P1 |
 | FEAT-37 | Sondages / votes — question + options + deadline + rang minimum pour voter, couvre promotions par vote Sage et décisions d'org | P1 |
 | FEAT-38 | Vue "cockpit" chef d'op live — page compacte : slots confirmés, membres en jeu (`in_game_since`), briefing affiché, pour piloter une op sans quitter INQFR | P1 |
 | FEAT-39 | PWA installable + notifications granulaires — manifeste + icône installation bureau/mobile, filtrage des push par type (op urgente, événement, message direct) | P2 |
@@ -110,6 +109,7 @@
 | FEAT-49 | Système d'accès dynamique par rang — table `page_access_rules`, matrix admin `/admin/acces` (Sage), `AccessGate` client avec `usePathname()` — migration 049 | 2026-06-21 |
 | FEAT-50 | Chat temporaire par opération — `op_chat_messages`, Realtime Supabase, bulles messenger, accès participants confirmés + commandant + MI+, `is_op_participant()` SECURITY DEFINER — migration 050 | 2026-06-21 |
 | FEAT-51 | Rapport de bug — `/rapport-bug` (formulaire + historique perso), admin `/admin/bugs` (filtre statut, gestion note admin), notif Sages à chaque soumission — migration 051 | 2026-06-21 |
+| FEAT-36 | Commentaires contextuels sur ops & événements — fil de discussion par item, `comments` table migration 056, CommentsSection dans EventViewDialog + EventDetailDialog + OperationDetail | 2026-08-24 |
 | FEAT-53 | Accès membres existants sans compte — bouton "Regénérer le lien" sur candidatures acceptées + panneau `MemberAccessPanel` (Sage) pour générer un magic link par email | 2026-08-24 |
 | BUG-07 | Inquisiteurs bloqués sur l'écriture de débrief opération — seuil UI corrigé de MI+ (600) à Inquisiteur+ (400) dans `saveOperationDebrief` et `operation-detail.tsx` | 2026-06-21 |
 | BUG-08 | Wiki — contenu markdown affiché en texte brut — `react-markdown` v10 ESM-only plantait au SSR → chargement `dynamic` avec `ssr:false` + `remark-gfm` | 2026-06-21 |
