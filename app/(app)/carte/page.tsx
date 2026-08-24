@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getRolePrivilege } from '@/lib/constants'
+import { getRolePrivilege, SC_SYSTEMS } from '@/lib/constants'
 import { CarteClient } from './carte-client'
 import type { MapPoint, MapJumpLane } from '@/types'
 
@@ -25,15 +25,23 @@ export default async function CartePage() {
     supabase.from('map_system_positions').select('system_name, x, y'),
   ])
 
+  // Filtre 1.0 : seuls les 5 systèmes confirmés au lancement sont affichés.
+  // Les données des autres systèmes restent en base (non supprimées) au cas
+  // où la roadmap CIG les ajouterait plus tard.
+  const isSystem10 = (name: string) => (SC_SYSTEMS as readonly string[]).includes(name)
+
   const systemPositions: Record<string, { x: number; y: number }> = {}
   for (const row of sysPos ?? []) {
-    systemPositions[row.system_name] = { x: row.x, y: row.y }
+    if (isSystem10(row.system_name)) systemPositions[row.system_name] = { x: row.x, y: row.y }
   }
+
+  const filteredPoints = (points ?? []).filter((p) => isSystem10(p.system_name))
+  const filteredLanes = (lanes ?? []).filter((l) => isSystem10(l.system_a) && isSystem10(l.system_b))
 
   return (
     <CarteClient
-      points={(points ?? []) as MapPoint[]}
-      jumpLanes={(lanes ?? []) as MapJumpLane[]}
+      points={filteredPoints as MapPoint[]}
+      jumpLanes={filteredLanes as MapJumpLane[]}
       systemPositions={systemPositions}
       canManage={canManage}
       canDelete={canDelete}

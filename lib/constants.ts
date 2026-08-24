@@ -321,44 +321,14 @@ export const OP_ROLE_ICONS: Record<OpRole, string> = {
   fighter_pilot:'✈️',
 }
 
+// Systèmes confirmés pour la version 1.0 de Star Citizen — les autres systèmes
+// du lore (Sol, Odin, Magnus, Nexus…) ne sont pas encore accessibles en jeu.
 export const SC_SYSTEMS = [
   'Stanton',
   'Pyro',
   'Nyx',
   'Terra',
-  'Magnus',
-  'Nexus',
   'Castra',
-  'Idris',
-  'Virgil',
-  'Odin',
-  'Ellis',
-  'Chronos',
-  'Hades',
-  'Kiel',
-  'Leir',
-  'Bremen',
-  'Davien',
-  'Vega',
-  'Nul',
-  'Oberon',
-  'Ariel',
-  'Tamsa',
-  'Baker',
-  'Banshee',
-  'Caliban',
-  'Cano',
-  'Cathcart',
-  'Croshaw',
-  'Ferron',
-  'Garron',
-  'Hadrian',
-  'Kellog',
-  'Kilian',
-  'Min',
-  'Sol',
-  'Tanga',
-  'Tiber',
 ] as const
 export type ScSystem = typeof SC_SYSTEMS[number]
 
