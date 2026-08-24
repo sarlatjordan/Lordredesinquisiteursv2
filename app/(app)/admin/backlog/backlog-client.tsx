@@ -30,6 +30,22 @@ const EMPTY: BacklogItemInput = { code: '', icon: '📌', title: '', description
 const PRIO_LABEL: Record<Priority, string> = { P0: '🔴 P0 — Incident', P1: '🟡 P1 — Sprint', P2: '⚪ P2 — Long terme' }
 const PRIO_BORDER: Record<Priority, string> = { P0: 'border-l-red-500', P1: 'border-l-amber-500', P2: 'border-l-slate-500' }
 
+const FEATURE_RECAP: { icon: string; label: string; desc: string }[] = [
+  { icon: '🔒', label: 'Sécurité & Auth', desc: 'RLS, MFA TOTP, trusted devices, Turnstile, CSP, ICS HMAC, OAuth Google & Discord' },
+  { icon: '⚡', label: 'Features core', desc: 'Messagerie temps réel, notifications, onboarding 4 rangs, épreuves, calendrier ICS, RGPD' },
+  { icon: '🚀', label: 'Flotte & Opérations', desc: 'Grille flotte, filtres, édition inline, 250 modèles RSI, Discord sync, planificateur de composition de flotte par slot (FEAT-25)' },
+  { icon: '🎮', label: 'Statut en jeu', desc: 'Mode "Je suis en jeu" toggleable depuis le dashboard, horodatage et liste des membres actuellement en jeu (FEAT-34)' },
+  { icon: '🔔', label: 'Notifications push', desc: 'Web Push VAPID + service worker, toggle sur /profil, déclenché automatiquement sur chaque notif in-app (FEAT-32)' },
+  { icon: '🎨', label: 'UI & Expérience', desc: 'Calendrier mois/semaine/liste, backgrounds SC, upload photo PC, toolbar bio markdown' },
+  { icon: '🗂', label: 'Admin & Recherche', desc: 'Kanban candidatures 4 colonnes (FEAT-31), recherche globale Ctrl+K membres/ressources/ops/events (FEAT-33), éditeur markdown unifié sur tous les champs texte (FEAT-35)' },
+  { icon: '🗓', label: 'Disponibilité & Communauté', desc: 'Tracker dispo 7j×4 créneaux sur /profil (FEAT-26), loot panel opérations avec distribution aUEC (FEAT-27), journal de guerre admin + landing (FEAT-28), 9 badges auto sur fiche membre (FEAT-29), widget Discord vocal dashboard (FEAT-30)' },
+  { icon: '📈', label: 'Performance', desc: 'Promise.all waterfall, RPC SQL points, colonnes Supabase, cache settings' },
+  { icon: '🏗', label: 'Architecture', desc: 'Server Actions Zod, auth-helpers, React.cache metadata, erreurs corrigées' },
+  { icon: '🎨', label: 'Conseil 20 juin', desc: 'Couleurs rang unifiées, noms chat colorés, logo toggle, widget présence fusionné, notif Discord avec mentions par rang, admin hub, gestion membres fusionnée, profil 2 colonnes, système d\'absences — 4 bugs corrigés' },
+  { icon: '🛠', label: 'Sprint 21 juin', desc: 'Accès dynamique par rang (FEAT-49), chat op Realtime (FEAT-50), rapport de bug + admin (FEAT-51), guide joueur & admin HTML (FEAT-53) — 2 bugs corrigés' },
+  { icon: '💬', label: 'Sprint 24 août', desc: 'Commentaires contextuels sur ops & événements (FEAT-36), fix images markdown ressources (BUG-18), page /register fonctionnelle' },
+]
+
 function nextCode(items: BacklogItem[]) {
   const nums = items.filter((i) => i.code.startsWith('FEAT-')).map((i) => parseInt(i.code.split('-')[1] ?? '0', 10) || 0)
   const max = nums.length ? Math.max(...nums) : 52
@@ -192,7 +208,7 @@ export function BacklogClient({ items: initial, canEdit }: BacklogClientProps) {
       {done.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground pt-2 border-t border-border">
-            Terminé ({done.length})
+            Terminé récemment ({done.length})
           </h2>
           <div className="space-y-1.5">
             {done.map((item) => (
@@ -221,6 +237,22 @@ export function BacklogClient({ items: initial, canEdit }: BacklogClientProps) {
           </div>
         </div>
       )}
+
+      <div className="space-y-3">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground pt-2 border-t border-border">
+          Historique complet — toutes les fonctionnalités livrées
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {FEATURE_RECAP.map((cat) => (
+            <div key={cat.label} className="rounded-xl border border-border bg-card p-4 space-y-1.5">
+              <p className="text-sm font-medium flex items-center gap-2">
+                <span>{cat.icon}</span> {cat.label}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{cat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
