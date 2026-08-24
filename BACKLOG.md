@@ -110,8 +110,19 @@
 | FEAT-49 | Système d'accès dynamique par rang — table `page_access_rules`, matrix admin `/admin/acces` (Sage), `AccessGate` client avec `usePathname()` — migration 049 | 2026-06-21 |
 | FEAT-50 | Chat temporaire par opération — `op_chat_messages`, Realtime Supabase, bulles messenger, accès participants confirmés + commandant + MI+, `is_op_participant()` SECURITY DEFINER — migration 050 | 2026-06-21 |
 | FEAT-51 | Rapport de bug — `/rapport-bug` (formulaire + historique perso), admin `/admin/bugs` (filtre statut, gestion note admin), notif Sages à chaque soumission — migration 051 | 2026-06-21 |
+| FEAT-53 | Accès membres existants sans compte — bouton "Regénérer le lien" sur candidatures acceptées + panneau `MemberAccessPanel` (Sage) pour générer un magic link par email | 2026-08-24 |
 | BUG-07 | Inquisiteurs bloqués sur l'écriture de débrief opération — seuil UI corrigé de MI+ (600) à Inquisiteur+ (400) dans `saveOperationDebrief` et `operation-detail.tsx` | 2026-06-21 |
 | BUG-08 | Wiki — contenu markdown affiché en texte brut — `react-markdown` v10 ESM-only plantait au SSR → chargement `dynamic` avec `ssr:false` + `remark-gfm` | 2026-06-21 |
+| BUG-09 | Rapport de bug — type field manquant, rapport étendu aux idées d'amélioration — migration 055, toggle Bug/Amélioration, badge dans l'historique et l'admin | 2026-08-24 |
+| BUG-10 | Candidatures — acceptation bloquée si statut `en_discussion` — guard `!== 'pending'` remplacé par `=== 'accepted' \|\| === 'refused'` | 2026-08-24 |
+| BUG-11 | Candidatures — email d'invitation non envoyé à l'acceptation — `type: 'magiclink'` → `type: 'invite'` dans `acceptApplication` | 2026-08-24 |
+| BUG-12 | Calendrier — heure de début absente dans les chips vue mois | 2026-08-24 |
+| BUG-13 | Calendrier — drift timezone +2h à chaque modification d'événement — `datetime-local` converti en ISO avant envoi à Supabase | 2026-08-24 |
+| BUG-14 | Calendrier — boutons inscription visibles sur mobile rendant les chips illisibles — `hidden sm:flex` sur vues mois et semaine | 2026-08-24 |
+| BUG-15 | Événements — statut d'inscription ne se rafraîchit pas sans fermer/rouvrir le dialog — update optimiste via `patchAttendance` | 2026-08-24 |
+| BUG-16 | Login — message d'erreur Supabase brut affiché pour un email inconnu — traduit en message utilisateur clair | 2026-08-24 |
+| BUG-17 | Flow magic link → `/register` — session cookie absent de la réponse de redirection du callback — `createServerClient` avec `setAll` direct sur `NextResponse.redirect` | 2026-08-24 |
+| BUG-18 | Images markdown non visibles dans les ressources — `img-src` CSP trop restrictif → `https:` *(en cours de validation client)* | — |
 
 ---
 
