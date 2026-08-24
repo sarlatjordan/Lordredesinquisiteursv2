@@ -223,6 +223,147 @@
         line-height: 1.5;
       }
 
+      /* ── Actions sur les cards ────────────────── */
+      .bl-actions {
+        display: flex;
+        gap: 2px;
+        flex-shrink: 0;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .bl-card:hover .bl-actions { opacity: 1; }
+      .act-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 5px;
+        color: #444450;
+        line-height: 1;
+        transition: color 0.12s, background 0.12s;
+      }
+      .act-btn:hover { background: #22222e; color: #9898a0; }
+      .act-btn.danger:hover { color: #f87171; }
+      .act-btn.done-btn:hover { color: #4ade80; }
+
+      /* ── Barre de gestion backlog ─────────────── */
+      .bl-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      .add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 12.5px;
+        font-weight: 500;
+        padding: 0.35rem 0.9rem;
+        border-radius: 8px;
+        border: 0.5px solid #3a3a44;
+        background: #1e1e2e;
+        color: #9898a0;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .add-btn:hover { color: #e8e6e0; border-color: #555560; }
+
+      .filter-pills {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .f-pill {
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 0.2rem 0.65rem;
+        border-radius: 99px;
+        border: 0.5px solid #2a2a32;
+        background: #18181e;
+        color: #555560;
+        cursor: pointer;
+        transition: all 0.12s;
+        font-family: inherit;
+      }
+      .f-pill:hover { color: #9898a0; }
+      .f-pill.active { background: #1e1e2e; color: #e8e6e0; border-color: #3a3a44; }
+
+      /* ── Section terminé dynamique ────────────── */
+      .done-dynamic { display: flex; flex-direction: column; gap: 0.35rem; }
+      .done-card {
+        background: #18181e;
+        border: 0.5px solid #2a2a32;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        border-left: 2px solid #14532d;
+        opacity: 0.65;
+      }
+      .done-card:hover { opacity: 0.85; }
+      .done-card .bl-name { text-decoration: line-through; color: #555560; }
+
+      /* ── Modal ─────────────────────────────────── */
+      .modal-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.65);
+        z-index: 100;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1.5rem;
+        backdrop-filter: blur(3px);
+      }
+      .modal-backdrop.hidden { display: none; }
+      .modal {
+        background: #18181e;
+        border: 0.5px solid #3a3a44;
+        border-radius: 14px;
+        padding: 1.5rem;
+        width: 100%; max-width: 480px;
+        display: flex; flex-direction: column; gap: 1rem;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      }
+      .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .modal-title { font-size: 14px; font-weight: 500; color: #d4d2cc; }
+      .modal-close {
+        background: none; border: none; cursor: pointer;
+        color: #555560; font-size: 18px; line-height: 1; padding: 2px;
+        border-radius: 4px; transition: color 0.12s;
+      }
+      .modal-close:hover { color: #9898a0; }
+      .f-field { display: flex; flex-direction: column; gap: 0.35rem; }
+      .f-label { font-size: 11.5px; color: #555560; font-weight: 500; }
+      .f-input, .f-select, .f-textarea {
+        background: #0f0f16;
+        border: 0.5px solid #2a2a32;
+        border-radius: 7px;
+        padding: 0.55rem 0.75rem;
+        color: #d4d2cc;
+        font-family: inherit; font-size: 13px;
+        outline: none; transition: border-color 0.15s;
+        width: 100%;
+      }
+      .f-input:focus, .f-select:focus, .f-textarea:focus { border-color: #3a3a44; }
+      .f-textarea { resize: vertical; min-height: 72px; }
+      .f-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem; }
+      .modal-footer { display: flex; gap: 0.5rem; justify-content: flex-end; }
+      .m-btn {
+        font-size: 12.5px; font-weight: 500;
+        padding: 0.4rem 1rem; border-radius: 7px; border: none;
+        cursor: pointer; font-family: inherit; transition: all 0.15s;
+      }
+      .m-btn-cancel { background: #1e1e2e; color: #555560; border: 0.5px solid #2a2a32; }
+      .m-btn-cancel:hover { color: #9898a0; }
+      .m-btn-save { background: #1e3a5f; color: #60a5fa; }
+      .m-btn-save:hover { background: #254d7a; }
+
       /* ── Changelog timeline ───────────────────── */
       .release {
         margin-bottom: 2.75rem;
@@ -1023,60 +1164,34 @@
 
     <!-- ══════════════ BACKLOG ══════════════ -->
     <div id="backlog" class="section">
-      <div class="pills">
-        <span class="pill pill-g">✓ 68 terminés</span>
-        <span class="pill pill-a">↑ 4 priorité haute</span>
-        <span class="pill pill-b">· 5 planifiés</span>
-      </div>
-
-      <div class="bl-section">
-        <div class="bl-label">Planifié — audit produit 19 juin</div>
-        <div class="bl-cards">
-          <div class="bl-card card-p1">
-            <div class="bl-icon">💬</div>
-            <div class="bl-body">
-              <div class="bl-name">Commentaires sur ops & événements</div>
-              <div class="bl-desc">Fil de discussion minimal par item. Supprime le retour Discord pour les échanges contextuels — friction #1 identifiée à l'audit.</div>
-            </div>
-            <div class="bl-id">FEAT-36 · P1</div>
+      <div class="bl-toolbar">
+        <div id="bl-pills" class="pills" style="margin:0"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+          <div class="filter-pills">
+            <button class="f-pill active" data-prio="all" onclick="setPrio(this)">Tous</button>
+            <button class="f-pill" data-prio="P0" onclick="setPrio(this)">🔴 P0</button>
+            <button class="f-pill" data-prio="P1" onclick="setPrio(this)">🟡 P1</button>
+            <button class="f-pill" data-prio="P2" onclick="setPrio(this)">⚪ P2</button>
           </div>
-          <div class="bl-card card-p1">
-            <div class="bl-icon">🗳️</div>
-            <div class="bl-body">
-              <div class="bl-name">Sondages / votes</div>
-              <div class="bl-desc">Question + options + deadline + rang minimum pour voter. Couvre les promotions par vote Sage et les décisions d'org actuellement gérées sur Discord.</div>
-            </div>
-            <div class="bl-id">FEAT-37 · P1</div>
-          </div>
-          <div class="bl-card card-p1">
-            <div class="bl-icon">🎮</div>
-            <div class="bl-body">
-              <div class="bl-name">Vue "cockpit" chef d'op live</div>
-              <div class="bl-desc">Page compacte pendant une op : slots confirmés, membres en jeu (in_game_since), briefing affiché. Piloter une op sans quitter INQFR.</div>
-            </div>
-            <div class="bl-id">FEAT-38 · P1</div>
-          </div>
-          <div class="bl-card card-p2">
-            <div class="bl-icon">📱</div>
-            <div class="bl-body">
-              <div class="bl-name">PWA installable + notifications granulaires</div>
-              <div class="bl-desc">Manifeste + icône pour installation bureau/mobile. Filtrage des push par type (op urgente, événement, message direct) pour éviter la désactivation en masse.</div>
-            </div>
-            <div class="bl-id">FEAT-39 · P2</div>
-          </div>
-          <div class="bl-card card-p1">
-            <div class="bl-icon">🗺️</div>
-            <div class="bl-body">
-              <div class="bl-name">Inventaire Blueprints</div>
-              <div class="bl-desc">Scanner les BP RSI (bookmarklet ou import JSON) — grille filtrable par type/tier/fabricant, marquage « en prod » pour suivre la fabrication en cours.</div>
-            </div>
-            <div class="bl-id">FEAT-52 · P1</div>
-          </div>
+          <button class="add-btn" onclick="openModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvel item
+          </button>
         </div>
       </div>
 
+      <div id="bl-planned-wrap" class="bl-section">
+        <div class="bl-label" id="bl-planned-label">Planifié</div>
+        <div class="bl-cards" id="bl-planned"></div>
+      </div>
+
+      <div id="bl-inprog-wrap" class="bl-section" style="display:none">
+        <div class="bl-label">En cours</div>
+        <div class="bl-cards" id="bl-inprog"></div>
+      </div>
+
       <div class="bl-section">
-        <div class="bl-label">Terminé — résumé</div>
+        <div class="bl-label">Terminé — résumé historique</div>
         <div class="done-grid">
           <div class="done-item">
             <div class="done-cat">🔒 Sécurité & Auth</div>
@@ -1165,7 +1280,228 @@
           </div>
         </div>
       </div>
+
+      <div id="bl-done-wrap" class="bl-section" style="display:none">
+        <div class="bl-label">Terminé — items gérés ici</div>
+        <div class="done-dynamic" id="bl-done"></div>
+      </div>
     </div>
     <!-- /backlog -->
+
+    <!-- Modal ajout/édition -->
+    <div class="modal-backdrop hidden" id="modal" onclick="handleBackdrop(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title" id="modal-title">Nouvel item</span>
+          <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+        </div>
+        <div class="f-field">
+          <label class="f-label">Titre *</label>
+          <input class="f-input" id="f-name" type="text" placeholder="Description courte">
+        </div>
+        <div class="f-row">
+          <div class="f-field">
+            <label class="f-label">ID</label>
+            <input class="f-input" id="f-id" type="text" placeholder="FEAT-XX" style="font-family:monospace">
+          </div>
+          <div class="f-field">
+            <label class="f-label">Priorité</label>
+            <select class="f-select" id="f-prio">
+              <option value="P1">P1 — Sprint</option>
+              <option value="P0">P0 — Incident</option>
+              <option value="P2">P2 — Long terme</option>
+            </select>
+          </div>
+          <div class="f-field">
+            <label class="f-label">Statut</label>
+            <select class="f-select" id="f-status">
+              <option value="planned">Planifié</option>
+              <option value="in_progress">En cours</option>
+              <option value="done">Terminé</option>
+            </select>
+          </div>
+        </div>
+        <div class="f-field">
+          <label class="f-label">Icône (emoji)</label>
+          <input class="f-input" id="f-icon" type="text" placeholder="🚀" maxlength="4" style="width:80px">
+        </div>
+        <div class="f-field">
+          <label class="f-label">Description</label>
+          <textarea class="f-textarea" id="f-desc" placeholder="Contexte, contraintes, références…"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="m-btn m-btn-cancel" onclick="closeModal()">Annuler</button>
+          <button class="m-btn m-btn-save" onclick="saveItem()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const KEY = 'inqfr-bl-v2';
+      const DEFAULTS = [
+        { id:'FEAT-36', icon:'💬', name:'Commentaires sur ops & événements', desc:'Fil de discussion minimal par item. Fil contextuel dans les pages opération et événement, avec suppression Sage.', prio:'P1', status:'done', createdAt:1753300000000 },
+        { id:'FEAT-37', icon:'🗳️', name:'Sondages / votes', desc:'Question + options + deadline + rang minimum pour voter. Couvre les promotions par vote Sage et les décisions d\'org actuellement gérées sur Discord.', prio:'P1', status:'planned', createdAt:1753300001000 },
+        { id:'FEAT-38', icon:'🎮', name:'Vue "cockpit" chef d\'op live', desc:'Page compacte pendant une op : slots confirmés, membres en jeu (in_game_since), briefing affiché. Piloter une op sans quitter INQFR.', prio:'P1', status:'planned', createdAt:1753300002000 },
+        { id:'FEAT-39', icon:'📱', name:'PWA installable + notifications granulaires', desc:'Manifeste + icône pour installation bureau/mobile. Filtrage des push par type (op urgente, événement, message direct) pour éviter la désactivation en masse.', prio:'P2', status:'planned', createdAt:1753300003000 },
+        { id:'FEAT-52', icon:'🗺️', name:'Inventaire Blueprints', desc:'Scanner les BP RSI (bookmarklet ou import JSON) — grille filtrable par type/tier/fabricant, marquage « en prod » pour suivre la fabrication en cours.', prio:'P1', status:'planned', createdAt:1753300004000 },
+        { id:'BUG-18',  icon:'🐛', name:'Images markdown non visibles dans les ressources', desc:'img-src CSP élargi à https: — en cours de validation client.', prio:'P1', status:'in_progress', createdAt:1753300005000 },
+      ];
+
+      let items = [];
+      let editId = null;
+      let prioPick = 'all';
+
+      function load() {
+        try {
+          const r = localStorage.getItem(KEY);
+          items = r ? JSON.parse(r) : JSON.parse(JSON.stringify(DEFAULTS));
+        } catch { items = JSON.parse(JSON.stringify(DEFAULTS)); }
+      }
+      function save() { localStorage.setItem(KEY, JSON.stringify(items)); }
+
+      function setPrio(btn) {
+        prioPick = btn.dataset.prio;
+        document.querySelectorAll('.f-pill').forEach(b => b.classList.toggle('active', b.dataset.prio === prioPick));
+        render();
+      }
+
+      function esc(s) {
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function cardClass(it) {
+        if (it.prio === 'P0') return 'card-p1'; // reuse amber border
+        if (it.prio === 'P2') return 'card-p2';
+        return 'card-p1';
+      }
+
+      function renderCard(it, isDone) {
+        const actCls = isDone ? 'done-card' : 'bl-card ' + cardClass(it);
+        return `<div class="${actCls}" data-id="${esc(it.id)}">
+          <div class="bl-icon">${esc(it.icon||'📌')}</div>
+          <div class="bl-body">
+            <div class="bl-name">${esc(it.name)}</div>
+            ${it.desc ? `<div class="bl-desc">${esc(it.desc)}</div>` : ''}
+          </div>
+          <div class="bl-id">${esc(it.id)} · ${esc(it.prio)}</div>
+          <div class="bl-actions">
+            ${!isDone ? `<button class="act-btn done-btn" title="Marquer terminé" onclick="markDone('${esc(it.id)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>` : `<button class="act-btn done-btn" title="Remettre en planifié" onclick="markPlanned('${esc(it.id)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>`}
+            <button class="act-btn" title="Modifier" onclick="openEdit('${esc(it.id)}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="act-btn danger" title="Supprimer" onclick="deleteItem('${esc(it.id)}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+        </div>`;
+      }
+
+      function render() {
+        const planned = items.filter(i => i.status === 'planned' && (prioPick === 'all' || i.prio === prioPick));
+        const inprog  = items.filter(i => i.status === 'in_progress' && (prioPick === 'all' || i.prio === prioPick));
+        const done    = items.filter(i => i.status === 'done');
+        const allOpen = items.filter(i => i.status !== 'done');
+        const p0      = allOpen.filter(i => i.prio === 'P0').length;
+        const p1      = allOpen.filter(i => i.prio === 'P1').length;
+
+        document.getElementById('bl-pills').innerHTML =
+          `<span class="pill pill-g">✓ ${done.length} terminés</span>` +
+          (p0 ? `<span class="pill pill-a">⚠ ${p0} P0</span>` : '') +
+          `<span class="pill pill-a">↑ ${p1} P1</span>` +
+          `<span class="pill pill-b">· ${planned.length} planifiés</span>` +
+          (inprog.length ? `<span class="pill pill-b">⏳ ${inprog.length} en cours</span>` : '');
+
+        document.getElementById('bl-planned').innerHTML = planned.map(i => renderCard(i, false)).join('') ||
+          '<div style="color:#3e3e48;font-size:12.5px;padding:0.75rem 0">Aucun item planifié.</div>';
+        document.getElementById('bl-planned-label').textContent = 'Planifié (' + items.filter(i=>i.status==='planned').length + ')';
+
+        const iw = document.getElementById('bl-inprog-wrap');
+        iw.style.display = inprog.length ? '' : 'none';
+        document.getElementById('bl-inprog').innerHTML = inprog.map(i => renderCard(i, false)).join('');
+
+        const dw = document.getElementById('bl-done-wrap');
+        dw.style.display = done.length ? '' : 'none';
+        document.getElementById('bl-done').innerHTML = done.map(i => renderCard(i, true)).join('');
+      }
+
+      function markDone(id) {
+        const it = items.find(i => i.id === id);
+        if (it) { it.status = 'done'; save(); render(); }
+      }
+      function markPlanned(id) {
+        const it = items.find(i => i.id === id);
+        if (it) { it.status = 'planned'; save(); render(); }
+      }
+      function deleteItem(id) {
+        if (!confirm('Supprimer cet item ?')) return;
+        items = items.filter(i => i.id !== id);
+        save(); render();
+      }
+
+      function nextId() {
+        const nums = items.filter(i => i.id.startsWith('FEAT-')).map(i => parseInt(i.id.split('-')[1])||0);
+        return 'FEAT-' + String((nums.length ? Math.max(...nums) : 52) + 1).padStart(2,'0');
+      }
+
+      function openModal() {
+        editId = null;
+        document.getElementById('modal-title').textContent = 'Nouvel item';
+        document.getElementById('f-name').value = '';
+        document.getElementById('f-id').value = '';
+        document.getElementById('f-prio').value = 'P1';
+        document.getElementById('f-status').value = 'planned';
+        document.getElementById('f-icon').value = '';
+        document.getElementById('f-desc').value = '';
+        document.getElementById('modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('f-name').focus(), 50);
+      }
+      function openEdit(id) {
+        const it = items.find(i => i.id === id);
+        if (!it) return;
+        editId = id;
+        document.getElementById('modal-title').textContent = 'Modifier l\'item';
+        document.getElementById('f-name').value = it.name || '';
+        document.getElementById('f-id').value = it.id || '';
+        document.getElementById('f-prio').value = it.prio || 'P1';
+        document.getElementById('f-status').value = it.status || 'planned';
+        document.getElementById('f-icon').value = it.icon || '';
+        document.getElementById('f-desc').value = it.desc || '';
+        document.getElementById('modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('f-name').focus(), 50);
+      }
+      function closeModal() { document.getElementById('modal').classList.add('hidden'); editId = null; }
+      function handleBackdrop(e) { if (e.target.id === 'modal') closeModal(); }
+
+      function saveItem() {
+        const name = document.getElementById('f-name').value.trim();
+        if (!name) { document.getElementById('f-name').focus(); return; }
+        let id     = document.getElementById('f-id').value.trim() || (editId || nextId());
+        const prio = document.getElementById('f-prio').value;
+        const status = document.getElementById('f-status').value;
+        const icon = document.getElementById('f-icon').value.trim() || '📌';
+        const desc = document.getElementById('f-desc').value.trim();
+
+        if (editId) {
+          const it = items.find(i => i.id === editId);
+          if (it) { it.name=name; it.id=id; it.prio=prio; it.status=status; it.icon=icon; it.desc=desc; }
+        } else {
+          if (items.some(i => i.id === id)) id += '_' + Date.now().toString(36);
+          items.unshift({ id, name, prio, status, icon, desc, createdAt: Date.now() });
+        }
+        save(); closeModal(); render();
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+        if ((e.ctrlKey||e.metaKey) && e.key === 'Enter' && !document.getElementById('modal').classList.contains('hidden')) saveItem();
+      });
+
+      load();
+      render();
+    </script>
   </body>
 </html>
