@@ -102,6 +102,16 @@ export default async function AdminPage() {
       bg:        'bg-red-400/5',
       available: true,
     },
+    {
+      href:      '/admin/backlog',
+      label:     'Backlog',
+      desc:      'Roadmap et tâches en cours',
+      icon:      TrendingUp,
+      color:     'text-blue-400',
+      border:    'border-blue-400/20 hover:border-blue-400/50',
+      bg:        'bg-blue-400/5',
+      available: true,
+    },
   ].filter((c) => c.available)
 
   return (
@@ -147,25 +157,6 @@ export default async function AdminPage() {
             <div>
               <p className="font-semibold text-foreground">Guide admin</p>
               <p className="text-xs text-muted-foreground mt-0.5">Documentation complète du panneau admin</p>
-            </div>
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground mt-1 shrink-0" />
-          </div>
-        </a>
-
-        {/* Backlog externe */}
-        <a
-          href="/backlog.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-xl border border-border hover:border-border/80 bg-muted/20 p-5 space-y-3 transition-colors group"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card border border-border">
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
-          </div>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-semibold text-foreground">Backlog</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Roadmap et tâches en cours</p>
             </div>
             <ExternalLink className="h-3.5 w-3.5 text-muted-foreground mt-1 shrink-0" />
           </div>

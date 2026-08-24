@@ -1254,6 +1254,45 @@ export interface Database {
         }
         Relationships: TableRelationship[]
       }
+      backlog_items: {
+        Row: {
+          id: string
+          code: string
+          icon: string
+          title: string
+          description: string
+          priority: 'P0' | 'P1' | 'P2'
+          status: 'planned' | 'in_progress' | 'done'
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          icon?: string
+          title: string
+          description?: string
+          priority: 'P0' | 'P1' | 'P2'
+          status?: 'planned' | 'in_progress' | 'done'
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          code?: string
+          icon?: string
+          title?: string
+          description?: string
+          priority?: 'P0' | 'P1' | 'P2'
+          status?: 'planned' | 'in_progress' | 'done'
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: TableRelationship[]
+      }
       war_journal: {
         Row: {
           id: string

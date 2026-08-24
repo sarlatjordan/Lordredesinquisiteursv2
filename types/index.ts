@@ -30,6 +30,7 @@ export type OpResource = Database['public']['Tables']['op_resources']['Row']
 export type BugReport = Database['public']['Tables']['bug_reports']['Row']
 export type OpChatMessage = Database['public']['Tables']['op_chat_messages']['Row']
 export type Comment = Database['public']['Tables']['comments']['Row']
+export type BacklogItem = Database['public']['Tables']['backlog_items']['Row']
 
 export type CommentWithAuthor = Comment & {
   author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
@@ -331,6 +332,17 @@ export type WarJournalWithAuthor = WarJournal & {
   author: Pick<Profile, 'username' | 'display_name' | 'avatar_url'>
   operation?: Pick<Operation, 'id' | 'title'> | null
 }
+
+// ─── Backlog produit ────────────────────────────────────────────────────────
+export const BacklogItemSchema = z.object({
+  code:        z.string().min(2, 'Code requis').max(20),
+  icon:        z.string().max(8).optional().transform((v) => v || '📌'),
+  title:       z.string().min(1, 'Titre requis').max(200),
+  description: z.string().max(2000).optional().transform((v) => v ?? ''),
+  priority:    z.enum(['P0', 'P1', 'P2']),
+  status:      z.enum(['planned', 'in_progress', 'done']).default('planned'),
+})
+export type BacklogItemInput = z.infer<typeof BacklogItemSchema>
 
 // ─── FEAT-47 : Absences ──────────────────────────────────────────────────────
 export const AbsenceCreateSchema = z.object({
