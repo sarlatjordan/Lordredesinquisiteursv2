@@ -66,6 +66,7 @@ import { MarkdownContent } from "@/components/ui/markdown-content";
 import { LootPanel } from "@/components/operations/loot-panel";
 import { Label } from "@/components/ui/label";
 import { OpChat } from "@/components/operations/op-chat";
+import { CommentsSection } from "@/components/comments/comments-section";
 
 interface OperationDetailProps {
   operation: OperationWithDetails;
@@ -601,6 +602,20 @@ export function OperationDetail({
           </div>
         </motion.section>
       )}
+      {/* Commentaires */}
+      <motion.section
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.32 }}
+        className="space-y-4"
+      >
+        <Separator />
+        <CommentsSection
+          entityType="operation"
+          entityId={op.id}
+          currentUserId={currentUserId}
+        />
+      </motion.section>
     </div>
   );
 }

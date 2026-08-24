@@ -297,6 +297,7 @@ export function EventsClient({ upcomingEvents, pastEvents, currentUserId, canCre
         event={viewedEvent}
         open={viewedEvent !== null}
         onClose={() => setViewedEvent(null)}
+        currentUserId={currentUserId}
       />
     </div>
   )

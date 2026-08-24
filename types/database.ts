@@ -14,6 +14,28 @@ type TableRelationship = {
 export interface Database {
   public: {
     Tables: {
+      comments: {
+        Row: {
+          id:          string
+          entity_type: 'operation' | 'event'
+          entity_id:   string
+          author_id:   string
+          content:     string
+          created_at:  string
+        }
+        Insert: {
+          id?:         string
+          entity_type: 'operation' | 'event'
+          entity_id:   string
+          author_id:   string
+          content:     string
+          created_at?: string
+        }
+        Update: {
+          content?: string
+        }
+        Relationships: TableRelationship[]
+      }
       bug_reports: {
         Row: {
           id:          string

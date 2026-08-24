@@ -6,15 +6,17 @@ import { Badge } from '@/components/ui/badge'
 import { formatDateTime, formatRelativeTime, buildGoogleCalendarUrl } from '@/lib/utils'
 import { EVENT_TYPES, EVENT_TYPE_COLORS, EVENT_STATUS, type EventType, type EventStatus } from '@/lib/constants'
 import { MarkdownContent } from '@/components/ui/markdown-content'
+import { CommentsSection } from '@/components/comments/comments-section'
 import type { EventWithDetails } from '@/types'
 
 interface EventViewDialogProps {
   event: EventWithDetails | null
   open: boolean
   onClose: () => void
+  currentUserId?: string
 }
 
-export function EventViewDialog({ event, open, onClose }: EventViewDialogProps) {
+export function EventViewDialog({ event, open, onClose, currentUserId }: EventViewDialogProps) {
   if (!event) return null
 
   const isPast = event.status === 'completed' || event.status === 'cancelled'
@@ -136,6 +138,16 @@ export function EventViewDialog({ event, open, onClose }: EventViewDialogProps) 
                 <CalendarPlus className="h-3.5 w-3.5" />
                 Télécharger .ics
               </a>
+            </div>
+          )}
+
+          {currentUserId && (
+            <div className="border-t border-border pt-4">
+              <CommentsSection
+                entityType="event"
+                entityId={event.id}
+                currentUserId={currentUserId}
+              />
             </div>
           )}
         </div>

@@ -29,6 +29,11 @@ export type OpRegistration = Database['public']['Tables']['op_registrations']['R
 export type OpResource = Database['public']['Tables']['op_resources']['Row']
 export type BugReport = Database['public']['Tables']['bug_reports']['Row']
 export type OpChatMessage = Database['public']['Tables']['op_chat_messages']['Row']
+export type Comment = Database['public']['Tables']['comments']['Row']
+
+export type CommentWithAuthor = Comment & {
+  author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
+}
 
 export type OpChatMessageWithProfile = OpChatMessage & {
   author: Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>

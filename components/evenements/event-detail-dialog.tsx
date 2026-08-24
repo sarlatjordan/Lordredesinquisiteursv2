@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus, ExternalLink, CheckCircle2, HelpCircle } from 'lucide-react'
+import { Loader2, Trash2, Plus, FileText, Users, Pencil, CalendarPlus, ExternalLink, CheckCircle2, HelpCircle, MessageSquare } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +19,7 @@ import {
   removeAttendeeByOrganizer,
   saveEventReport,
 } from '@/actions/events'
+import { CommentsSection } from '@/components/comments/comments-section'
 import { ROLES, ROLE_PRIVILEGES, type Role } from '@/lib/constants'
 import type { EventWithDetails, AttendeeWithProfile, Profile } from '@/types'
 import { buildGoogleCalendarUrl } from '@/lib/utils'
@@ -236,6 +237,10 @@ export function EventDetailDialog({ event, open, onClose, currentUserId, onRegis
               <FileText className="h-3.5 w-3.5" />
               Rapport
             </TabsTrigger>
+            <TabsTrigger value="comments" className="flex-1 gap-1.5">
+              <MessageSquare className="h-3.5 w-3.5" />
+              Fil
+            </TabsTrigger>
           </TabsList>
 
           {/* ─── Onglet Éditer ─── */}
@@ -380,6 +385,16 @@ export function EventDetailDialog({ event, open, onClose, currentUserId, onRegis
               </Button>
             </div>
           </TabsContent>
+          {/* ─── Onglet Fil de discussion ─── */}
+          {currentUserId && (
+            <TabsContent value="comments" className="mt-4">
+              <CommentsSection
+                entityType="event"
+                entityId={event.id}
+                currentUserId={currentUserId}
+              />
+            </TabsContent>
+          )}
         </Tabs>
       </DialogContent>
     </Dialog>
